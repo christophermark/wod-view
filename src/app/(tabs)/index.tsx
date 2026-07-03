@@ -80,11 +80,9 @@ export default function LogScreen() {
           <Text style={styles.headerMeta}>
             {stats.total} WODS · SINCE {sinceYear}
           </Text>
-          {__DEV__ && (
-            <Pressable onPress={() => router.push('/settings')} hitSlop={10}>
-              <SymbolView name="gearshape.fill" tintColor={colors.inkFaint} size={16} />
-            </Pressable>
-          )}
+          <Pressable onPress={() => router.push('/settings')} hitSlop={10}>
+            <SymbolView name="gearshape.fill" tintColor={colors.inkFaint} size={16} />
+          </Pressable>
         </View>
       </View>
 

@@ -174,6 +174,26 @@ function weekIndex(iso: string): number {
 
 /** Computes lifetime stats from a newest-first workout list. */
 export function computeStats(workouts: Workout[]): Stats {
+  // Production builds start with no data at all (pre-import), so the empty
+  // case must not crash even though screens never render it.
+  if (workouts.length === 0) {
+    return {
+      total: 0,
+      prCount: 0,
+      rxCount: 0,
+      rxRate: 0,
+      firstDate: '',
+      lastDate: '',
+      activeDays: 0,
+      years: [],
+      maxYearCount: 0,
+      liftBests: [],
+      movementCounts: MOVEMENTS.map(([name]) => ({ name, count: 0 })),
+      busiestMonth: { title: '', count: 0 },
+      longestStreakWeeks: 0,
+    };
+  }
+
   const total = workouts.length;
   const prCount = workouts.filter((w) => w.pr).length;
   const rxCount = workouts.filter((w) => w.rx).length;

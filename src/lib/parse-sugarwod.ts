@@ -79,7 +79,10 @@ export function restoreLineBreaks(text: string): string {
 
 function toIsoDate(mdy: string): string {
   const [m, d, y] = mdy.split('/');
-  return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+  // Missing/extra parts fall through as "undefined" or empty segments, which
+  // parseDate() below turns into NaN — callers check that to raise a clean
+  // per-row error instead of us throwing here.
+  return `${y}-${(m ?? '').padStart(2, '0')}-${(d ?? '').padStart(2, '0')}`;
 }
 
 const REQUIRED_COLUMNS = ['date', 'title', 'description', 'best_result_display'];
@@ -108,7 +111,16 @@ export function parseSugarwodCsv(csv: string): Workout[] {
       }
       const rawScore = parseFloat(get('best_result_raw'));
       const date = toIsoDate(get('date'));
-      if (!Number.isFinite(parseDate(date).year)) {
+      const { year, month, day } = parseDate(date);
+      const validDate =
+        Number.isFinite(year) &&
+        Number.isFinite(month) &&
+        Number.isFinite(day) &&
+        month >= 1 &&
+        month <= 12 &&
+        day >= 1 &&
+        day <= 31;
+      if (!validDate) {
         throw new Error(`Row ${i + 2}: unparseable date "${get('date')}"`);
       }
       return {

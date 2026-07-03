@@ -70,6 +70,17 @@ describe('buildWorkoutsByDate', () => {
 });
 
 describe('computeStats', () => {
+  it('returns zeroed stats for an empty list (pre-import production state)', () => {
+    const stats = computeStats([]);
+    expect(stats.total).toBe(0);
+    expect(stats.rxRate).toBe(0);
+    expect(stats.years).toEqual([]);
+    expect(stats.maxYearCount).toBe(0);
+    expect(stats.liftBests).toEqual([]);
+    expect(stats.longestStreakWeeks).toBe(0);
+    expect(stats.movementCounts.every((m) => m.count === 0)).toBe(true);
+  });
+
   // Newest-first, like real data
   const list = [
     workout({ date: '2025-01-20', rx: true }),

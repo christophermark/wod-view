@@ -102,4 +102,23 @@ describe('parseSugarwodCsv', () => {
     expect(() => parseSugarwodCsv('foo,bar\n1,2\n')).toThrow(/missing columns/);
     expect(() => parseSugarwodCsv('')).toThrow();
   });
+
+  it('rejects binary/garbage content masquerading as a CSV', () => {
+    const binaryish = '\x00\x01PNG\r\n\x1a\n,,,\x02\x03\x04\n'.repeat(5);
+    expect(() => parseSugarwodCsv(binaryish)).toThrow(/missing columns/);
+  });
+
+  it('raises a clean per-row error for an unparseable date instead of crashing', () => {
+    const missingDate = [HEADER, ',"X","desc",1,"1","Reps","","[]","",RX,'].join('\n');
+    expect(() => parseSugarwodCsv(missingDate)).toThrow(/Row 2: unparseable date/);
+
+    const wrongFormat = [
+      HEADER,
+      '2021-09-28,"X","desc",1,"1","Reps","","[]","",RX,',
+    ].join('\n');
+    expect(() => parseSugarwodCsv(wrongFormat)).toThrow(/Row 2: unparseable date/);
+
+    const outOfRange = [HEADER, '13/40/2021,"X","desc",1,"1","Reps","","[]","",RX,'].join('\n');
+    expect(() => parseSugarwodCsv(outOfRange)).toThrow(/Row 2: unparseable date/);
+  });
 });

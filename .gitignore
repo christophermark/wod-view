@@ -45,3 +45,5 @@ example
 # personal workout data (SugarWOD export + generated JSON)
 /data/workouts.csv
 /src/data/workouts.json
+# generated from the committed sample CSV on postinstall
+/src/data/preview-workouts.json
