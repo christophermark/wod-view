@@ -82,6 +82,16 @@ export function groupByMonth(list: Workout[]): MonthSection[] {
   return sections;
 }
 
+/** Sessions per calendar month (index 0 = January) for one year. */
+export function sessionsByMonth(list: Workout[], year: number): number[] {
+  const counts = new Array<number>(12).fill(0);
+  for (const w of list) {
+    const { year: y, month } = parseDate(w.date);
+    if (y === year) counts[month - 1]++;
+  }
+  return counts;
+}
+
 /** date (yyyy-mm-dd) → workouts on that day */
 export function buildWorkoutsByDate(list: Workout[]) {
   const map = new Map<string, Workout[]>();
@@ -150,7 +160,8 @@ export interface Stats {
   years: YearCount[];
   maxYearCount: number;
   liftBests: LiftBest[];
-  topMovements: MovementCount[];
+  /** Every detectable movement with its appearance count, most frequent first. */
+  movementCounts: MovementCount[];
   busiestMonth: { title: string; count: number };
   longestStreakWeeks: number; // consecutive calendar weeks with ≥1 workout
 }
@@ -201,13 +212,11 @@ export function computeStats(workouts: Workout[]): Stats {
   }
   const liftBests = [...liftMap.values()].sort((a, b) => b.best - a.best);
 
-  const topMovements = MOVEMENTS.map(([name, pattern]) => ({
+  // Zero-count movements stay in — "never programmed" is a stat too.
+  const movementCounts = MOVEMENTS.map(([name, pattern]) => ({
     name,
     count: workouts.filter((w) => pattern.test(w.description)).length,
-  }))
-    .filter((m) => m.count > 0)
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 10);
+  })).sort((a, b) => b.count - a.count);
 
   const monthMap = new Map<string, number>();
   for (const w of workouts) {
@@ -246,7 +255,7 @@ export function computeStats(workouts: Workout[]): Stats {
     years,
     maxYearCount,
     liftBests,
-    topMovements,
+    movementCounts,
     busiestMonth,
     longestStreakWeeks,
   };

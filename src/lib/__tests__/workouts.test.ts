@@ -4,6 +4,7 @@ import {
   formatDate,
   groupByMonth,
   scoreLabel,
+  sessionsByMonth,
   Workout,
 } from '../workouts';
 
@@ -137,6 +138,34 @@ describe('computeStats', () => {
   });
 
   it('counts movement mentions in descriptions', () => {
-    expect(stats.topMovements).toContainEqual({ name: 'Wall Balls', count: 1 });
+    expect(stats.movementCounts).toContainEqual({ name: 'Wall Balls', count: 1 });
+  });
+
+  it('keeps never-programmed movements with a zero count', () => {
+    const zero = stats.movementCounts.find((m) => m.name === 'Muscle-Ups');
+    expect(zero).toEqual({ name: 'Muscle-Ups', count: 0 });
+  });
+
+  it('sorts movement counts most-frequent first', () => {
+    const counts = stats.movementCounts.map((m) => m.count);
+    expect(counts).toEqual([...counts].sort((a, b) => b - a));
+  });
+});
+
+describe('sessionsByMonth', () => {
+  it('counts workouts per calendar month for one year only', () => {
+    const counts = sessionsByMonth(
+      [
+        workout({ date: '2025-01-06' }),
+        workout({ date: '2025-01-20' }),
+        workout({ date: '2025-03-05' }),
+        workout({ date: '2024-03-05' }), // other year, ignored
+      ],
+      2025,
+    );
+    expect(counts).toHaveLength(12);
+    expect(counts[0]).toBe(2); // January
+    expect(counts[2]).toBe(1); // March
+    expect(counts.reduce((a, b) => a + b, 0)).toBe(3);
   });
 });

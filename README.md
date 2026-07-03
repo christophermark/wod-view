@@ -6,7 +6,7 @@ A clean, athletic archive viewer for exported [SugarWOD](https://www.sugarwod.co
 
 - **Log** — chronological feed of every workout, grouped by month, with free-text search (titles, descriptions, notes) and quick filters (PRs, Rx, Scaled, For Time, Reps, Load).
 - **Calendar** — month grid of training days; gold days are PR days. Tap a day to see what you did.
-- **Stats** — lifetime stat tiles, sessions-per-year chart, barbell lift bests, most-programmed movements, and log milestones.
+- **Stats** — lifetime stat tiles, WODs-per-year chart (or per-month when a year is selected via the year filter), barbell lift bests, most/least-programmed movements, and log milestones.
 - **Workout detail** — full whiteboard description, your score (with PR treatment), and athlete notes.
 
 ## Data

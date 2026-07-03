@@ -1,9 +1,12 @@
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useMemo, useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useWorkouts } from '@/lib/data-context';
-import { formatDate, parseDate } from '@/lib/workouts';
+import { computeStats, formatDate, monthName, parseDate, sessionsByMonth } from '@/lib/workouts';
 import { colors, fonts, radii, spacing } from '@/theme';
+
+const MONTH_INITIALS = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
 
 function StatTile({ value, label, accent }: { value: string; label: string; accent?: boolean }) {
   return (
@@ -20,9 +23,49 @@ function SectionLabel({ children }: { children: string }) {
 
 export default function StatsScreen() {
   const insets = useSafeAreaInsets();
-  const { stats } = useWorkouts();
-  const currentYear = new Date().getFullYear();
-  const maxMovement = stats.topMovements[0]?.count ?? 1;
+  const { workouts, stats: lifetimeStats } = useWorkouts();
+  const [now] = useState(() => new Date());
+  const currentYear = now.getFullYear();
+
+  const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  const [movementMode, setMovementMode] = useState<'most' | 'least'>('most');
+
+  // The selected year can disappear when the data source changes.
+  const year =
+    selectedYear != null && lifetimeStats.years.some((y) => y.year === selectedYear)
+      ? selectedYear
+      : null;
+
+  const stats = useMemo(
+    () =>
+      year == null
+        ? lifetimeStats
+        : computeStats(workouts.filter((w) => parseDate(w.date).year === year)),
+    [workouts, lifetimeStats, year],
+  );
+
+  const monthCounts = useMemo(
+    () => (year == null ? null : sessionsByMonth(workouts, year)),
+    [workouts, year],
+  );
+  const maxMonthCount = monthCounts ? Math.max(...monthCounts, 1) : 1;
+
+  const movements = useMemo(() => {
+    const counts = stats.movementCounts;
+    return movementMode === 'most'
+      ? counts.filter((m) => m.count > 0).slice(0, 10)
+      : [...counts].sort((a, b) => a.count - b.count).slice(0, 10);
+  }, [stats, movementMode]);
+  const maxMovement = Math.max(...movements.map((m) => m.count), 1);
+
+  const weeksElapsed =
+    year === currentYear
+      ? Math.max(
+          1,
+          (now.getTime() - new Date(currentYear, 0, 1).getTime()) / (7 * 24 * 3600 * 1000),
+        )
+      : 52;
+  const wodsPerWeek = year == null ? null : (stats.total / weeksElapsed).toFixed(1);
 
   return (
     <ScrollView
@@ -33,35 +76,86 @@ export default function StatsScreen() {
       }}>
       <View style={styles.header}>
         <Text style={styles.heading}>STATS</Text>
-        <Text style={styles.headerMeta}>LIFETIME</Text>
+        <Text style={styles.headerMeta}>{year == null ? 'LIFETIME' : String(year)}</Text>
+      </View>
+
+      <View>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.chipsRow}>
+          <YearChip label="ALL" active={year == null} onPress={() => setSelectedYear(null)} />
+          {[...lifetimeStats.years].reverse().map((y) => (
+            <YearChip
+              key={y.year}
+              label={`’${String(y.year).slice(2)}`}
+              active={year === y.year}
+              onPress={() => setSelectedYear(y.year)}
+            />
+          ))}
+        </ScrollView>
       </View>
 
       <View style={styles.tileGrid}>
-        <StatTile value={String(stats.total)} label="TOTAL SESSIONS" />
+        <StatTile value={String(stats.total)} label="TOTAL WODS" />
         <StatTile value={String(stats.prCount)} label="PERSONAL RECORDS" accent />
         <StatTile value={`${Math.round(stats.rxRate * 100)}%`} label="RX RATE" />
         <StatTile value={`${stats.longestStreakWeeks}`} label="BEST WEEKLY STREAK" />
       </View>
 
-      <SectionLabel>SESSIONS BY YEAR</SectionLabel>
-      <View style={styles.card}>
-        <View style={styles.yearChart}>
-          {stats.years.map((y) => {
-            const h = Math.max(6, (y.count / stats.maxYearCount) * 120);
-            const inProgress = y.year === currentYear;
-            return (
-              <View key={y.year} style={styles.yearCol}>
-                <Text style={styles.yearCount}>{y.count}</Text>
-                <View
-                  style={[styles.yearBar, { height: h }, inProgress && styles.yearBarInProgress]}
-                />
-                <Text style={styles.yearLabel}>{String(y.year).slice(2)}</Text>
-              </View>
-            );
-          })}
-        </View>
-        <Text style={styles.footnote}>’{String(currentYear).slice(2)} in progress</Text>
-      </View>
+      {year == null ? (
+        <>
+          <SectionLabel>WODS BY YEAR</SectionLabel>
+          <View style={styles.card}>
+            <View style={styles.barChart}>
+              {stats.years.map((y) => {
+                const h = Math.max(6, (y.count / stats.maxYearCount) * 120);
+                const inProgress = y.year === currentYear;
+                return (
+                  <View key={y.year} style={styles.barCol}>
+                    <Text style={styles.barCount}>{y.count}</Text>
+                    <View
+                      style={[styles.yearBar, { height: h }, inProgress && styles.barInProgress]}
+                    />
+                    <Text style={styles.barLabel}>{String(y.year).slice(2)}</Text>
+                  </View>
+                );
+              })}
+            </View>
+            <Text style={styles.footnote}>’{String(currentYear).slice(2)} in progress</Text>
+          </View>
+        </>
+      ) : (
+        <>
+          <SectionLabel>WODS BY MONTH</SectionLabel>
+          <View style={styles.card}>
+            <View style={styles.barChart}>
+              {monthCounts!.map((count, i) => {
+                const isCurrentMonth = year === currentYear && i === now.getMonth();
+                return (
+                  <View key={i} style={styles.barCol}>
+                    <Text style={styles.barCount}>{count > 0 ? count : ''}</Text>
+                    <View
+                      style={[
+                        styles.monthBar,
+                        { height: Math.max(3, (count / maxMonthCount) * 120) },
+                        count === 0 && styles.barEmpty,
+                        isCurrentMonth && styles.barInProgress,
+                      ]}
+                    />
+                    <Text style={styles.barLabel}>{MONTH_INITIALS[i]}</Text>
+                  </View>
+                );
+              })}
+            </View>
+            {year === currentYear && (
+              <Text style={styles.footnote}>
+                through {monthName(now.getMonth() + 1)} {now.getDate()}
+              </Text>
+            )}
+          </View>
+        </>
+      )}
 
       {stats.liftBests.length > 0 && (
         <>
@@ -83,9 +177,25 @@ export default function StatsScreen() {
         </>
       )}
 
-      <SectionLabel>MOST PROGRAMMED</SectionLabel>
+      <View style={styles.sectionRow}>
+        <SectionLabel>
+          {movementMode === 'most' ? 'MOST PROGRAMMED' : 'LEAST PROGRAMMED'}
+        </SectionLabel>
+        <View style={styles.segment}>
+          {(['most', 'least'] as const).map((mode) => (
+            <Pressable
+              key={mode}
+              onPress={() => setMovementMode(mode)}
+              style={[styles.segmentBtn, movementMode === mode && styles.segmentBtnActive]}>
+              <Text style={[styles.segmentText, movementMode === mode && styles.segmentTextActive]}>
+                {mode.toUpperCase()}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+      </View>
       <View style={styles.card}>
-        {stats.topMovements.map((m, i) => (
+        {movements.map((m, i) => (
           <View key={m.name} style={[styles.movementRow, i > 0 && { marginTop: spacing.md }]}>
             <Text style={styles.movementName}>{m.name.toUpperCase()}</Text>
             <View style={styles.movementBarTrack}>
@@ -94,26 +204,50 @@ export default function StatsScreen() {
             <Text style={styles.movementCount}>{m.count}</Text>
           </View>
         ))}
-        <Text style={styles.footnote}>times appearing in a workout description</Text>
+        <Text style={styles.footnote}>
+          {movementMode === 'most'
+            ? 'times appearing in a workout description'
+            : 'rarest of the movements the app can detect'}
+        </Text>
       </View>
 
       <SectionLabel>THE LOG</SectionLabel>
       <View style={styles.card}>
-        <FactRow label="FIRST SESSION" value={formatDate(stats.firstDate)} />
-        <FactRow label="LATEST SESSION" value={formatDate(stats.lastDate)} divider />
+        <FactRow label="FIRST WOD" value={formatDate(stats.firstDate)} />
+        <FactRow label="LATEST WOD" value={formatDate(stats.lastDate)} divider />
         <FactRow label="DAYS TRAINED" value={`${stats.activeDays}`} divider />
         <FactRow
           label="BUSIEST MONTH"
-          value={`${stats.busiestMonth.title} · ${stats.busiestMonth.count} sessions`}
+          value={`${stats.busiestMonth.title} · ${stats.busiestMonth.count} WODs`}
           divider
         />
-        <FactRow
-          label="YEARS ON THE LOG"
-          value={`${parseDate(stats.lastDate).year - parseDate(stats.firstDate).year + 1}`}
-          divider
-        />
+        {year == null ? (
+          <FactRow
+            label="YEARS ON THE LOG"
+            value={`${parseDate(stats.lastDate).year - parseDate(stats.firstDate).year + 1}`}
+            divider
+          />
+        ) : (
+          <FactRow label="AVG WODS / WEEK" value={wodsPerWeek ?? '—'} divider />
+        )}
       </View>
     </ScrollView>
+  );
+}
+
+function YearChip({
+  label,
+  active,
+  onPress,
+}: {
+  label: string;
+  active: boolean;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable onPress={onPress} style={[styles.yearChip, active && styles.yearChipActive]}>
+      <Text style={[styles.yearChipText, active && styles.yearChipTextActive]}>{label}</Text>
+    </Pressable>
   );
 }
 
@@ -149,6 +283,32 @@ const styles = StyleSheet.create({
     fontSize: 11,
     letterSpacing: 0.5,
     color: colors.inkFaint,
+  },
+  chipsRow: {
+    paddingHorizontal: spacing.lg,
+    gap: spacing.sm,
+    paddingBottom: spacing.md,
+  },
+  yearChip: {
+    borderRadius: radii.pill,
+    borderWidth: 1,
+    borderColor: colors.hairline,
+    backgroundColor: colors.card,
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+  },
+  yearChipActive: {
+    backgroundColor: colors.ink,
+    borderColor: colors.ink,
+  },
+  yearChipText: {
+    fontFamily: fonts.bodyBold,
+    fontSize: 12,
+    letterSpacing: 0.8,
+    color: colors.inkSoft,
+  },
+  yearChipTextActive: {
+    color: colors.paper,
   },
   tileGrid: {
     flexDirection: 'row',
@@ -187,6 +347,37 @@ const styles = StyleSheet.create({
     marginTop: spacing.xl,
     marginBottom: spacing.sm,
   },
+  sectionRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    paddingRight: spacing.lg,
+  },
+  segment: {
+    flexDirection: 'row',
+    borderRadius: radii.sm,
+    borderWidth: 1,
+    borderColor: colors.hairline,
+    backgroundColor: colors.card,
+    overflow: 'hidden',
+    marginBottom: spacing.sm,
+  },
+  segmentBtn: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  segmentBtnActive: {
+    backgroundColor: colors.ink,
+  },
+  segmentText: {
+    fontFamily: fonts.bodyBold,
+    fontSize: 10,
+    letterSpacing: 0.8,
+    color: colors.inkSoft,
+  },
+  segmentTextActive: {
+    color: colors.paper,
+  },
   card: {
     backgroundColor: colors.card,
     borderRadius: radii.lg,
@@ -195,19 +386,19 @@ const styles = StyleSheet.create({
     marginHorizontal: spacing.lg,
     padding: spacing.lg,
   },
-  yearChart: {
+  barChart: {
     flexDirection: 'row',
     alignItems: 'flex-end',
     justifyContent: 'space-between',
-    gap: spacing.sm,
+    gap: 4,
   },
-  yearCol: {
+  barCol: {
     flex: 1,
     alignItems: 'center',
   },
-  yearCount: {
+  barCount: {
     fontFamily: fonts.monoBold,
-    fontSize: 12,
+    fontSize: 10,
     color: colors.ink,
     marginBottom: 4,
   },
@@ -218,12 +409,22 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 4,
     borderTopRightRadius: 4,
   },
-  yearBarInProgress: {
+  monthBar: {
+    alignSelf: 'stretch',
+    marginHorizontal: 2,
+    backgroundColor: colors.ink,
+    borderTopLeftRadius: 3,
+    borderTopRightRadius: 3,
+  },
+  barEmpty: {
+    backgroundColor: colors.hairline,
+  },
+  barInProgress: {
     backgroundColor: colors.accent,
   },
-  yearLabel: {
+  barLabel: {
     fontFamily: fonts.mono,
-    fontSize: 11,
+    fontSize: 10,
     color: colors.inkFaint,
     marginTop: 6,
   },

@@ -78,7 +78,7 @@ export default function LogScreen() {
         <Text style={styles.wordmark}>WOD VIEW</Text>
         <View style={styles.headerRight}>
           <Text style={styles.headerMeta}>
-            {stats.total} SESSIONS · SINCE {sinceYear}
+            {stats.total} WODS · SINCE {sinceYear}
           </Text>
           {__DEV__ && (
             <Pressable onPress={() => router.push('/settings')} hitSlop={10}>
