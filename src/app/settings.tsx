@@ -1,10 +1,21 @@
 import { useRouter } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useWorkouts } from '@/lib/data-context';
 import { colors, fonts, radii, spacing } from '@/theme';
+
+const SUGARWOD_EXPORT_HELP_URL =
+  'https://help.sugarwod.com/hc/en-us/articles/115003724008-How-can-I-export-my-workout-data-from-SugarWOD-';
+
+const EXPORT_STEPS = [
+  'In the SugarWOD app, open the “More” tab and choose to export your workout data.',
+  'SugarWOD emails a workouts.csv attachment to your account email.',
+  'Open that email on this phone and save the attachment to the Files app.',
+  'Tap “Import SugarWOD Export…” above and pick the file.',
+];
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -26,7 +37,10 @@ export default function SettingsScreen() {
   return (
     <View style={styles.screen}>
       <View style={[styles.topBar, { paddingTop: insets.top + spacing.sm }]}>
-        <Pressable onPress={() => router.back()} hitSlop={12} style={styles.backBtn}>
+        <Pressable
+          onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}
+          hitSlop={12}
+          style={styles.backBtn}>
           <Text style={styles.backArrow}>‹</Text>
           <Text style={styles.backLabel}>BACK</Text>
         </Pressable>
@@ -45,7 +59,7 @@ export default function SettingsScreen() {
             onPress={useBundled}
           />
           <SourceRow
-            label="IMPORTED CSV"
+            label="SUGARWOD EXPORT"
             sub={
               importedCount != null ? `${importedCount} workouts on device` : 'Nothing imported yet'
             }
@@ -59,7 +73,7 @@ export default function SettingsScreen() {
         <Pressable
           onPress={handleImport}
           style={({ pressed }) => [styles.importBtn, pressed && { opacity: 0.85 }]}>
-          <Text style={styles.importBtnText}>IMPORT SUGARWOD CSV…</Text>
+          <Text style={styles.importBtnText}>IMPORT SUGARWOD EXPORT…</Text>
         </Pressable>
 
         {message && (
@@ -67,6 +81,24 @@ export default function SettingsScreen() {
             {message.text}
           </Text>
         )}
+
+        <Text style={[styles.sectionLabel, { marginTop: spacing.xxl }]}>
+          HOW TO EXPORT FROM SUGARWOD
+        </Text>
+        <View style={styles.card}>
+          {EXPORT_STEPS.map((step, i) => (
+            <View key={i} style={[styles.stepRow, i > 0 && { marginTop: spacing.lg }]}>
+              <Text style={styles.stepNumber}>{i + 1}</Text>
+              <Text style={styles.stepText}>{step}</Text>
+            </View>
+          ))}
+          <Pressable
+            onPress={() => WebBrowser.openBrowserAsync(SUGARWOD_EXPORT_HELP_URL)}
+            hitSlop={8}
+            style={styles.helpLink}>
+            <Text style={styles.helpLinkText}>VIEW SUGARWOD HELP DOC ›</Text>
+          </Pressable>
+        </View>
 
         <Text style={styles.footnote}>
           Currently viewing {stats.total} workouts from the{' '}
@@ -150,7 +182,7 @@ const styles = StyleSheet.create({
     fontSize: 30,
     color: colors.ink,
     paddingHorizontal: spacing.lg,
-    marginTop: spacing.sm,
+    marginTop: spacing.md,
   },
   sectionLabel: {
     fontFamily: fonts.display,
@@ -216,7 +248,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.ink,
     borderRadius: radii.md,
     marginHorizontal: spacing.lg,
-    marginTop: spacing.lg,
+    marginTop: spacing.xl,
     paddingVertical: 14,
     alignItems: 'center',
   },
@@ -232,6 +264,36 @@ const styles = StyleSheet.create({
     color: colors.ink,
     paddingHorizontal: spacing.lg + spacing.xs,
     marginTop: spacing.md,
+  },
+  stepRow: {
+    flexDirection: 'row',
+    gap: spacing.md,
+  },
+  stepNumber: {
+    fontFamily: fonts.monoBold,
+    fontSize: 13,
+    color: colors.accent,
+    width: 14,
+    textAlign: 'center',
+  },
+  stepText: {
+    flex: 1,
+    fontFamily: fonts.body,
+    fontSize: 14,
+    lineHeight: 21,
+    color: colors.inkSoft,
+  },
+  helpLink: {
+    marginTop: spacing.lg,
+    paddingTop: spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: colors.hairline,
+  },
+  helpLinkText: {
+    fontFamily: fonts.display,
+    fontSize: 14,
+    letterSpacing: 1,
+    color: colors.accent,
   },
   footnote: {
     fontFamily: fonts.body,
