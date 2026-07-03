@@ -11,6 +11,9 @@ before writing Expo-specific code — APIs have changed.
   `src/data/preview-workouts.json`. Runs automatically on postinstall.
 - `npx tsx scripts/generate-sample-workouts.ts` — regenerate the synthetic sample CSV
   (deterministic; seeded PRNG, fixed date range ending 2026-07-01).
+- `npx tsx scripts/generate-brand-assets.ts` — regenerate every icon/logo PNG in
+  `assets/images/` from the Barlow Condensed "W" mark (single SVG source; edit the script,
+  never the PNGs).
 - `npm test` / `npm run typecheck` / `npx eslint .` / `npm run format`
 - `npx expo start --ios` — run in the iOS simulator (Expo Go).
 - CI (`.github/workflows/ci.yml`) runs tsc, eslint (0 warnings), prettier --check, jest.

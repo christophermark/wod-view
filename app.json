@@ -8,12 +8,16 @@
     "scheme": "wodview",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon",
+      "icon": {
+        "light": "./assets/images/icon.png",
+        "dark": "./assets/images/ios-icon-dark.png",
+        "tinted": "./assets/images/ios-icon-tinted.png"
+      },
       "bundleIdentifier": "com.christophermark.wodview"
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#F6F4EE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
@@ -32,7 +36,7 @@
         {
           "backgroundColor": "#F6F4EE",
           "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76
+          "imageWidth": 96
         }
       ]
     ],

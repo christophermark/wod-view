@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useWorkouts } from '@/lib/data-context';
@@ -41,6 +41,11 @@ function HeroStep({ onContinue }: { onContinue: () => void }) {
           styles.heroContent,
           { paddingTop: insets.top + spacing.xxl, paddingBottom: insets.bottom + spacing.xl },
         ]}>
+        <Image
+          source={require('../../assets/images/logo-mark.png')}
+          style={styles.logoMark}
+          accessibilityLabel="WOD View"
+        />
         <Text style={styles.eyebrow}>PERSONAL WOD ARCHIVE</Text>
         <Text style={styles.heroTitle}>
           EVERY REP.{'\n'}EVERY PR.{'\n'}
@@ -160,6 +165,9 @@ const styles = StyleSheet.create({
   importContent: {
     flexGrow: 1,
     paddingHorizontal: spacing.lg,
+  },
+  logoMark: {
+    marginBottom: spacing.xl,
   },
   eyebrow: {
     fontFamily: fonts.monoBold,
