@@ -5,17 +5,8 @@ import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-nati
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useWorkouts } from '@/lib/data-context';
+import { SUGARWOD_EXPORT_HELP_URL, SUGARWOD_EXPORT_STEPS } from '@/lib/sugarwod-export';
 import { colors, fonts, radii, spacing } from '@/theme';
-
-const SUGARWOD_EXPORT_HELP_URL =
-  'https://help.sugarwod.com/hc/en-us/articles/115003724008-How-can-I-export-my-workout-data-from-SugarWOD';
-
-const EXPORT_STEPS = [
-  'In the SugarWOD app, open the “More” tab and choose to export your workout data.',
-  'SugarWOD emails a workouts.csv attachment to your account email.',
-  'Open that email on this phone and save the attachment to the Files app.',
-  'Tap “Import SugarWOD Export…” above and pick the file.',
-];
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -125,7 +116,7 @@ export default function SettingsScreen() {
           HOW TO EXPORT FROM SUGARWOD
         </Text>
         <View style={[styles.card, styles.stepsCard]}>
-          {EXPORT_STEPS.map((step, i) => (
+          {SUGARWOD_EXPORT_STEPS.map((step, i) => (
             <View key={i} style={[styles.stepRow, i > 0 && { marginTop: spacing.lg }]}>
               <Text style={styles.stepNumber}>{i + 1}</Text>
               <Text style={styles.stepText}>{step}</Text>
@@ -145,8 +136,8 @@ export default function SettingsScreen() {
             <View style={[styles.card, styles.stepsCard]}>
               <Text style={styles.dataBody}>
                 Your workouts live only on this device — nothing is ever uploaded, and nothing is
-                deleted from SugarWOD. Want a clean slate? Clear what’s here and re-import
-                whenever you’re ready.
+                deleted from SugarWOD. Want a clean slate? Clear what’s here and re-import whenever
+                you’re ready.
               </Text>
               <Pressable
                 onPress={handleReset}

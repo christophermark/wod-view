@@ -112,10 +112,7 @@ describe('parseSugarwodCsv', () => {
     const missingDate = [HEADER, ',"X","desc",1,"1","Reps","","[]","",RX,'].join('\n');
     expect(() => parseSugarwodCsv(missingDate)).toThrow(/Row 2: unparseable date/);
 
-    const wrongFormat = [
-      HEADER,
-      '2021-09-28,"X","desc",1,"1","Reps","","[]","",RX,',
-    ].join('\n');
+    const wrongFormat = [HEADER, '2021-09-28,"X","desc",1,"1","Reps","","[]","",RX,'].join('\n');
     expect(() => parseSugarwodCsv(wrongFormat)).toThrow(/Row 2: unparseable date/);
 
     const outOfRange = [HEADER, '13/40/2021,"X","desc",1,"1","Reps","","[]","",RX,'].join('\n');

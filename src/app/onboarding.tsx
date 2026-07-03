@@ -5,17 +5,8 @@ import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-nati
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useWorkouts } from '@/lib/data-context';
+import { SUGARWOD_EXPORT_HELP_URL, SUGARWOD_EXPORT_STEPS } from '@/lib/sugarwod-export';
 import { colors, fonts, radii, spacing } from '@/theme';
-
-const SUGARWOD_EXPORT_HELP_URL =
-  'https://help.sugarwod.com/hc/en-us/articles/115003724008-How-can-I-export-my-workout-data-from-SugarWOD-';
-
-const EXPORT_STEPS = [
-  'In the SugarWOD app, open the “More” tab and choose to export your workout data.',
-  'SugarWOD emails a workouts.csv attachment to your account email.',
-  'Open that email on this phone and save the attachment to the Files app.',
-  'Come back here, tap “Import SugarWOD Export…”, and pick the file.',
-];
 
 const VALUE_PROPS: [title: string, sub: string][] = [
   ['THE LOG', 'Every workout you ever wrote down, restored line by line.'],
@@ -120,7 +111,7 @@ function ImportStep({ onBack }: { onBack: () => void }) {
         </Text>
 
         <View style={styles.card}>
-          {EXPORT_STEPS.map((stepText, i) => (
+          {SUGARWOD_EXPORT_STEPS.map((stepText, i) => (
             <View key={i} style={[styles.stepRow, i > 0 && { marginTop: spacing.lg }]}>
               <Text style={styles.stepNumber}>{i + 1}</Text>
               <Text style={styles.stepText}>{stepText}</Text>
@@ -141,13 +132,17 @@ function ImportStep({ onBack }: { onBack: () => void }) {
         </Pressable>
         {error && <Text style={styles.error}>{error}</Text>}
 
-        <Pressable onPress={handlePreview} hitSlop={8} style={styles.previewLink}>
-          <Text style={styles.previewLinkTitle}>NO EXPORT HANDY? TRY PREVIEW MODE ›</Text>
-          <Text style={styles.previewLinkSub}>
-            Explore the app with three years of sample data. Your real import is one tap away
-            whenever you’re ready.
+        <View style={styles.previewCard}>
+          <Text style={styles.previewCardSub}>
+            No export handy? Explore the app with three years of sample data. Your real import is
+            one tap away whenever you’re ready.
           </Text>
-        </Pressable>
+          <Pressable
+            onPress={handlePreview}
+            style={({ pressed }) => [styles.secondaryBtn, pressed && { opacity: 0.7 }]}>
+            <Text style={styles.secondaryBtnText}>TRY PREVIEW MODE ›</Text>
+          </Pressable>
+        </View>
       </ScrollView>
     </View>
   );
@@ -305,7 +300,7 @@ const styles = StyleSheet.create({
     color: colors.accent,
     marginTop: spacing.md,
   },
-  previewLink: {
+  previewCard: {
     marginTop: spacing.xxl,
     borderRadius: radii.lg,
     borderWidth: 1,
@@ -313,17 +308,24 @@ const styles = StyleSheet.create({
     backgroundColor: colors.accentSoft,
     padding: spacing.lg,
   },
-  previewLinkTitle: {
-    fontFamily: fonts.display,
-    fontSize: 16,
-    letterSpacing: 0.8,
-    color: colors.accent,
-  },
-  previewLinkSub: {
+  previewCardSub: {
     fontFamily: fonts.body,
     fontSize: 13,
     lineHeight: 19,
     color: colors.inkSoft,
-    marginTop: spacing.xs,
+  },
+  secondaryBtn: {
+    borderRadius: radii.md,
+    borderWidth: 1.5,
+    borderColor: colors.accent,
+    marginTop: spacing.md,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  secondaryBtnText: {
+    fontFamily: fonts.display,
+    fontSize: 16,
+    letterSpacing: 1.2,
+    color: colors.accent,
   },
 });
