@@ -29,7 +29,12 @@ descriptions and notes on export, using formatting heuristics.
 ## Development
 
 ```sh
-npm install
-npm run convert   # requires data/workouts.csv
+npm install          # postinstall converts your CSV (or the committed sample) automatically
 npx expo start --ios
 ```
+
+Useful commands: `npm test`, `npm run typecheck`, `npx eslint .`, `npm run format`.
+CI runs all four on every push.
+
+In dev builds, a gear icon on the Log screen opens a debug settings screen where you can
+import a SugarWOD CSV in-app and switch between the bundled and imported datasets.

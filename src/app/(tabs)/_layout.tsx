@@ -34,9 +34,7 @@ export default function TabLayout() {
         name="calendar"
         options={{
           title: 'CALENDAR',
-          tabBarIcon: ({ color }) => (
-            <SymbolView name="calendar" tintColor={color} size={24} />
-          ),
+          tabBarIcon: ({ color }) => <SymbolView name="calendar" tintColor={color} size={24} />,
         }}
       />
       <Tabs.Screen

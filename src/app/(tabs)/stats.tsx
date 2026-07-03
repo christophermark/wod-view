@@ -1,7 +1,8 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { formatDate, parseDate, monthName, stats } from '@/lib/workouts';
+import { useWorkouts } from '@/lib/data-context';
+import { formatDate, parseDate } from '@/lib/workouts';
 import { colors, fonts, radii, spacing } from '@/theme';
 
 function StatTile({ value, label, accent }: { value: string; label: string; accent?: boolean }) {
@@ -19,6 +20,7 @@ function SectionLabel({ children }: { children: string }) {
 
 export default function StatsScreen() {
   const insets = useSafeAreaInsets();
+  const { stats } = useWorkouts();
   const currentYear = new Date().getFullYear();
   const maxMovement = stats.topMovements[0]?.count ?? 1;
 
@@ -51,11 +53,7 @@ export default function StatsScreen() {
               <View key={y.year} style={styles.yearCol}>
                 <Text style={styles.yearCount}>{y.count}</Text>
                 <View
-                  style={[
-                    styles.yearBar,
-                    { height: h },
-                    inProgress && styles.yearBarInProgress,
-                  ]}
+                  style={[styles.yearBar, { height: h }, inProgress && styles.yearBarInProgress]}
                 />
                 <Text style={styles.yearLabel}>{String(y.year).slice(2)}</Text>
               </View>
@@ -91,9 +89,7 @@ export default function StatsScreen() {
           <View key={m.name} style={[styles.movementRow, i > 0 && { marginTop: spacing.md }]}>
             <Text style={styles.movementName}>{m.name.toUpperCase()}</Text>
             <View style={styles.movementBarTrack}>
-              <View
-                style={[styles.movementBar, { width: `${(m.count / maxMovement) * 100}%` }]}
-              />
+              <View style={[styles.movementBar, { width: `${(m.count / maxMovement) * 100}%` }]} />
             </View>
             <Text style={styles.movementCount}>{m.count}</Text>
           </View>

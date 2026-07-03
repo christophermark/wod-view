@@ -1,0 +1,10 @@
+date,title,description,best_result_raw,best_result_display,score_type,barbell_lift,set_details,notes,rx_or_scaled,pr
+01/06/2025,"Monday - 1.6.2025","FOR TIME:3 Rounds:15 Wall Balls 20#/14#12 Box Jumps 24""/20""9 Burpees*12:00 TIME CAP",512,"8:32","","","[{""mins"":8,""secs"":32}]","Felt strong today",RX,
+01/08/2025,"Wednesday - 1.8.2025","12:00 AMRAP10 KB Swings 53#/35#10 Sit-Ups200m Run",188,"188","Reps","","[{""reps"":188}]","35# kettlebell",SCALED,
+01/10/2025,"STRENGTH - Back Squat","Build to a heavy single.In an 18 minute windowBuild up to a 1RM Back Squat",225,"225","Load","Back Squat","[{""load"":225,""success"":true}]","PR by 10#!",RX,PR
+01/13/2025,"Monday - 1.13.2025","20:00 EMOMMinute 1: 12 Cal RowMinute 2: 10 Push-UpsMinute 3: 15 Air SquatsMinute 4: Rest",4,"4","Rounds + Reps","","[{""rnds"":4,""reps"":0}]","",RX,
+01/15/2025,"Post-WOD Core","Complete the following:3 Rounds10 Hollow Rocks20 Flutter Kicks",1,"Yes","Checkbox","","[{""boolean"":1}]","",RX,
+02/03/2025,"Monday - 2.3.2025","FOR TIME:21-15-9Deadlifts 185#/125#Pull-UpsDirectly into...9-15-21Push Press 75#/55#",763,"12:43","","","[{""mins"":12,""secs"":43}]","135# barkipping pullups getting better",SCALED,
+02/05/2025,"SKILL - Handstands","Spend 10:00 practicing handstand holds.",3,"3","Emoji Selection","","[{""index"":3}]","",RX,
+02/07/2025,"STRENGTH - Deadlift","Work up to a heavy triple.",275,"275","Load","Deadlift","[{""load"":275,""success"":true}]","Grip was the limiter",RX,PR
+02/10/2025,"Monday - 2.10.2025","15:00 AMR40 Walking Lunges30 Double Unders20 Cal Row",312,"312","Reps","","[{""reps"":312}]","First workout with new shoes 🎉",RX,

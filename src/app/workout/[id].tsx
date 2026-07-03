@@ -3,13 +3,15 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { PrBadge, RxChip, TagChip } from '@/components/badges';
-import { formatDate, scoreLabel, workoutById } from '@/lib/workouts';
+import { useWorkouts } from '@/lib/data-context';
+import { formatDate, scoreLabel } from '@/lib/workouts';
 import { colors, fonts, radii, spacing } from '@/theme';
 
 export default function WorkoutScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { workoutById } = useWorkouts();
   const workout = id ? workoutById.get(id) : undefined;
 
   if (!workout) {
@@ -47,9 +49,7 @@ export default function WorkoutScreen() {
             <Text style={[styles.scoreValue, workout.pr && { color: colors.gold }]}>
               {workout.score}
             </Text>
-            {workout.pr && (
-              <Text style={styles.scoreSub}>{scoreLabel(workout).toUpperCase()}</Text>
-            )}
+            {workout.pr && <Text style={styles.scoreSub}>{scoreLabel(workout).toUpperCase()}</Text>}
           </View>
         )}
 

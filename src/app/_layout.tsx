@@ -9,16 +9,14 @@ import {
   BarlowCondensed_800ExtraBold,
   BarlowCondensed_900Black,
 } from '@expo-google-fonts/barlow-condensed';
-import {
-  IBMPlexMono_500Medium,
-  IBMPlexMono_600SemiBold,
-} from '@expo-google-fonts/ibm-plex-mono';
+import { IBMPlexMono_500Medium, IBMPlexMono_600SemiBold } from '@expo-google-fonts/ibm-plex-mono';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 
+import { WorkoutsProvider } from '@/lib/data-context';
 import { colors } from '@/theme';
 
 SplashScreen.preventAutoHideAsync();
@@ -43,7 +41,7 @@ export default function RootLayout() {
   if (!fontsLoaded) return null;
 
   return (
-    <>
+    <WorkoutsProvider>
       <StatusBar style="dark" />
       <Stack
         screenOptions={{
@@ -52,7 +50,8 @@ export default function RootLayout() {
         }}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="workout/[id]" />
+        <Stack.Screen name="settings" />
       </Stack>
-    </>
+    </WorkoutsProvider>
   );
 }

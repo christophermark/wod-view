@@ -1,4 +1,7 @@
-import workoutsJson from '@/data/workouts.json';
+// Pure types and helpers for workout data. This module must stay free of
+// React/React Native imports so it can be unit tested and reused by the
+// Node convert script. Screens get their data from WorkoutsProvider
+// (data-context.tsx), never from module-level singletons here.
 
 export interface Workout {
   id: string;
@@ -15,14 +18,19 @@ export interface Workout {
   pr: boolean;
 }
 
-// Newest first (the convert script sorts descending)
-export const workouts = workoutsJson as Workout[];
-
-export const workoutById = new Map(workouts.map((w) => [w.id, w]));
-
 const MONTH_NAMES = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
 ];
 const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -58,6 +66,7 @@ export interface MonthSection {
   data: Workout[];
 }
 
+/** Groups a newest-first workout list into month sections. */
 export function groupByMonth(list: Workout[]): MonthSection[] {
   const sections: MonthSection[] = [];
   let current: MonthSection | null = null;
@@ -74,15 +83,15 @@ export function groupByMonth(list: Workout[]): MonthSection[] {
 }
 
 /** date (yyyy-mm-dd) → workouts on that day */
-export const workoutsByDate = (() => {
+export function buildWorkoutsByDate(list: Workout[]) {
   const map = new Map<string, Workout[]>();
-  for (const w of workouts) {
-    const list = map.get(w.date);
-    if (list) list.push(w);
+  for (const w of list) {
+    const existing = map.get(w.date);
+    if (existing) existing.push(w);
     else map.set(w.date, [w]);
   }
   return map;
-})();
+}
 
 // ---------------------------------------------------------------------------
 // Stats
@@ -146,19 +155,20 @@ export interface Stats {
   longestStreakWeeks: number; // consecutive calendar weeks with ≥1 workout
 }
 
-function isoWeekIndex(iso: string): number {
+function weekIndex(iso: string): number {
   const { year, month, day } = parseDate(iso);
   const date = new Date(year, month - 1, day);
   return Math.floor(date.getTime() / (7 * 24 * 3600 * 1000));
 }
 
-export const stats: Stats = (() => {
+/** Computes lifetime stats from a newest-first workout list. */
+export function computeStats(workouts: Workout[]): Stats {
   const total = workouts.length;
   const prCount = workouts.filter((w) => w.pr).length;
   const rxCount = workouts.filter((w) => w.rx).length;
   const firstDate = workouts[workouts.length - 1].date;
   const lastDate = workouts[0].date;
-  const activeDays = workoutsByDate.size;
+  const activeDays = buildWorkoutsByDate(workouts).size;
 
   const yearMap = new Map<number, number>();
   for (const w of workouts) {
@@ -175,7 +185,12 @@ export const stats: Stats = (() => {
     if (!w.barbellLift || w.scoreType !== 'Load' || w.scoreRaw == null) continue;
     const prev = liftMap.get(w.barbellLift);
     if (!prev) {
-      liftMap.set(w.barbellLift, { lift: w.barbellLift, best: w.scoreRaw, date: w.date, attempts: 1 });
+      liftMap.set(w.barbellLift, {
+        lift: w.barbellLift,
+        best: w.scoreRaw,
+        date: w.date,
+        attempts: 1,
+      });
     } else {
       prev.attempts++;
       if (w.scoreRaw > prev.best) {
@@ -210,7 +225,7 @@ export const stats: Stats = (() => {
   const [by, bm] = busiestKey.split('-').map(Number);
   const busiestMonth = { title: `${monthName(bm)} ${by}`, count: busiestCount };
 
-  const weeks = [...new Set(workouts.map((w) => isoWeekIndex(w.date)))].sort((a, b) => a - b);
+  const weeks = [...new Set(workouts.map((w) => weekIndex(w.date)))].sort((a, b) => a - b);
   let longestStreakWeeks = 0;
   let run = 0;
   let prevWeek = Number.NaN;
@@ -235,4 +250,4 @@ export const stats: Stats = (() => {
     busiestMonth,
     longestStreakWeeks,
   };
-})();
+}

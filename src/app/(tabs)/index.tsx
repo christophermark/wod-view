@@ -1,3 +1,5 @@
+import { useRouter } from 'expo-router';
+import { SymbolView } from 'expo-symbols';
 import { useMemo, useState } from 'react';
 import {
   Pressable,
@@ -11,7 +13,8 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { WorkoutCard } from '@/components/WorkoutCard';
-import { groupByMonth, parseDate, stats, Workout, workouts } from '@/lib/workouts';
+import { useWorkouts } from '@/lib/data-context';
+import { groupByMonth, parseDate, Workout } from '@/lib/workouts';
 import { colors, fonts, radii, spacing } from '@/theme';
 
 const FILTERS = [
@@ -47,6 +50,8 @@ function matchesFilter(w: Workout, filter: FilterKey) {
 
 export default function LogScreen() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
+  const { workouts, stats } = useWorkouts();
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<FilterKey>('all');
 
@@ -62,7 +67,7 @@ export default function LogScreen() {
       );
     });
     return groupByMonth(filtered);
-  }, [query, filter]);
+  }, [workouts, query, filter]);
 
   const resultCount = sections.reduce((n, s) => n + s.data.length, 0);
   const sinceYear = parseDate(stats.firstDate).year;
@@ -71,9 +76,16 @@ export default function LogScreen() {
     <View style={[styles.screen, { paddingTop: insets.top + spacing.md }]}>
       <View style={styles.header}>
         <Text style={styles.wordmark}>WOD VIEW</Text>
-        <Text style={styles.headerMeta}>
-          {stats.total} SESSIONS · SINCE {sinceYear}
-        </Text>
+        <View style={styles.headerRight}>
+          <Text style={styles.headerMeta}>
+            {stats.total} SESSIONS · SINCE {sinceYear}
+          </Text>
+          {__DEV__ && (
+            <Pressable onPress={() => router.push('/settings')} hitSlop={10}>
+              <SymbolView name="gearshape.fill" tintColor={colors.inkFaint} size={16} />
+            </Pressable>
+          )}
+        </View>
       </View>
 
       <View style={styles.searchWrap}>
@@ -155,6 +167,11 @@ const styles = StyleSheet.create({
     fontSize: 34,
     letterSpacing: 0.5,
     color: colors.ink,
+  },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
   },
   headerMeta: {
     fontFamily: fonts.mono,

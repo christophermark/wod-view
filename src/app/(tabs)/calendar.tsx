@@ -3,7 +3,8 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { WorkoutCard } from '@/components/WorkoutCard';
-import { formatDate, monthName, parseDate, workouts, workoutsByDate } from '@/lib/workouts';
+import { useWorkouts } from '@/lib/data-context';
+import { formatDate, monthName, parseDate } from '@/lib/workouts';
 import { colors, fonts, radii, spacing } from '@/theme';
 
 const WEEKDAYS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
@@ -18,6 +19,7 @@ function isoFor(year: number, month: number, day: number) {
 
 export default function CalendarScreen() {
   const insets = useSafeAreaInsets();
+  const { workouts, workoutsByDate } = useWorkouts();
   const latest = parseDate(workouts[0].date);
   const earliest = parseDate(workouts[workouts.length - 1].date);
   const today = new Date();
