@@ -1,0 +1,27 @@
+# Shared subflow: cold-launch into preview mode (synthetic sample data).
+#
+# Dev builds boot straight to the LOG tab on the bundled dataset (onboarding
+# only gates production first launch), so preview is entered the way a dev
+# would: settings → PREVIEW MODE source row. Leaves the app on the LOG tab
+# with the preview banner showing.
+appId: com.christophermark.wodview
+---
+- runFlow: dismiss-open-dialog.yaml
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible: 'WOD VIEW'
+    timeout: 60000 # first launch waits on Metro bundling + font load
+- tapOn:
+    id: 'settings-button'
+- assertVisible: 'SETTINGS'
+# Pressables merge child texts into one accessibility string ("LABEL, subtitle"),
+# so rows/buttons are matched on "LABEL, …" patterns.
+- tapOn: 'PREVIEW MODE, Synthetic.*' # dev-only source row
+- assertVisible: 'PREVIEW MODE · SAMPLE DATA'
+- tapOn:
+    id: 'settings-back'
+- assertVisible: 'WOD VIEW'
+# Card a11y text starts with the date rail ("WED, 1, POWER CLEAN 3X5, …"),
+# hence the leading wildcard.
+- assertVisible: '.*POWER CLEAN 3X5.*' # newest workout in the deterministic sample dataset

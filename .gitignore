@@ -42,6 +42,9 @@ example
 /ios
 /android
 
+# maestro e2e output
+/.maestro/screenshots/
+
 # personal workout data (SugarWOD export + generated JSON)
 /data/workouts.csv
 /src/data/workouts.json

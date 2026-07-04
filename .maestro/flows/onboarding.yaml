@@ -1,0 +1,42 @@
+# Onboarding walkthrough: hero → import step → back → into preview mode.
+#
+# Dev builds never show onboarding organically (they boot on the bundled
+# dataset), so this reaches it via settings → DEV TOOLS → VIEW ONBOARDING FLOW.
+# Screenshots land in .maestro/screenshots/ (run via `npm run e2e` from repo root).
+appId: com.christophermark.wodview
+---
+- runFlow: ../subflows/dismiss-open-dialog.yaml
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible: 'WOD VIEW'
+    timeout: 60000 # first launch waits on Metro bundling + font load
+- tapOn:
+    id: 'settings-button'
+- assertVisible: 'SETTINGS'
+- scrollUntilVisible:
+    element:
+      text: 'VIEW ONBOARDING FLOW.*'
+- tapOn: 'VIEW ONBOARDING FLOW.*'
+- assertVisible: 'PERSONAL WOD ARCHIVE'
+- takeScreenshot: .maestro/screenshots/onboarding-01-hero
+- tapOn: 'GET STARTED.*'
+- assertVisible: 'LOAD YOUR LOG'
+- assertVisible: 'TRY PREVIEW MODE.*'
+- takeScreenshot: .maestro/screenshots/onboarding-02-import
+# The settings screen sits under onboarding in the stack and leaks its own
+# occluded "‹ BACK" into the a11y hierarchy — the testID disambiguates.
+# The settle wait matters: a tap fired straight after takeScreenshot can be
+# swallowed.
+- waitForAnimationToEnd:
+    timeout: 3000
+- tapOn:
+    id: 'onboarding-back'
+- assertVisible: 'PERSONAL WOD ARCHIVE'
+- tapOn: 'GET STARTED.*'
+- tapOn: 'TRY PREVIEW MODE.*'
+- extendedWaitUntil:
+    visible: 'PREVIEW MODE · SAMPLE DATA'
+    timeout: 15000
+- assertVisible: 'WOD VIEW'
+- takeScreenshot: .maestro/screenshots/onboarding-03-preview-entered

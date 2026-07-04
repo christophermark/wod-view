@@ -59,7 +59,8 @@ export default function SettingsScreen() {
         <Pressable
           onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}
           hitSlop={12}
-          style={styles.backBtn}>
+          style={styles.backBtn}
+          testID="settings-back">
           <Text style={styles.backArrow}>‹</Text>
           <Text style={styles.backLabel}>BACK</Text>
         </Pressable>

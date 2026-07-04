@@ -1,0 +1,10 @@
+# Expo CLI sometimes leaves a system "Open in "WOD View"?" dialog on the
+# simulator (from its open-url attempts). Dismiss it if present so flows
+# start from a clean screen.
+appId: com.christophermark.wodview
+---
+- runFlow:
+    when:
+      visible: 'Open in .*'
+    commands:
+      - tapOn: 'Cancel'

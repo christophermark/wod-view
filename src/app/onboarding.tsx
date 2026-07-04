@@ -100,7 +100,7 @@ function ImportStep({ onBack }: { onBack: () => void }) {
           styles.importContent,
           { paddingTop: insets.top + spacing.md, paddingBottom: insets.bottom + spacing.xl },
         ]}>
-        <Pressable onPress={onBack} hitSlop={12} style={styles.backBtn}>
+        <Pressable onPress={onBack} hitSlop={12} style={styles.backBtn} testID="onboarding-back">
           <Text style={styles.backArrow}>‹</Text>
           <Text style={styles.backLabel}>BACK</Text>
         </Pressable>

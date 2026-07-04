@@ -80,7 +80,7 @@ export default function LogScreen() {
           <Text style={styles.headerMeta}>
             {stats.total} WODS · SINCE {sinceYear}
           </Text>
-          <Pressable onPress={() => router.push('/settings')} hitSlop={10}>
+          <Pressable onPress={() => router.push('/settings')} hitSlop={10} testID="settings-button">
             <SymbolView name="gearshape.fill" tintColor={colors.inkFaint} size={16} />
           </Pressable>
         </View>
@@ -88,6 +88,7 @@ export default function LogScreen() {
 
       <View style={styles.searchWrap}>
         <TextInput
+          testID="log-search"
           style={styles.search}
           value={query}
           onChangeText={setQuery}

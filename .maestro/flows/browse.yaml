@@ -1,0 +1,45 @@
+# Browse every screen on preview data: log, workout detail, search, calendar,
+# stats, settings, then exit preview via the banner.
+# Relies on the deterministic sample dataset (newest workout: Power Clean 3x5;
+# "MURPH" exists for search).
+appId: com.christophermark.wodview
+---
+- runFlow: ../subflows/enter-preview.yaml
+- takeScreenshot: .maestro/screenshots/browse-01-log
+# Cards merge all child texts into one a11y string starting with the date rail
+# ("WED, 1, POWER CLEAN 3X5, …"), hence the leading wildcard.
+- tapOn: '.*POWER CLEAN 3X5.*'
+- assertVisible: 'THE WORKOUT'
+- takeScreenshot: .maestro/screenshots/browse-02-workout-detail
+- tapOn:
+    id: 'workout-back'
+- assertVisible: 'WOD VIEW'
+- tapOn:
+    id: 'log-search'
+- inputText: 'murph'
+- hideKeyboard
+- assertVisible:
+    text: '.*MURPH.*'
+    index: 0
+- takeScreenshot: .maestro/screenshots/browse-03-log-search
+# Tab buttons expose "LABEL, tab, n of 3" as their a11y text.
+- tapOn: 'CALENDAR, tab.*'
+- assertVisible: '.*THIS MONTH'
+- takeScreenshot: .maestro/screenshots/browse-04-calendar
+- tapOn: 'STATS, tab.*'
+- assertVisible: 'LIFETIME'
+- takeScreenshot: .maestro/screenshots/browse-05-stats
+- scroll
+- takeScreenshot: .maestro/screenshots/browse-06-stats-scrolled
+- tapOn: 'LOG, tab.*'
+- tapOn:
+    id: 'settings-button'
+- assertVisible: 'SETTINGS'
+- takeScreenshot: .maestro/screenshots/browse-07-settings
+- tapOn:
+    id: 'settings-back'
+- assertVisible: 'WOD VIEW'
+- tapOn: 'EXIT' # preview banner exit → back to the bundled dataset in dev
+- assertNotVisible: 'PREVIEW MODE · SAMPLE DATA'
+- assertVisible: 'WOD VIEW'
+- takeScreenshot: .maestro/screenshots/browse-08-after-exit-preview

@@ -20,6 +20,7 @@ its brief.
   never the PNGs).
 - `npm test` / `npm run typecheck` / `npx eslint .` / `npm run format`
 - `npx expo start --ios` — run in the iOS simulator (Expo Go).
+- `npm run e2e` — Maestro e2e flows with screenshots (see "E2E self-verification" below).
 - CI (`.github/workflows/ci.yml`) runs tsc, eslint (0 warnings), prettier --check, jest.
 
 ## Data privacy — hard rule
@@ -54,6 +55,34 @@ personal-CSV test pattern).
 - SugarWOD's export strips newlines from description/notes fields; `restoreLineBreaks()` in
   `parse-sugarwod.ts` restores them heuristically. When fixing a mis-split, add a regression
   case to `src/lib/__tests__/parse-sugarwod.test.ts` first.
+
+## E2E self-verification (Maestro)
+
+`npm run e2e` runs the flows in `.maestro/flows/` against the iOS simulator and drops
+screenshots in `.maestro/screenshots/` (gitignored) — read them to visually verify UI
+work. One-time setup: `npx expo run:ios` (debug build, loads JS from Metro so code
+changes need no rebuild), then keep `npx expo start` running. The runner script
+(`scripts/e2e.sh`) checks prerequisites and picks the booted simulator that has the app
+installed. Failure screenshots land in `ls -t ~/.maestro/tests | head -1`.
+
+Flow-writing gotchas (all learned the hard way — see comments in the flows):
+
+- Maestro text matching is a **full-string regex** against the element's accessibility
+  text. RN Pressables collapse all child Texts into one string (`"LABEL, subtitle, …"`;
+  workout cards start with the date rail: `"WED, 1, POWER CLEAN 3X5, …"`), and tab bar
+  buttons read `"LOG, tab, 1 of 3"` — so match with `.*X.*` patterns or testIDs.
+- Screens lower in the navigation stack leak their (occluded) elements into the
+  hierarchy; identical-looking controls (the `‹ BACK` buttons) need unique testIDs
+  (`onboarding-back`, `settings-back`, `workout-back`; also `settings-button`,
+  `log-search`).
+- Dev builds boot straight to the LOG tab on the bundled dataset — `clearState` does
+  NOT surface onboarding. Flows reach onboarding via settings → DEV TOOLS and preview
+  via settings → PREVIEW MODE row (`.maestro/subflows/enter-preview.yaml`).
+- Assertions must only reference the committed synthetic sample data (deterministic:
+  newest workout "Power Clean 3x5", "MURPH" exists for search) — never the personal
+  bundled dataset.
+- A tap fired immediately after `takeScreenshot` can be swallowed; precede it with
+  `waitForAnimationToEnd`.
 
 ## Gotchas
 

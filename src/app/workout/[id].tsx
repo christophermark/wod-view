@@ -28,7 +28,8 @@ export default function WorkoutScreen() {
         <Pressable
           onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}
           hitSlop={12}
-          style={styles.backBtn}>
+          style={styles.backBtn}
+          testID="workout-back">
           <Text style={styles.backArrow}>‹</Text>
           <Text style={styles.backLabel}>LOG</Text>
         </Pressable>
