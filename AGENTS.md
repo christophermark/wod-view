@@ -4,6 +4,10 @@ Personal iPhone app (Expo SDK 57 / expo-router / TypeScript strict) for browsing
 SugarWOD workouts. Read the exact versioned docs at https://docs.expo.dev/versions/v57.0.0/
 before writing Expo-specific code — APIs have changed.
 
+Planned analytics features live as self-contained briefs in `docs/features/` (see the
+README there for build order and conventions). When asked to implement one, start from
+its brief.
+
 ## Commands
 
 - `npm run convert` — parse `data/workouts.csv` (or the committed sample fallback) into
