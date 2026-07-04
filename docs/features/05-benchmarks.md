@@ -1,6 +1,6 @@
 # 05 — Benchmarks: detection, pages, standards, retest radar
 
-**Effort:** M · **Depends on:** 03 (for disambiguation) · **Status:** not started
+**Effort:** M · **Depends on:** 03 (for disambiguation) · **Status:** done
 
 ## Why
 

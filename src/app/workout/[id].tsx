@@ -1,8 +1,10 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useMemo } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { PrBadge, RxChip, TagChip } from '@/components/badges';
+import { matchBenchmark } from '@/lib/benchmarks';
 import { useWorkouts } from '@/lib/data-context';
 import { formatDate, scoreLabel } from '@/lib/workouts';
 import { colors, fonts, radii, spacing } from '@/theme';
@@ -13,6 +15,7 @@ export default function WorkoutScreen() {
   const insets = useSafeAreaInsets();
   const { workoutById } = useWorkouts();
   const workout = id ? workoutById.get(id) : undefined;
+  const benchmark = useMemo(() => (workout ? matchBenchmark(workout) : null), [workout]);
 
   if (!workout) {
     return (
@@ -43,6 +46,14 @@ export default function WorkoutScreen() {
           <RxChip rx={workout.rx} />
           {workout.pr && <PrBadge />}
           {workout.barbellLift.length > 0 && <TagChip label={workout.barbellLift} />}
+          {benchmark && (
+            <Pressable
+              onPress={() => router.push(`/benchmark/${encodeURIComponent(benchmark.name)}`)}
+              hitSlop={6}
+              testID="benchmark-chip">
+              <TagChip label={`${benchmark.name} ›`} />
+            </Pressable>
+          )}
         </View>
 
         {workout.score.length > 0 && (

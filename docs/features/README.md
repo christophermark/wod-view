@@ -12,7 +12,7 @@ Numbering is the recommended build order — each step makes the next cheaper.
 | 02  | [On this day](02-on-this-day.md)                  | S      | —                 | not started |
 | 03  | [Movement taxonomy](03-movement-taxonomy.md)      | M      | —                 | done        |
 | 04  | ["Last time" panel](04-last-time-panel.md)        | M      | 03                | not started |
-| 05  | [Benchmarks](05-benchmarks.md)                    | M      | 03                | not started |
+| 05  | [Benchmarks](05-benchmarks.md)                    | M      | 03                | done        |
 | 06  | [Lift progression + e1RM](06-lift-progression.md) | M      | 03 (rep parsing)  | not started |
 | 07  | [WOD Wrapped recaps](07-wod-wrapped.md)           | M      | 03, ideally 04–06 | not started |
 | 08  | [Deep-cuts backlog](08-deep-cuts-backlog.md)      | varies | varies            | ideas       |

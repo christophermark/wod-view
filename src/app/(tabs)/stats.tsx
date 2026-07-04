@@ -1,7 +1,9 @@
+import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { benchmarkHistory, retestRadar, todayIso } from '@/lib/benchmarks';
 import { useWorkouts } from '@/lib/data-context';
 import { computeStats, formatDate, monthName, parseDate, sessionsByMonth } from '@/lib/workouts';
 import { colors, fonts, radii, spacing } from '@/theme';
@@ -22,10 +24,17 @@ function SectionLabel({ children }: { children: string }) {
 }
 
 export default function StatsScreen() {
+  const router = useRouter();
   const insets = useSafeAreaInsets();
   const { workouts, stats: lifetimeStats } = useWorkouts();
   const [now] = useState(() => new Date());
   const currentYear = now.getFullYear();
+
+  // Benchmarks are lifetime facts, so the year filter doesn't apply to them.
+  const benchmarks = useMemo(() => {
+    const history = benchmarkHistory(workouts);
+    return { tracked: history.size, radar: retestRadar(workouts, todayIso(now)).slice(0, 3) };
+  }, [workouts, now]);
 
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [movementMode, setMovementMode] = useState<'most' | 'least'>('most');
@@ -173,6 +182,35 @@ export default function StatsScreen() {
                 </Text>
               </View>
             ))}
+          </View>
+        </>
+      )}
+
+      {year == null && benchmarks.tracked > 0 && (
+        <>
+          <SectionLabel>BENCHMARKS</SectionLabel>
+          <View style={styles.card}>
+            <Pressable
+              onPress={() => router.push('/benchmarks')}
+              style={({ pressed }) => [styles.benchRow, pressed && { opacity: 0.7 }]}
+              testID="benchmarks-link">
+              <Text style={styles.benchTitle}>{benchmarks.tracked} TRACKED</Text>
+              <Text style={styles.benchLink}>VIEW ALL ›</Text>
+            </Pressable>
+            {benchmarks.radar.length > 0 && (
+              <View style={styles.radarBlock}>
+                <Text style={styles.radarLabel}>RETEST RADAR</Text>
+                {benchmarks.radar.map((r) => (
+                  <Pressable
+                    key={r.def.name}
+                    onPress={() => router.push(`/benchmark/${encodeURIComponent(r.def.name)}`)}
+                    style={({ pressed }) => [styles.radarRow, pressed && { opacity: 0.7 }]}>
+                    <Text style={styles.radarName}>{r.def.name.toUpperCase()}</Text>
+                    <Text style={styles.radarDays}>{r.daysSince} DAYS AGO</Text>
+                  </Pressable>
+                ))}
+              </View>
+            )}
           </View>
         </>
       )}
@@ -498,6 +536,54 @@ const styles = StyleSheet.create({
     fontFamily: fonts.monoBold,
     fontSize: 12,
     color: colors.ink,
+  },
+  benchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: spacing.sm,
+  },
+  benchTitle: {
+    fontFamily: fonts.display,
+    fontSize: 17,
+    letterSpacing: 0.6,
+    color: colors.ink,
+  },
+  benchLink: {
+    fontFamily: fonts.display,
+    fontSize: 14,
+    letterSpacing: 1,
+    color: colors.accent,
+  },
+  radarBlock: {
+    borderTopWidth: 1,
+    borderTopColor: colors.hairline,
+    marginTop: spacing.sm,
+    paddingTop: spacing.md,
+  },
+  radarLabel: {
+    fontFamily: fonts.mono,
+    fontSize: 10,
+    letterSpacing: 1,
+    color: colors.inkFaint,
+    marginBottom: spacing.xs,
+  },
+  radarRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: spacing.sm,
+  },
+  radarName: {
+    fontFamily: fonts.bodyBold,
+    fontSize: 13,
+    letterSpacing: 0.4,
+    color: colors.ink,
+  },
+  radarDays: {
+    fontFamily: fonts.monoBold,
+    fontSize: 12,
+    color: colors.accent,
   },
   factRow: {
     flexDirection: 'row',

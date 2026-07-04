@@ -1,0 +1,57 @@
+# Benchmarks feature on preview data: stats card + retest radar → benchmarks
+# list → Fran detail (timeline, standards caption, history) → attempt →
+# workout detail benchmark chip.
+# Deterministic sample facts: 17 tracked benchmarks; radar tops out with
+# KAREN; Fran has 4 attempts, best 5:05 (INTERMEDIATE — 0:05 OFF ADVANCED).
+appId: com.christophermark.wodview
+---
+- runFlow: ../subflows/enter-preview.yaml
+- tapOn: 'STATS, tab.*'
+- assertVisible: 'LIFETIME'
+# centerElement, or the match fires while the card is still occluded below
+# the fold (lower elements leak into the hierarchy).
+- scrollUntilVisible:
+    element:
+      text: 'RETEST RADAR'
+    centerElement: true
+- takeScreenshot: .maestro/screenshots/benchmarks-01-stats-card
+# The card Pressable merges child texts: "17 TRACKED, VIEW ALL ›".
+- assertVisible: '17 TRACKED.*'
+- assertVisible: '.*KAREN.*'
+- waitForAnimationToEnd
+- tapOn:
+    id: 'benchmarks-link'
+- assertVisible: 'BENCHMARKS'
+- assertVisible: 'THE GIRLS'
+- takeScreenshot: .maestro/screenshots/benchmarks-02-list
+# Rows merge child texts: "FRAN, 4 ATTEMPTS · N DAYS AGO, 5:05".
+- waitForAnimationToEnd
+- tapOn: 'FRAN,.*'
+- assertVisible: '★ BEST'
+- assertVisible: '5:05'
+- assertVisible: 'INTERMEDIATE — 0:05 OFF ADVANCED'
+- assertVisible: 'HISTORY'
+- takeScreenshot: .maestro/screenshots/benchmarks-03-fran-detail
+# Scroll to the history list and open the newest attempt.
+- scrollUntilVisible:
+    element:
+      text: '.*APRIL 10, 2026.*'
+- waitForAnimationToEnd
+- tapOn: '.*APRIL 10, 2026.*'
+- assertVisible: 'THE WORKOUT'
+- assertVisible: 'FRAN ›' # benchmark chip links back to the benchmark page
+- takeScreenshot: .maestro/screenshots/benchmarks-04-workout-chip
+- tapOn:
+    id: 'benchmark-chip'
+- assertVisible: '★ BEST'
+- tapOn:
+    id: 'benchmark-back'
+- tapOn:
+    id: 'workout-back'
+- tapOn:
+    id: 'benchmark-back'
+- assertVisible: 'THE GIRLS'
+- tapOn:
+    id: 'benchmarks-back'
+- assertVisible: 'RETEST RADAR' # lands back on the scrolled stats screen
+- takeScreenshot: .maestro/screenshots/benchmarks-05-back-on-stats

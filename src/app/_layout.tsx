@@ -68,6 +68,8 @@ function AppShell() {
           <Stack.Protected guard={!needsOnboarding}>
             <Stack.Screen name="(tabs)" />
             <Stack.Screen name="workout/[id]" />
+            <Stack.Screen name="benchmarks" />
+            <Stack.Screen name="benchmark/[name]" />
             <Stack.Screen name="settings" />
           </Stack.Protected>
           <Stack.Screen name="onboarding" />
