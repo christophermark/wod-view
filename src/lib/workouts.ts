@@ -3,6 +3,8 @@
 // Node convert script. Screens get their data from WorkoutsProvider
 // (data-context.tsx), never from module-level singletons here.
 
+import { DISPLAY_MOVEMENTS } from './movements';
+
 export interface Workout {
   id: string;
   date: string; // ISO yyyy-mm-dd
@@ -123,31 +125,9 @@ export interface MovementCount {
   count: number;
 }
 
-const MOVEMENTS: [name: string, pattern: RegExp][] = [
-  ['Burpees', /burpee/i],
-  ['Wall Balls', /wall ?ball/i],
-  ['Box Jumps', /box jump/i],
-  ['Deadlifts', /deadlift/i],
-  ['Double Unders', /double under/i],
-  ['Pull-Ups', /pull-? ?up/i],
-  ['Push-Ups', /push-? ?up/i],
-  ['Running', /\b\d+ ?m (run|row)|run\b/i],
-  ['Rowing', /\brow(ing)?\b|calorie row/i],
-  ['KB Swings', /(kb|kettlebell).{0,20}swing|swing.{0,20}(kb|kettlebell)/i],
-  ['Snatches', /snatch/i],
-  ['Cleans', /clean/i],
-  ['Thrusters', /thruster/i],
-  ['Front Squats', /front squat/i],
-  ['Back Squats', /back squat/i],
-  ['Lunges', /lunge/i],
-  ['Sit-Ups', /sit-? ?up/i],
-  ['Toes-to-Bar', /toes.{0,3}(2|to).{0,3}bar|t2b/i],
-  ['HSPU', /hspu|handstand push/i],
-  ['Rope Climbs', /rope climb/i],
-  ['Push Press', /push press/i],
-  ['Overhead Squats', /overhead squat|ohs/i],
-  ['Muscle-Ups', /muscle-? ?up/i],
-];
+// Movement detection lives in the taxonomy (movements.ts); movementCounts
+// iterates display-level movements only, so lift variants (Power Cleans,
+// Split Jerks, …) never double-count against their parent movement.
 
 export interface Stats {
   total: number;
@@ -188,7 +168,7 @@ export function computeStats(workouts: Workout[]): Stats {
       years: [],
       maxYearCount: 0,
       liftBests: [],
-      movementCounts: MOVEMENTS.map(([name]) => ({ name, count: 0 })),
+      movementCounts: DISPLAY_MOVEMENTS.map(({ name }) => ({ name, count: 0 })),
       busiestMonth: { title: '', count: 0 },
       longestStreakWeeks: 0,
     };
@@ -233,7 +213,7 @@ export function computeStats(workouts: Workout[]): Stats {
   const liftBests = [...liftMap.values()].sort((a, b) => b.best - a.best);
 
   // Zero-count movements stay in — "never programmed" is a stat too.
-  const movementCounts = MOVEMENTS.map(([name, pattern]) => ({
+  const movementCounts = DISPLAY_MOVEMENTS.map(({ name, pattern }) => ({
     name,
     count: workouts.filter((w) => pattern.test(w.description)).length,
   })).sort((a, b) => b.count - a.count);

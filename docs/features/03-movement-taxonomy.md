@@ -1,6 +1,6 @@
 # 03 — Movement taxonomy (foundation)
 
-**Effort:** M · **Depends on:** nothing · **Status:** not started
+**Effort:** M · **Depends on:** nothing · **Status:** done
 **Unlocks:** 04 last-time, 05 benchmarks, 06 lift parsing, 07 wrapped, most of 08.
 
 ## Why
