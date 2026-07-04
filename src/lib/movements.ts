@@ -25,28 +25,37 @@ export interface MovementDef {
 }
 
 export const MOVEMENT_DEFS: MovementDef[] = [
-  // --- Legacy display movements: names and patterns must stay in lockstep
-  // with historical movementCounts (parity-tested against the preview
-  // dataset). The lone change is the "clean up" guard on Cleans.
+  // --- Legacy display movements. Patterns may only *widen* (extra spellings,
+  // plurals, abbreviations) — the parity test asserts every workout the
+  // original 23 regexes matched is still matched.
   { name: 'Burpees', pattern: /burpee/i, modality: 'gymnastics' },
-  { name: 'Wall Balls', pattern: /wall ?ball/i, modality: 'weightlifting', equipment: 'medball' },
+  {
+    name: 'Wall Balls',
+    pattern: /wall[- ]?ball/i,
+    modality: 'weightlifting',
+    equipment: 'medball',
+  },
   { name: 'Box Jumps', pattern: /box jump/i, modality: 'gymnastics', equipment: 'box' },
   {
     name: 'Deadlifts',
-    pattern: /deadlift/i,
+    pattern: /deadlift|\bdls?\b/i,
     modality: 'weightlifting',
     equipment: 'barbell',
     barbellLift: true,
   },
   {
     name: 'Double Unders',
-    pattern: /double under/i,
+    pattern: /double[- ]?unders?|\bdubs\b/i,
     modality: 'monostructural',
     equipment: 'rope',
   },
   { name: 'Pull-Ups', pattern: /pull-? ?up/i, modality: 'gymnastics', equipment: 'rig' },
   { name: 'Push-Ups', pattern: /push-? ?up/i, modality: 'gymnastics' },
-  { name: 'Running', pattern: /\b\d+ ?m (run|row)|run\b/i, modality: 'monostructural' },
+  {
+    name: 'Running',
+    pattern: /\b\d+ ?m (run|row)|runs?\b|running\b/i,
+    modality: 'monostructural',
+  },
   {
     name: 'Rowing',
     pattern: /\brow(ing)?\b|calorie row/i,
@@ -55,7 +64,7 @@ export const MOVEMENT_DEFS: MovementDef[] = [
   },
   {
     name: 'KB Swings',
-    pattern: /(kb|kettlebell).{0,20}swing|swing.{0,20}(kb|kettlebell)/i,
+    pattern: /(kb|kettlebell).{0,20}swing|swing.{0,20}(kb|kettlebell)|(american|freedom) swings?/i,
     modality: 'weightlifting',
     equipment: 'kettlebell',
   },
@@ -98,7 +107,7 @@ export const MOVEMENT_DEFS: MovementDef[] = [
   { name: 'Sit-Ups', pattern: /sit-? ?up/i, modality: 'gymnastics' },
   {
     name: 'Toes-to-Bar',
-    pattern: /toes.{0,3}(2|to).{0,3}bar|t2b/i,
+    pattern: /toes?.{0,3}(2|to).{0,3}bar|t2b|\bttb\b/i,
     modality: 'gymnastics',
     equipment: 'rig',
   },
@@ -155,7 +164,7 @@ export const MOVEMENT_DEFS: MovementDef[] = [
   { name: 'Dips', pattern: /\bdips?\b/i, modality: 'gymnastics' },
   { name: 'Ring Rows', pattern: /ring row/i, modality: 'gymnastics', equipment: 'rings' },
   { name: 'GHD Sit-Ups', pattern: /\bghd\b/i, modality: 'gymnastics', equipment: 'ghd' },
-  { name: 'Wall Walks', pattern: /wall walk/i, modality: 'gymnastics' },
+  { name: 'Wall Walks', pattern: /wall (walk|climb)/i, modality: 'gymnastics' },
   { name: 'Handstand Walk', pattern: /handstand walk|hs walk/i, modality: 'gymnastics' },
   {
     name: 'Devil Press',
@@ -206,7 +215,7 @@ export const MOVEMENT_DEFS: MovementDef[] = [
   { name: 'Step-Ups', pattern: /step-? ?ups?\b/i, modality: 'gymnastics', equipment: 'box' },
   { name: 'Broad Jumps', pattern: /broad jump/i, modality: 'gymnastics' },
   { name: 'Mountain Climbers', pattern: /mountain climber/i, modality: 'gymnastics' },
-  { name: 'Russian Twists', pattern: /russian twist/i, modality: 'gymnastics' },
+  { name: 'Russian Twists', pattern: /(russian|plate) twists?/i, modality: 'gymnastics' },
   { name: 'Hollow Rocks', pattern: /hollow (rock|hold)/i, modality: 'gymnastics' },
   { name: 'Bear Crawls', pattern: /bear crawl/i, modality: 'gymnastics' },
   {
@@ -218,10 +227,53 @@ export const MOVEMENT_DEFS: MovementDef[] = [
   { name: 'Sled Work', pattern: /\bsled\b/i, modality: 'weightlifting', equipment: 'sled' },
   {
     name: 'SDHP',
-    pattern: /sdhp|sumo deadlift high pull/i,
+    pattern: /sdhp|sumo (deadlift|dl) high pulls?|dlhps?/i,
     modality: 'weightlifting',
     equipment: 'barbell',
   },
+
+  // --- Display movements added by the July 2026 coverage sweep against the
+  // personal archive (docs/features/03-movement-taxonomy.md).
+  {
+    name: 'Goblet Squats',
+    pattern: /goblet squats?/i,
+    modality: 'weightlifting',
+    equipment: 'kettlebell',
+  },
+  {
+    name: 'Renegade Rows',
+    pattern: /renegade rows?/i,
+    modality: 'weightlifting',
+    equipment: 'dumbbell',
+  },
+  {
+    name: 'Dumbbell Rows',
+    pattern: /(db|dumbbell|bent[- ]?over|barbell) rows?/i,
+    modality: 'weightlifting',
+    equipment: 'dumbbell',
+  },
+  {
+    name: 'Ground-to-Overhead',
+    pattern: /ground.{0,3}(2|to).{0,3}overhead|g2oh|\bgtoh\b/i,
+    modality: 'weightlifting',
+    equipment: 'plate',
+  },
+  {
+    name: 'Shoulder-to-Overhead',
+    pattern: /shoulder.{0,3}(2|to).{0,3}overhead|s2oh|\bstoh\b/i,
+    modality: 'weightlifting',
+    equipment: 'barbell',
+    barbellLift: true,
+  },
+  {
+    name: 'Box Step-Overs',
+    pattern: /step[- ]?overs?\b/i,
+    modality: 'gymnastics',
+    equipment: 'box',
+  },
+  { name: 'Flutter Kicks', pattern: /flutter kicks?/i, modality: 'gymnastics' },
+  { name: 'Arch Holds', pattern: /arch (hold|rock)/i, modality: 'gymnastics' },
+  { name: 'Handstand Holds', pattern: /handstand (hold|time)/i, modality: 'gymnastics' },
 
   // --- Barbell-lift variants (granularity for lift pages; excluded from the
   // display list so "most programmed" doesn't count Cleans twice).
@@ -305,10 +357,37 @@ export const MOVEMENT_DEFS: MovementDef[] = [
     barbellLift: true,
     variantOf: 'Deadlifts',
   },
+  {
+    name: 'Bar Muscle-Ups',
+    pattern: /bar muscle-? ?up/i,
+    modality: 'gymnastics',
+    equipment: 'rig',
+    variantOf: 'Muscle-Ups',
+  },
+  {
+    name: 'Ring Muscle-Ups',
+    pattern: /ring muscle-? ?up/i,
+    modality: 'gymnastics',
+    equipment: 'rings',
+    variantOf: 'Muscle-Ups',
+  },
 ];
 
 /** Display-level movements: what movementCounts and volume stats iterate. */
 export const DISPLAY_MOVEMENTS: MovementDef[] = MOVEMENT_DEFS.filter((d) => !d.variantOf);
+
+/**
+ * The text to run movement detection against. Percentage-scheme strength days
+ * ("6 Rounds @ 2:00 / 5 reps @ 45% of 3RM…") often name their lift only in
+ * the workout title, so when the description contains no detectable movement
+ * the title is appended as a fallback line. Descriptions that already name a
+ * movement never consult the title — real titles carry coach names and
+ * day-of-week chatter that must not add phantom detections.
+ */
+export function detectionText(w: { description: string; title: string }): string {
+  if (MOVEMENT_DEFS.some((d) => d.pattern.test(w.description))) return w.description;
+  return w.title ? `${w.description}\n${w.title}` : w.description;
+}
 
 // ---------------------------------------------------------------------------
 // Detection with rep estimation
@@ -334,8 +413,14 @@ export interface DetectOptions {
 
 /** "21-15-9" style ladders: three or more dash-joined rep counts. */
 const LADDER = /(?<!\d)(\d{1,3}(?:\s*-\s*\d{1,3}){2,})(?!\d)/;
-/** "5 Rounds", "5 RFT", "x 7 sets" — a whole-workout multiplier. */
-const ROUNDS = /\b(\d{1,2})\s*(?:rounds?|rnds?|rds|rft|sets?)\b/i;
+/**
+ * "5 Rounds", "5 RFT", "x 7 sets" — a whole-workout multiplier. Guarded
+ * against logging chatter like "note load lifted in last 3 sets".
+ */
+const ROUNDS =
+  /(?<!last\s)(?<!final\s)(?<!first\s)\b(\d{1,2})\s*(?:rounds?|rnds?|rds|rft|sets?)\b/i;
+/** "5x5", "3 x 10" — a complete sets×reps scheme (strength-day notation). */
+const SETS_X_REPS = /(?<!\d)(\d{1,2})\s*[x×]\s*(\d{1,3})(?!\d)/i;
 /** "12:00 EMOM", "EMOM 12", "EMOM x 12" — total minutes. */
 const EMOM =
   /(?:(\d{1,2})(?::\d{2})?\s*(?:min(?:ute)?s?\s*)?emom)|(?:emom\s*(?:x\s*)?(\d{1,2})\b)/i;
@@ -350,18 +435,31 @@ function stripLoads(line: string): string {
   return line.replace(/\d+\s*(?:#|lbs?\b|kg\b|['"″”])/g, '').replace(/\d+\s*\/\s*\d+/g, '');
 }
 
+/** A per-line rep count plus whether it is already a complete scheme total. */
+interface LineCount {
+  reps: number;
+  /** Complete totals (ladder sums, sets×reps products) skip round multipliers. */
+  complete: boolean;
+}
+
 function repsBeforeMatch(
   line: string,
   matchIndex: number,
   ladderSum: number | null,
-): number | null {
+): LineCount | null {
   const before = line.slice(0, matchIndex);
   // The "count" is the tail of a rep ladder ("21-15-9 Thrusters") — the
   // movement gets the whole ladder, not the last rung.
-  if (ladderSum != null && /\d(?:\s*-\s*\d+){2,}\s*$/.test(before)) return ladderSum;
+  if (ladderSum != null && /\d(?:\s*-\s*\d+){2,}\s*$/.test(before)) {
+    return { reps: ladderSum, complete: true };
+  }
+  // "5x3 Power Cleans" — a sets×reps scheme right before the movement is the
+  // whole prescription, not a count of 3.
+  const scheme = before.match(/(?<!\d)(\d{1,2})\s*[x×]\s*(\d{1,3})\s*$/i);
+  if (scheme) return { reps: Number(scheme[1]) * Number(scheme[2]), complete: true };
   const m = before.match(TRAILING_COUNT);
   if (!m) return null;
-  return Number(m[1]);
+  return { reps: Number(m[1]), complete: false };
 }
 
 /**
@@ -416,27 +514,35 @@ export function detectMovements(description: string, opts: DetectOptions = {}): 
       found = true;
       if (total == null) continue; // already unparseable
       let base = repsBeforeMatch(line, match.index, ladderSum);
+      if (base == null) {
+        // "Back Squat 5x5" — the scheme trails the movement; the product is
+        // the complete prescription.
+        const scheme = SETS_X_REPS.exec(line.slice(match.index));
+        if (scheme) base = { reps: Number(scheme[1]) * Number(scheme[2]), complete: true };
+      }
       // A count-less movement line under a ladder ("21-15-9 / Thrusters 95# /
       // Pull-Ups") gets the ladder sum. Loads and heights (95#, 53/35, 24")
       // aren't counts, so strip them first; any digits left (400m Run) mean
       // the line is doing something else and stays unparseable.
-      if (base == null && ladderSum != null && !/\d/.test(stripLoads(line))) base = ladderSum;
+      if (base == null && ladderSum != null && !/\d/.test(stripLoads(line))) {
+        base = { reps: ladderSum, complete: true };
+      }
       if (base == null) {
         total = null;
         continue;
       }
       let lineReps: number | null;
-      if (amrap) {
-        lineReps = opts.amrapRounds != null ? base * opts.amrapRounds : null;
+      if (base.complete) {
+        lineReps = base.reps; // ladders and sets×reps are already whole-workout totals
+      } else if (amrap) {
+        lineReps = opts.amrapRounds != null ? base.reps * opts.amrapRounds : null;
       } else if (emomMinutes != null && EMOM_SLOT.test(line)) {
-        lineReps = emomRepeats != null ? base * emomRepeats : null;
+        lineReps = emomRepeats != null ? base.reps * emomRepeats : null;
       } else if (emomMinutes != null && slotCount === 0) {
         // "EMOM 10: 5 Power Cleans" — repeats unknown without slot lines
         lineReps = null;
-      } else if (base === ladderSum) {
-        lineReps = base; // ladder already sums the whole scheme
       } else {
-        lineReps = base * (roundsMult ?? 1);
+        lineReps = base.reps * (roundsMult ?? 1);
       }
       total = lineReps == null ? null : total + lineReps;
     }

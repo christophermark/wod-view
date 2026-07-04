@@ -3,7 +3,7 @@
 // Node convert script. Screens get their data from WorkoutsProvider
 // (data-context.tsx), never from module-level singletons here.
 
-import { DISPLAY_MOVEMENTS } from './movements';
+import { detectionText, DISPLAY_MOVEMENTS } from './movements';
 
 export interface Workout {
   id: string;
@@ -213,9 +213,12 @@ export function computeStats(workouts: Workout[]): Stats {
   const liftBests = [...liftMap.values()].sort((a, b) => b.best - a.best);
 
   // Zero-count movements stay in — "never programmed" is a stat too.
+  // detectionText falls back to the title for strength days whose
+  // descriptions are pure percentage schemes.
+  const texts = workouts.map((w) => detectionText(w));
   const movementCounts = DISPLAY_MOVEMENTS.map(({ name, pattern }) => ({
     name,
-    count: workouts.filter((w) => pattern.test(w.description)).length,
+    count: texts.filter((t) => pattern.test(t)).length,
   })).sort((a, b) => b.count - a.count);
 
   const monthMap = new Map<string, number>();

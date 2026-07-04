@@ -1,6 +1,6 @@
 import previewWorkouts from '../../data/preview-workouts.json';
-import { detectMovements, DISPLAY_MOVEMENTS, MOVEMENT_DEFS } from '../movements';
-import { Workout } from '../workouts';
+import { detectionText, detectMovements, DISPLAY_MOVEMENTS, MOVEMENT_DEFS } from '../movements';
+import { computeStats, Workout } from '../workouts';
 
 const preview = previewWorkouts as Workout[];
 
@@ -67,6 +67,67 @@ describe('detectMovements — detection', () => {
   });
 });
 
+describe('detectMovements — expanded spellings (July 2026 coverage sweep)', () => {
+  // Every alias here was found in real SugarWOD programming text and missed
+  // by the original patterns. Cases are synthetic recreations, not archive
+  // content.
+  const CASES: [description: string, expected: string][] = [
+    ['21 Wall-ball shots 20#', 'Wall Balls'],
+    ['50 Double-Unders', 'Double Unders'],
+    ['100 Dubs', 'Double Unders'],
+    ['3 Wall Climbs', 'Wall Walks'],
+    ['5 Wall Climb', 'Wall Walks'],
+    ['10 Toe to Bar', 'Toes-to-Bar'],
+    ['12 TTB', 'Toes-to-Bar'],
+    ['15 KB DL 53#', 'Deadlifts'],
+    ['10 DLs 185#', 'Deadlifts'],
+    ['20 American Swings 53#', 'KB Swings'],
+    ['20 Freedom Swings 53#', 'KB Swings'],
+    ['30 Plate Twists 25#', 'Russian Twists'],
+    ['15 KB Sumo DLHPs 35#', 'SDHP'],
+    ['12 Sumo DL High Pulls 75#', 'SDHP'],
+    ['4 x 200m Shuttle Runs', 'Running'],
+    ['12 Goblet Squats 53#', 'Goblet Squats'],
+    ['10 Renegade Rows 35#', 'Renegade Rows'],
+    ['12 DB Rows 50#', 'Dumbbell Rows'],
+    ['10 Bent-Over Rows 95#', 'Dumbbell Rows'],
+    ['15 Plate Ground-to-Overhead 45#', 'Ground-to-Overhead'],
+    ['20 Plate G2OH 45#', 'Ground-to-Overhead'],
+    ['10 Shoulder-to-Overhead 115#', 'Shoulder-to-Overhead'],
+    ['12 S2OH 95#', 'Shoulder-to-Overhead'],
+    ['10 Medicine-Ball Box Step-Overs', 'Box Step-Overs'],
+    ['20 Box Step Overs 24"', 'Box Step-Overs'],
+    ['30 Flutter Kicks', 'Flutter Kicks'],
+    [':30 Arch Hold', 'Arch Holds'],
+    ['Accumulate 1:00 Handstand Hold', 'Handstand Holds'],
+    ['3 Bar Muscle-Ups', 'Bar Muscle-Ups'],
+    ['2 Ring Muscle-Ups', 'Ring Muscle-Ups'],
+  ];
+
+  test.each(CASES)('%s → %s', (description, expected) => {
+    expect(names(description)).toContain(expected);
+  });
+
+  test('bar/ring muscle-up variants still roll up to Muscle-Ups', () => {
+    expect(names('3 Bar Muscle-Ups')).toContain('Muscle-Ups');
+    expect(names('2 Ring Muscle-Ups')).toContain('Muscle-Ups');
+  });
+
+  test('DLHP does not trigger the DL deadlift abbreviation', () => {
+    expect(names('15 DLHPs 45#')).not.toContain('Deadlifts');
+  });
+
+  test('"rows" the strength movement does not count as erg Rowing', () => {
+    expect(names('10 Renegade Rows 35#')).not.toContain('Rowing');
+    expect(names('12 DB Rows 50#')).not.toContain('Rowing');
+  });
+
+  test('plain running vocabulary still detects', () => {
+    expect(names('800m Run')).toContain('Running');
+    expect(names('Runs do not count toward score\n400m Run')).toContain('Running');
+  });
+});
+
 describe('detectMovements — rep estimation', () => {
   test('rep ladder applies its sum to movements on and after the ladder line', () => {
     const desc = 'FOR TIME\n21-15-9\nThrusters 95#\nPull-Ups';
@@ -117,6 +178,29 @@ describe('detectMovements — rep estimation', () => {
     expect(reps('3 Rounds\n13 Cal Row\n10 Burpees', 'Rowing')).toBe(39);
   });
 
+  test('sets×reps scheme after the movement is the complete total', () => {
+    expect(reps('Back Squat 5x5 @ 70%', 'Back Squats')).toBe(25);
+    expect(reps('Bench Press 3 x 10', 'Bench Press')).toBe(30);
+  });
+
+  test('sets×reps scheme before the movement is the complete total', () => {
+    expect(reps('5x3 Power Cleans 155#', 'Power Cleans')).toBe(15);
+  });
+
+  test('sets×reps is not multiplied by a rounds context', () => {
+    expect(reps('Strength in 4 sets\nBack Squat 5x5', 'Back Squats')).toBe(25);
+  });
+
+  test('"log load lifted in last 3 sets" is not a rounds multiplier', () => {
+    const desc = 'Strength\n10 Deadlifts 225#\nLog load lifted in last 3 sets';
+    expect(reps(desc, 'Deadlifts')).toBe(10);
+  });
+
+  test('a header line naming the movement without a count poisons reps to null', () => {
+    const desc = 'Deadlift Day\n10 Deadlifts 225#';
+    expect(reps(desc, 'Deadlifts')).toBeNull();
+  });
+
   test('distance-based lines yield null, not meters-as-reps', () => {
     expect(reps('3 Rounds\n400m Run\n21 KB Swings 53#', 'Running')).toBeNull();
     expect(reps('3 Rounds\n400m Run\n21 KB Swings 53#', 'KB Swings')).toBe(63);
@@ -128,10 +212,49 @@ describe('detectMovements — rep estimation', () => {
   });
 });
 
+describe('detectionText — title fallback for strength days', () => {
+  const percentDay = '6 Rounds @ 2:00\n5 reps @ 45% of 3RM\n5 reps @ 55% of 3RM';
+
+  test('appends the title when the description names no movement', () => {
+    const text = detectionText({ description: percentDay, title: 'Front Squat Week 3' });
+    expect(names(text)).toContain('Front Squats');
+  });
+
+  test('ignores the title when the description already names a movement', () => {
+    const text = detectionText({ description: '10 Burpees', title: 'Back Squat Bonus' });
+    expect(names(text)).toEqual(['Burpees']);
+  });
+
+  test('title-detected movements get null reps (percentage schemes are unparseable)', () => {
+    const text = detectionText({ description: percentDay, title: 'Front Squat Week 3' });
+    expect(reps(text, 'Front Squats')).toBeNull();
+  });
+
+  test('computeStats movementCounts includes title-fallback workouts', () => {
+    const workout: Workout = {
+      id: 'w1',
+      date: '2026-01-05',
+      title: 'Front Squat Week 3',
+      description: percentDay,
+      score: '185',
+      scoreRaw: 185,
+      scoreType: 'Load',
+      barbellLift: '',
+      sets: [],
+      notes: '',
+      rx: true,
+      pr: false,
+    };
+    const counts = computeStats([workout]).movementCounts;
+    expect(counts.find((m) => m.name === 'Front Squats')?.count).toBe(1);
+  });
+});
+
 describe('parity with the legacy MOVEMENTS list', () => {
   // The exact [name, pattern] pairs that shipped in workouts.ts before the
-  // taxonomy. Counts over the committed preview dataset must not change when
-  // patterns are refined (e.g. the Cleans "clean up" guard).
+  // taxonomy. Patterns may widen (new spellings raise counts), but every
+  // workout the legacy regex matched must still match — losing detections
+  // is a regression.
   const LEGACY: [string, RegExp][] = [
     ['Burpees', /burpee/i],
     ['Wall Balls', /wall ?ball/i],
@@ -162,11 +285,15 @@ describe('parity with the legacy MOVEMENTS list', () => {
     expect(preview.length).toBeGreaterThan(100);
   });
 
-  test.each(LEGACY)('%s counts match on the preview dataset', (name, legacyPattern) => {
-    const def = MOVEMENT_DEFS.find((d) => d.name === name);
-    expect(def).toBeDefined();
-    const legacyCount = preview.filter((w) => legacyPattern.test(w.description)).length;
-    const newCount = preview.filter((w) => def!.pattern.test(w.description)).length;
-    expect(newCount).toBe(legacyCount);
-  });
+  test.each(LEGACY)(
+    '%s never loses a legacy match on the preview dataset',
+    (name, legacyPattern) => {
+      const def = MOVEMENT_DEFS.find((d) => d.name === name);
+      expect(def).toBeDefined();
+      const lost = preview.filter(
+        (w) => legacyPattern.test(w.description) && !def!.pattern.test(w.description),
+      );
+      expect(lost.map((w) => w.id)).toEqual([]);
+    },
+  );
 });
