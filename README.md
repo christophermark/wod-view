@@ -38,3 +38,23 @@ CI runs all four on every push.
 
 In dev builds, a gear icon on the Log screen opens a debug settings screen where you can
 import a SugarWOD CSV in-app and switch between the bundled and imported datasets.
+
+## Movement detection sweep
+
+Stats rely on the movement taxonomy in `src/lib/movements.ts` recognizing the gym's
+programming vocabulary. To audit coverage against your archive (e.g. after importing a
+fresh export):
+
+```sh
+npx tsx scripts/analyze-movement-coverage.ts   # --top 120 for more mined lines
+```
+
+It prints per-movement hit counts, rep-parse rates, and the unmatched description lines
+where missing movements and spellings hide. To act on the findings, ask Claude Code to
+"run a movement sweep" — the `/movement-sweep` skill (`.claude/skills/movement-sweep/`)
+wraps the script with the full interpret-and-expand workflow: classify mined phrases,
+widen patterns safely (never lose an existing match), and add synthetic-only regression
+tests for every change.
+
+Planned analytics features (benchmark pages, lift progression, year recaps, …) are
+specced in [`docs/features/`](docs/features/README.md).
