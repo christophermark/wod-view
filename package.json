@@ -61,6 +61,8 @@
     "postinstall": "tsx scripts/convert-workouts.ts",
     "test": "jest",
     "e2e": "bash scripts/e2e.sh",
+    "screenshots": "bash scripts/marketing-screenshots.sh",
+    "verify:release-bundle": "tsx scripts/verify-release-bundle.ts",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write ."
   },

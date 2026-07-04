@@ -1,0 +1,60 @@
+# App Store marketing screenshots. NOT part of the e2e suite (npm run e2e only
+# runs .maestro/flows/) — run via `npm run screenshots`, which first swaps the
+# dev bundled dataset to the synthetic sample so no PREVIEW banner (and no
+# personal data) appears in any shot, and restores it afterwards.
+#
+# Same Maestro gotchas as the e2e flows: full-string-regex text matching,
+# Pressables merge child texts ("WED, 1, POWER CLEAN 3X5, …"), tab buttons
+# read "LABEL, tab, n of 3", and a tap straight after takeScreenshot can be
+# swallowed (hence the waitForAnimationToEnd calls).
+appId: com.christophermark.wodview
+---
+- runFlow: ../../subflows/dismiss-open-dialog.yaml
+- launchApp:
+    clearState: true
+# Dev builds boot straight to the LOG tab on the bundled dataset (swapped to
+# sample data by the runner script). Wait on the search placeholder, not
+# 'WOD VIEW' — the home-screen app icon also matches that label, so it would
+# false-pass if the launch silently failed.
+- extendedWaitUntil:
+    visible: 'Search movements.*'
+    timeout: 60000 # first launch waits on Metro bundling + font load
+- waitForAnimationToEnd
+- takeScreenshot: .maestro/marketing/raw/log
+
+# Workout detail: MURPH — the most recognizable card in the sample dataset.
+- tapOn:
+    id: 'log-search'
+- inputText: 'murph'
+- hideKeyboard
+- waitForAnimationToEnd
+- tapOn:
+    text: '.*MURPH.*'
+    index: 0
+- assertVisible: 'THE WORKOUT'
+- waitForAnimationToEnd
+- takeScreenshot: .maestro/marketing/raw/workout
+- tapOn:
+    id: 'workout-back'
+- assertVisible: 'WOD VIEW'
+
+- tapOn: 'STATS, tab.*'
+- assertVisible: 'LIFETIME'
+- waitForAnimationToEnd
+- takeScreenshot: .maestro/marketing/raw/stats
+
+- tapOn: 'CALENDAR, tab.*'
+- assertVisible: '.*THIS MONTH'
+- waitForAnimationToEnd
+- takeScreenshot: .maestro/marketing/raw/calendar
+
+# Onboarding hero ("EVERY REP. EVERY PR. STILL YOURS.") — reachable in dev
+# builds via settings → DEV TOOLS.
+- tapOn: 'LOG, tab.*'
+- tapOn:
+    id: 'settings-button'
+- assertVisible: 'SETTINGS'
+- tapOn: 'VIEW ONBOARDING FLOW ›'
+- assertVisible: 'PERSONAL WOD ARCHIVE'
+- waitForAnimationToEnd
+- takeScreenshot: .maestro/marketing/raw/onboarding

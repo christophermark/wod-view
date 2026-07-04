@@ -21,7 +21,17 @@ its brief.
 - `npm test` / `npm run typecheck` / `npx eslint .` / `npm run format`
 - `npx expo start --ios` — run in the iOS simulator (Expo Go).
 - `npm run e2e` — Maestro e2e flows with screenshots (see "E2E self-verification" below).
+- `npm run screenshots` — regenerate App Store marketing screenshots
+  (`.maestro/marketing/`, isolated from the e2e suite; see
+  `docs/app-store/screenshots.md`). Temporarily swaps the bundled dataset to the
+  synthetic sample so no personal data or preview banner appears, restores on exit.
+- `npm run verify:release-bundle` — release-blocking check that a production
+  `expo export` contains no personal-dataset strings. Run before every store build.
 - CI (`.github/workflows/ci.yml`) runs tsc, eslint (0 warnings), prettier --check, jest.
+
+App Store submission state, listing copy, and pipeline docs live in `docs/app-store/`
+(start at its README). The privacy policy and support pages are GitHub Pages off
+`docs/privacy/` and `docs/support/` — keep them true if data handling ever changes.
 
 ## Data privacy — hard rule
 
@@ -32,9 +42,9 @@ by `scripts/generate-sample-workouts.ts`).
 
 The personal dataset must never reach a release bundle: `data-context.tsx` requires
 `workouts.json` only inside an `if (__DEV__)` branch, which Metro strips from production
-dependency graphs. If you touch that require, re-verify with `npx expo export` and check
-the bundle contains no personal-only strings (see `datasets.test.ts` for the local-only
-personal-CSV test pattern).
+dependency graphs. If you touch that require, re-verify with `npm run verify:release-bundle`
+(exports a production bundle and scans it for personal-only strings; also see
+`datasets.test.ts` for the local-only personal-CSV test pattern).
 
 ## Architecture rules
 

@@ -1,0 +1,68 @@
+# App Store readiness — decision log
+
+Running log of judgment calls made during the readiness work (July 2026),
+with the reasoning, so any of them can be revisited with context.
+
+## 2026-07-04
+
+- **Dark mode: locked to light** (`userInterfaceStyle: "light"` in app.json).
+  `src/theme.ts` has no dark tokens and no screen reads `useColorScheme` —
+  in "automatic" the app's screens stayed paper-light while system chrome
+  (alerts, share sheet, keyboard) went dark, a half-state that looks like a
+  bug. The design is explicitly "clean athletic light"; shipping it as a
+  light-mode app is the honest version. Revisit only if a real dark theme is
+  designed.
+
+- **Export compliance: `ITSAppUsesNonExemptEncryption: false`.** Verified
+  the app makes no network calls (`grep` over src/ finds only
+  `expo-web-browser` opening one fixed help URL) and ships no cryptography.
+  Only OS-provided mechanisms are used, which are exempt. Setting the key in
+  app.json also skips the per-build questionnaire in App Store Connect.
+
+- **App Privacy: "Data Not Collected".** Apple's definition of collect is
+  "transmitted off the device". Nothing is. Dependency tree audited
+  (package.json): no analytics, crash reporting, ads, or tracking SDKs; no
+  expo-updates (which would phone home for OTA bundles). Standing rule: any
+  future telemetry/OTA addition invalidates this answer and the privacy
+  policy.
+
+- **Privacy policy + support hosted on GitHub Pages from `main:/docs`.**
+  The repo is already public, so Pages is free and zero-infrastructure, and
+  the policy lives next to the code it describes. Branded static HTML
+  (paper/ink/accent tokens) at `/privacy/` and `/support/`. A `.nojekyll`
+  file keeps Pages from mangling the rest of docs/. Tradeoff accepted:
+  everything under docs/ (feature briefs, these notes) gets a public URL —
+  it is all in the public repo anyway.
+
+- **Build pipeline: EAS Build + EAS Submit** (eas.json committed). The
+  native folders are gitignored prebuild output, which is exactly the
+  managed-workflow shape EAS is built for: prebuild happens in the cloud,
+  signing credentials are managed by EAS, and there is no local Xcode
+  project state to drift. Local `xcodebuild` archive + Transporter stays
+  documented as the fallback. `appVersionSource: remote` + `autoIncrement`
+  so build numbers never need hand-editing. Free-tier build quota is plenty
+  for a personal app's release cadence.
+
+- **Screenshots: 6.9" portrait only, captured at 1320×2868** on the
+  iPhone 17 Pro Max simulator. Apple's current spec sheet (fetched from
+  developer.apple.com July 2026) accepts 1320×2868 / 1290×2796 / 1260×2736
+  for the 6.9" class, and one 6.9" set now covers every smaller iPhone
+  shelf by automatic scaling. iPad shots not required (iPhone-only app).
+  Marketing flows live in `.maestro/marketing/`, fully isolated from
+  `.maestro/flows/` so the e2e suite's assumptions are untouched.
+
+- **Store name "WOD View" kept.** App Store search (July 2026) shows no
+  existing app with that name; plenty of precedent for "WOD" in app names.
+  Uniqueness is finally enforced when the app record is created — if it
+  collides, fallback ideas: "WOD View — Training Archive" (28 chars).
+
+- **Trademarks:** SugarWOD only in the description as a compatibility
+  statement + non-affiliation line; never in name/subtitle/keywords/promo.
+  "CrossFit" nowhere. Reasoning in store-listing.md.
+
+- **Support/contact email: christophercmark@gmail.com** (from git commit
+  identity). Flagged in the checklist for Chris to confirm before it goes
+  on a public page → it is already live on the Pages site; easy to change.
+
+- **Version 1.0.0** kept in app.json/package.json. Build numbers handled
+  remotely by EAS.
