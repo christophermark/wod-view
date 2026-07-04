@@ -124,6 +124,9 @@ export default function LogScreen() {
       <SectionList
         sections={sections}
         keyExtractor={(w) => w.id}
+        // Let a tap on a result open it while the search keyboard is up —
+        // the default swallows that first tap just to dismiss the keyboard.
+        keyboardShouldPersistTaps="handled"
         renderItem={({ item }) => <WorkoutCard workout={item} />}
         renderSectionHeader={({ section }) => (
           <View style={styles.sectionHeader}>

@@ -17,7 +17,8 @@ State of the App Store readiness work. Files here:
 - [x] App Review notes with the preview-mode walkthrough (review-notes.md)
 - [x] Marketing screenshot pipeline (`npm run screenshots`, screenshots.md)
 - [x] Production bundle verified free of personal data (`npm run verify:release-bundle`)
-- [ ] Preview/review path verified in a Release-configuration build (in progress)
+- [x] Preview/review path verified in a Release-configuration build (onboarding →
+      preview → all tabs; no dev UI; banner EXIT returns to onboarding)
 
 ## Needs Chris (in order)
 
