@@ -51,8 +51,13 @@ dependency graphs. If you touch that require, re-verify with `npm run verify:rel
 
 ## Architecture rules
 
-- **`src/lib/workouts.ts` and `src/lib/parse-sugarwod.ts` stay free of React/React Native/Node
-  imports.** They are pure, unit-tested, and shared with the Node convert script.
+- **`src/lib/workouts.ts` and the parser modules (`parse-sugarwod.ts`, `parse-chalkitpro.ts`,
+  `parse-workouts-csv.ts`) stay free of React/React Native/Node imports.** They are pure,
+  unit-tested, and shared with the Node convert script.
+- The import flow parses through `parseWorkoutsCsv()` (`parse-workouts-csv.ts`), which
+  detects the source app by CSV header: SugarWOD or Chalk It Pro. Chalk It Pro support is
+  deliberately unadvertised — all user-facing import copy mentions only SugarWOD, and
+  unknown files fail with the SugarWOD-flavored error.
 - **Screens get data only from `useWorkouts()`** (`src/lib/data-context.tsx`), never by
   importing JSON or module-level singletons. The provider switches between three sources:
   `bundled` (dev-only test mode, empty in production), `imported` (in-app CSV import,

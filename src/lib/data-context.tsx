@@ -1,7 +1,8 @@
 import { File, Paths } from 'expo-file-system';
 import { createContext, ReactNode, useCallback, useContext, useMemo, useState } from 'react';
 
-import { parseSugarwodCsv, WrongFileError } from '@/lib/parse-sugarwod';
+import { WrongFileError } from '@/lib/parse-sugarwod';
+import { parseWorkoutsCsv } from '@/lib/parse-workouts-csv';
 import { SUGARWOD_EXPORT_FILENAME } from '@/lib/sugarwod-export';
 import {
   buildWorkoutsByDate,
@@ -115,7 +116,7 @@ export function WorkoutsProvider({ children }: { children: ReactNode }) {
         return { ok: false, error: 'That file is too large to be a SugarWOD export.' };
       }
       const csv = await picked.result.text();
-      const parsed = parseSugarwodCsv(csv);
+      const parsed = parseWorkoutsCsv(csv);
       if (parsed.length === 0) {
         return {
           ok: false,
