@@ -18,6 +18,9 @@ its brief.
 - `npx tsx scripts/generate-brand-assets.ts` — regenerate every icon/logo PNG in
   `assets/images/` from the Barlow Condensed "W" mark (single SVG source; edit the script,
   never the PNGs).
+- `npx tsx scripts/analyze-movement-coverage.ts` — audit movement-detection coverage
+  against the local dataset. The `/movement-sweep` skill wraps it with the full
+  interpret-and-expand workflow.
 - `npm test` / `npm run typecheck` / `npx eslint .` / `npm run format`
 - `npx expo start --ios` — run in the iOS simulator (Expo Go).
 - `npm run e2e` — Maestro e2e flows with screenshots (see "E2E self-verification" below).
