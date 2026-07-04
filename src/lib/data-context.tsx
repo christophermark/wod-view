@@ -1,7 +1,8 @@
 import { File, Paths } from 'expo-file-system';
 import { createContext, ReactNode, useCallback, useContext, useMemo, useState } from 'react';
 
-import { parseSugarwodCsv } from '@/lib/parse-sugarwod';
+import { parseSugarwodCsv, WrongFileError } from '@/lib/parse-sugarwod';
+import { SUGARWOD_EXPORT_FILENAME } from '@/lib/sugarwod-export';
 import {
   buildWorkoutsByDate,
   computeStats,
@@ -115,13 +116,24 @@ export function WorkoutsProvider({ children }: { children: ReactNode }) {
       }
       const csv = await picked.result.text();
       const parsed = parseSugarwodCsv(csv);
-      if (parsed.length === 0) return { ok: false, error: 'No workouts found in that file.' };
+      if (parsed.length === 0) {
+        return {
+          ok: false,
+          error: `No workouts in that file. Make sure you picked the ${SUGARWOD_EXPORT_FILENAME} attachment from SugarWOD’s email.`,
+        };
+      }
       importedDataFile().write(JSON.stringify(parsed));
       setImported(parsed);
       setSource('imported');
       writeSourcePref('imported');
       return { ok: true, count: parsed.length };
     } catch (e) {
+      if (e instanceof WrongFileError) {
+        return {
+          ok: false,
+          error: `That file isn’t a SugarWOD export. Look for the ${SUGARWOD_EXPORT_FILENAME} attachment in the email SugarWOD sent you.`,
+        };
+      }
       return { ok: false, error: e instanceof Error ? e.message : 'Import failed.' };
     }
   }, []);

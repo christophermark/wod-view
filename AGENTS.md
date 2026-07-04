@@ -56,3 +56,7 @@ personal-CSV test pattern).
 - `.npmrc` sets `legacy-peer-deps` because jest-expo@57 pins `@react-native/jest-preset@^0.85`
   while react-native 0.86 wants 0.86 — remove when jest-expo catches up.
 - TypeScript 6 needs the explicit `"types": ["node", "jest"]` in tsconfig.json.
+- `@testing-library/react-native` v14 is fully async: `render`, `renderHook`, and `unmount`
+  all return promises that must be awaited, or React reports overlapping `act()` calls.
+  `src/lib/__tests__/import-flow.test.tsx` is the working pattern — it also shows the
+  in-memory `expo-file-system` mock for exercising the import flow end-to-end.

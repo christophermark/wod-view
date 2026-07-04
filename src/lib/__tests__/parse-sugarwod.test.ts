@@ -1,4 +1,4 @@
-import { parseCsv, parseSugarwodCsv, restoreLineBreaks } from '../parse-sugarwod';
+import { parseCsv, parseSugarwodCsv, restoreLineBreaks, WrongFileError } from '../parse-sugarwod';
 
 describe('parseCsv', () => {
   it('parses quoted fields containing commas and escaped quotes', () => {
@@ -101,6 +101,11 @@ describe('parseSugarwodCsv', () => {
   it('rejects files that are not SugarWOD exports', () => {
     expect(() => parseSugarwodCsv('foo,bar\n1,2\n')).toThrow(/missing columns/);
     expect(() => parseSugarwodCsv('')).toThrow();
+  });
+
+  it('throws WrongFileError for wrong-file cases so the UI can point at workouts.csv', () => {
+    expect(() => parseSugarwodCsv('foo,bar\n1,2\n')).toThrow(WrongFileError);
+    expect(() => parseSugarwodCsv('')).toThrow(WrongFileError);
   });
 
   it('rejects binary/garbage content masquerading as a CSV', () => {

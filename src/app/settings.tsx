@@ -1,11 +1,11 @@
 import { useRouter } from 'expo-router';
-import * as WebBrowser from 'expo-web-browser';
 import { useState } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { ExportStepsCard } from '@/components/ExportStepsCard';
 import { useWorkouts } from '@/lib/data-context';
-import { SUGARWOD_EXPORT_HELP_URL, SUGARWOD_EXPORT_STEPS } from '@/lib/sugarwod-export';
+import { SUGARWOD_EXPORT_FILENAME } from '@/lib/sugarwod-export';
 import { colors, fonts, radii, spacing } from '@/theme';
 
 export default function SettingsScreen() {
@@ -103,7 +103,9 @@ export default function SettingsScreen() {
         <Pressable
           onPress={handleImport}
           style={({ pressed }) => [styles.importBtn, pressed && { opacity: 0.85 }]}>
-          <Text style={styles.importBtnText}>IMPORT SUGARWOD EXPORT…</Text>
+          <Text style={styles.importBtnText}>
+            IMPORT <Text style={styles.importBtnFile}>{SUGARWOD_EXPORT_FILENAME}</Text>…
+          </Text>
         </Pressable>
 
         {message && (
@@ -115,20 +117,7 @@ export default function SettingsScreen() {
         <Text style={[styles.sectionLabel, { marginTop: spacing.xxl }]}>
           HOW TO EXPORT FROM SUGARWOD
         </Text>
-        <View style={[styles.card, styles.stepsCard]}>
-          {SUGARWOD_EXPORT_STEPS.map((step, i) => (
-            <View key={i} style={[styles.stepRow, i > 0 && { marginTop: spacing.lg }]}>
-              <Text style={styles.stepNumber}>{i + 1}</Text>
-              <Text style={styles.stepText}>{step}</Text>
-            </View>
-          ))}
-          <Pressable
-            onPress={() => WebBrowser.openBrowserAsync(SUGARWOD_EXPORT_HELP_URL)}
-            hitSlop={8}
-            style={styles.helpLink}>
-            <Text style={styles.helpLinkText}>VIEW SUGARWOD HELP DOC ›</Text>
-          </Pressable>
-        </View>
+        <ExportStepsCard style={{ marginHorizontal: spacing.lg }} />
 
         {importedCount != null && (
           <>
@@ -320,42 +309,18 @@ const styles = StyleSheet.create({
     letterSpacing: 1.2,
     color: colors.paper,
   },
+  importBtnFile: {
+    fontFamily: fonts.monoBold,
+    fontSize: 14,
+    letterSpacing: 0,
+    color: colors.paper,
+  },
   message: {
     fontFamily: fonts.bodySemi,
     fontSize: 13,
     color: colors.ink,
     paddingHorizontal: spacing.lg + spacing.xs,
     marginTop: spacing.md,
-  },
-  stepRow: {
-    flexDirection: 'row',
-    gap: spacing.md,
-  },
-  stepNumber: {
-    fontFamily: fonts.monoBold,
-    fontSize: 13,
-    color: colors.accent,
-    width: 14,
-    textAlign: 'center',
-  },
-  stepText: {
-    flex: 1,
-    fontFamily: fonts.body,
-    fontSize: 14,
-    lineHeight: 21,
-    color: colors.inkSoft,
-  },
-  helpLink: {
-    marginTop: spacing.lg,
-    paddingTop: spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: colors.hairline,
-  },
-  helpLinkText: {
-    fontFamily: fonts.display,
-    fontSize: 14,
-    letterSpacing: 1,
-    color: colors.accent,
   },
   devLink: {
     marginTop: spacing.sm,

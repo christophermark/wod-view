@@ -87,17 +87,20 @@ function toIsoDate(mdy: string): string {
 
 const REQUIRED_COLUMNS = ['date', 'title', 'description', 'best_result_display'];
 
+/** The picked file isn't a SugarWOD export at all (vs. an export with bad rows). */
+export class WrongFileError extends Error {}
+
 /**
  * Parses a full SugarWOD CSV export. Returns workouts sorted newest-first.
- * Throws if the header doesn't look like a SugarWOD export.
+ * Throws WrongFileError if the header doesn't look like a SugarWOD export.
  */
 export function parseSugarwodCsv(csv: string): Workout[] {
   const [header, ...rows] = parseCsv(csv);
-  if (!header) throw new Error('Empty CSV file');
+  if (!header) throw new WrongFileError('Empty CSV file');
   const col = Object.fromEntries(header.map((name, i) => [name.trim(), i]));
   const missing = REQUIRED_COLUMNS.filter((name) => !(name in col));
   if (missing.length > 0) {
-    throw new Error(`Not a SugarWOD export — missing columns: ${missing.join(', ')}`);
+    throw new WrongFileError(`Not a SugarWOD export — missing columns: ${missing.join(', ')}`);
   }
 
   return rows
