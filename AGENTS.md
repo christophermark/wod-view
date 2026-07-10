@@ -91,8 +91,8 @@ Flow-writing gotchas (all learned the hard way — see comments in the flows):
   buttons read `"LOG, tab, 1 of 3"` — so match with `.*X.*` patterns or testIDs.
 - Screens lower in the navigation stack leak their (occluded) elements into the
   hierarchy; identical-looking controls (the `‹ BACK` buttons) need unique testIDs
-  (`onboarding-back`, `settings-back`, `workout-back`; also `settings-button`,
-  `log-search`).
+  (`onboarding-back`, `settings-back`, `workout-back`, `benchmark-back`,
+  `benchmarks-back`, `lift-back`; also `settings-button`, `log-search`).
 - Dev builds boot straight to the LOG tab on the bundled dataset — `clearState` does
   NOT surface onboarding. Flows reach onboarding via settings → DEV TOOLS and preview
   via settings → PREVIEW MODE row (`.maestro/subflows/enter-preview.yaml`).

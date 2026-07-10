@@ -1,0 +1,53 @@
+# Lift progression on preview data: stats LIFT BESTS rows → Deadlifts page
+# (max card, load chart, percent table, sessions) → session → workout detail.
+# Deterministic sample facts: Deadlifts is the top lift best (all-time max
+# 315, current max 275, 11 sessions); percent toggle defaults to CURRENT.
+appId: com.christophermark.wodview
+---
+- runFlow: ../subflows/enter-preview.yaml
+- tapOn: 'STATS, tab.*'
+- assertVisible: 'LIFETIME'
+# centerElement, or the match fires while the row is still occluded below
+# the fold (lower elements leak into the hierarchy).
+- scrollUntilVisible:
+    element:
+      text: 'LIFT BESTS'
+    centerElement: true
+- takeScreenshot: .maestro/screenshots/lifts-01-stats-rows
+# Rows merge child texts: "DEADLIFTS, <date>, 315 LB, ›".
+- waitForAnimationToEnd
+- tapOn: 'DEADLIFTS,.*'
+- assertVisible: 'CURRENT MAX'
+# Nested Texts merge: the hero value reads "275 LB".
+- assertVisible: '275 LB'
+- assertVisible: 'ALL-TIME MAX 315 LB.*'
+- takeScreenshot: .maestro/screenshots/lifts-02-deadlift-page
+- scrollUntilVisible:
+    element:
+      text: 'PERCENTAGES'
+    centerElement: true
+- assertVisible: 'CURRENT'
+- waitForAnimationToEnd
+# The pill is the only element whose full text is exactly ALL-TIME (the max
+# subline reads "ALL-TIME MAX 315 LB · …").
+- tapOn: 'ALL-TIME'
+- takeScreenshot: .maestro/screenshots/lifts-03-percent-table
+- scrollUntilVisible:
+    element:
+      text: 'SESSIONS'
+    centerElement: true
+- takeScreenshot: .maestro/screenshots/lifts-04-sessions
+- waitForAnimationToEnd
+# Newest session row merges child texts: "<DATE>, sets…, ›" — any row works;
+# tap the first thing that looks like a set line via the chevron rows is
+# fragile, so tap by the section's first row date pattern (year always 20xx).
+- tapOn: '.*20[0-9][0-9].*✓.*'
+- assertVisible: 'THE WORKOUT'
+- takeScreenshot: .maestro/screenshots/lifts-05-workout-detail
+- tapOn:
+    id: 'workout-back'
+- assertVisible: 'SESSIONS'
+- tapOn:
+    id: 'lift-back'
+- assertVisible: 'LIFT BESTS' # lands back on the scrolled stats screen
+- takeScreenshot: .maestro/screenshots/lifts-06-back-on-stats

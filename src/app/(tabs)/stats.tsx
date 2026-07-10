@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { benchmarkHistory, retestRadar, todayIso } from '@/lib/benchmarks';
 import { useWorkouts } from '@/lib/data-context';
+import { liftPages } from '@/lib/lifts';
 import { computeStats, formatDate, monthName, parseDate, sessionsByMonth } from '@/lib/workouts';
 import { colors, fonts, radii, spacing } from '@/theme';
 
@@ -56,6 +57,18 @@ export default function StatsScreen() {
   const monthCounts = useMemo(
     () => (year == null ? null : sessionsByMonth(workouts, year)),
     [workouts, year],
+  );
+
+  // Same filtered list `stats` feeds to computeStats, so lift pages respect
+  // the year picker the same way lift bests used to. A lift whose only
+  // recorded sets were misses has no best to list.
+  const lifts = useMemo(
+    () =>
+      liftPages(
+        year == null ? workouts : workouts.filter((w) => parseDate(w.date).year === year),
+        todayIso(now),
+      ).filter((p) => p.allTimeMax > 0),
+    [workouts, year, now],
   );
   const maxMonthCount = monthCounts ? Math.max(...monthCounts, 1) : 1;
 
@@ -166,21 +179,30 @@ export default function StatsScreen() {
         </>
       )}
 
-      {stats.liftBests.length > 0 && (
+      {lifts.length > 0 && (
         <>
           <SectionLabel>LIFT BESTS</SectionLabel>
           <View style={styles.card}>
-            {stats.liftBests.map((l, i) => (
-              <View key={l.lift} style={[styles.liftRow, i > 0 && styles.rowDivider]}>
+            {lifts.map((p, i) => (
+              <Pressable
+                key={p.lift}
+                onPress={() => router.push(`/lift/${encodeURIComponent(p.lift)}`)}
+                style={({ pressed }) => [
+                  styles.liftRow,
+                  i > 0 && styles.rowDivider,
+                  pressed && { opacity: 0.7 },
+                ]}
+                testID={`lift-row-${p.lift}`}>
                 <View style={styles.liftInfo}>
-                  <Text style={styles.liftName}>{l.lift.toUpperCase()}</Text>
-                  <Text style={styles.liftDate}>{formatDate(l.date).toUpperCase()}</Text>
+                  <Text style={styles.liftName}>{p.lift.toUpperCase()}</Text>
+                  <Text style={styles.liftDate}>{formatDate(p.allTimeMaxDate).toUpperCase()}</Text>
                 </View>
                 <Text style={styles.liftBest}>
-                  {l.best}
+                  {p.allTimeMax}
                   <Text style={styles.liftUnit}> LB</Text>
                 </Text>
-              </View>
+                <Text style={styles.chevron}>›</Text>
+              </Pressable>
             ))}
           </View>
         </>
@@ -506,6 +528,12 @@ const styles = StyleSheet.create({
   liftUnit: {
     fontSize: 11,
     color: colors.inkFaint,
+  },
+  chevron: {
+    fontFamily: fonts.display,
+    fontSize: 20,
+    color: colors.inkFaint,
+    marginLeft: spacing.sm,
   },
   movementRow: {
     flexDirection: 'row',

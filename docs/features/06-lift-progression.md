@@ -1,6 +1,6 @@
 # 06 — Lift progression, e1RM, percent-of-max
 
-**Effort:** M · **Depends on:** 03 (lift-name parsing from descriptions) · **Status:** not started
+**Effort:** M · **Depends on:** 03 (lift-name parsing from descriptions) · **Status:** done
 
 ## Why
 

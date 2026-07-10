@@ -70,6 +70,7 @@ function AppShell() {
             <Stack.Screen name="workout/[id]" />
             <Stack.Screen name="benchmarks" />
             <Stack.Screen name="benchmark/[name]" />
+            <Stack.Screen name="lift/[name]" />
             <Stack.Screen name="settings" />
           </Stack.Protected>
           <Stack.Screen name="onboarding" />
