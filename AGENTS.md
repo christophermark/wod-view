@@ -104,6 +104,12 @@ Flow-writing gotchas (all learned the hard way — see comments in the flows):
 
 ## Gotchas
 
+- Adding a native module (`npx expo install <pkg>`) requires rebuilding the dev
+  app; use `npx expo prebuild -p ios --clean && npx expo run:ios`. Incremental
+  rebuilds on the stale generated `ios/` can die with undefined-symbol linker
+  errors (`facebook::react::Sealable`, `ShadowNode::getDebugName`) against the
+  prebuilt React core — the clean prebuild is the fix, not
+  `buildReactNativeFromSource`.
 - `.npmrc` sets `legacy-peer-deps` because jest-expo@57 pins `@react-native/jest-preset@^0.85`
   while react-native 0.86 wants 0.86 — remove when jest-expo catches up.
 - TypeScript 6 needs the explicit `"types": ["node", "jest"]` in tsconfig.json.

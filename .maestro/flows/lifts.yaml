@@ -21,7 +21,17 @@ appId: com.christophermark.wodview
 # Nested Texts merge: the hero value reads "275 LB".
 - assertVisible: '275 LB'
 - assertVisible: 'ALL-TIME MAX 315 LB.*'
+# Chart legend + callout labels (callout defaults to the newest session).
+- assertVisible: 'TOP LOAD'
+- assertVisible: 'EST. 1RM'
 - takeScreenshot: .maestro/screenshots/lifts-02-deadlift-page
+# Tap an earlier data point (chart is scrolled to the recent end; slot 8 of
+# the sample's 11 deadlift sessions is on-screen) — the callout follows.
+- waitForAnimationToEnd
+- tapOn:
+    id: 'lift-chart-slot-8'
+- assertVisible: 'TOP LOAD'
+- takeScreenshot: .maestro/screenshots/lifts-02b-chart-point
 - scrollUntilVisible:
     element:
       text: 'PERCENTAGES'

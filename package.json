@@ -30,6 +30,7 @@
     "react-native-reanimated": "4.5.0",
     "react-native-safe-area-context": "~5.7.0",
     "react-native-screens": "4.25.2",
+    "react-native-svg": "15.15.4",
     "react-native-web": "~0.21.0",
     "react-native-worklets": "0.10.0"
   },
@@ -63,6 +64,7 @@
     "test": "jest",
     "e2e": "bash scripts/e2e.sh",
     "screenshots": "bash scripts/marketing-screenshots.sh",
+    "store-previews": "tsx scripts/compose-store-previews.ts",
     "verify:release-bundle": "tsx scripts/verify-release-bundle.ts",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write ."

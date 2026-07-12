@@ -35,9 +35,12 @@ session artifact; the distilled rationale is in each brief's "Why".
 - **Privacy is a hard rule.** Test fixtures are synthetic only. Static
   reference data (benchmark standards, movement taxonomy) is committed;
   personal data never is. Everything computes on-device.
-- **No chart library yet.** The stats screen hand-rolls bars with Views.
-  Prefer that for grids/bars; if a feature truly needs lines/curves, discuss
-  adding `react-native-svg` in that feature's PR, not as a side effect.
+- **Charts: hand-rolled bars, `react-native-svg` for lines.** The stats screen
+  hand-rolls bars with Views — keep doing that for grids/bars. `react-native-svg`
+  is in the project (added for the lift-progression line chart in
+  `src/app/lift/[name].tsx`, which is the reference implementation: 2px lines,
+  ≥8px markers with a surface ring, tap targets ≥24px, legend for two series,
+  values in a callout rather than on every point).
 
 ## Dataset facts to design against
 
