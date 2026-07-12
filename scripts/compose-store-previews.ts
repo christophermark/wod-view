@@ -28,6 +28,9 @@ const PAPER = '#F6F4EE';
 const INK = '#16130D';
 const ACCENT = '#E8391D';
 const HAIRLINE = '#E7E3D8';
+const INK_SOFT = '#5C574B';
+const GOLD = '#A87B00';
+const CARD = '#FFFFFF';
 
 const loadFont = (p: string): Font =>
   parseFont(fs.readFileSync(path.join(ROOT, p)).buffer as ArrayBuffer);
@@ -60,6 +63,8 @@ interface Slide {
   bg: 'paper' | 'ink' | 'accent';
   /** Optional small mono footer line (used by the type-only closer). */
   footer?: string;
+  /** Render the export → import → insight diagram instead of a screenshot. */
+  diagram?: boolean;
 }
 
 const SLIDES: Slide[] = [
@@ -73,6 +78,15 @@ const SLIDES: Slide[] = [
       [{ text: 'STILL YOURS.', accent: true }],
     ],
     bg: 'ink',
+  },
+  {
+    shot: null,
+    name: 'import',
+    eyebrow: 'HOW IT WORKS',
+    lines: [[{ text: 'BRING YOUR' }], [{ text: 'HISTORY ' }, { text: 'HOME.', accent: true }]],
+    bg: 'paper',
+    diagram: true,
+    footer: 'IMPORT TAKES ABOUT TWO MINUTES.',
   },
   {
     shot: 'workout',
@@ -174,6 +188,97 @@ function trackedText(
     svg: `<g transform="translate(${x.toFixed(2)} ${y.toFixed(2)}) scale(${s.toFixed(6)})">${parts.join('')}</g>`,
     width: (cursor - trackingEm) * s,
   };
+}
+
+// ---------------------------------------------------------------------------
+// Import diagram (the value-prop slide): export → import → insight, drawn in
+// the app's own UI grammar — numbered rows like the onboarding value props,
+// the csv chip from settings, the real import button, stat tiles from the
+// stats screen. All sizes are iPhone-canvas units scaled by `s`.
+// ---------------------------------------------------------------------------
+
+function importDiagram(margin: number, contentTop: number, s: number): string {
+  const parts: string[] = [];
+  const contentX = margin + 118 * s;
+  const artifactW = 950 * s;
+
+  const stepLabel = (n: string, label: string, sub: string, baseline: number) => {
+    parts.push(trackedText(mono, n, margin, baseline - 10 * s, 40 * s, ACCENT, 4 * s).svg);
+    parts.push(textPath(display, label, contentX, baseline, 88 * s, INK));
+    parts.push(trackedText(mono, sub, contentX, baseline + 78 * s, 40 * s, INK_SOFT, 3 * s).svg);
+  };
+  const arrow = (y: number) => {
+    const ax = contentX + 90 * s;
+    parts.push(
+      `<polygon points="${ax - 20 * s},${y} ${ax + 20 * s},${y} ${ax},${y + 34 * s}" fill="${ACCENT}"/>`,
+    );
+  };
+
+  // 01 EXPORT — the csv chip (settings screen's grammar).
+  let y = contentTop + 110 * s;
+  stepLabel('01', 'EXPORT', 'THE CSV YOUR GYM APP EMAILS YOU', y);
+  const chipTop = y + 128 * s;
+  const chipH = 170 * s;
+  parts.push(
+    `<rect x="${contentX}" y="${chipTop}" width="${artifactW}" height="${chipH}" rx="${24 * s}" fill="${CARD}" stroke="${HAIRLINE}" stroke-width="${2.5 * s}"/>`,
+    `<rect x="${contentX + 30 * s}" y="${chipTop + 32 * s}" width="${106 * s}" height="${106 * s}" rx="${18 * s}" fill="${ACCENT}"/>`,
+  );
+  const csv = trackedText(mono, 'CSV', 0, 0, 30 * s, PAPER, 2 * s);
+  parts.push(
+    trackedText(
+      mono,
+      'CSV',
+      contentX + 30 * s + (106 * s - csv.width) / 2,
+      chipTop + 96 * s,
+      30 * s,
+      PAPER,
+      2 * s,
+    ).svg,
+    trackedText(mono, 'workouts.csv', contentX + 176 * s, chipTop + 102 * s, 46 * s, INK, 1 * s)
+      .svg,
+  );
+  arrow(chipTop + chipH + 92 * s);
+
+  // 02 IMPORT — the app's actual button.
+  y = chipTop + chipH + 330 * s;
+  stepLabel('02', 'IMPORT', 'ONE TAP. PARSED ON THIS PHONE.', y);
+  const btnTop = y + 128 * s;
+  const btnH = 160 * s;
+  parts.push(
+    `<rect x="${contentX}" y="${btnTop}" width="${artifactW}" height="${btnH}" rx="${20 * s}" fill="${INK}"/>`,
+  );
+  const btnLabelW = display.getAdvanceWidth('IMPORT ', 60 * s);
+  const btnFile = trackedText(mono, 'workouts.csv…', 0, 0, 44 * s, PAPER, 0);
+  const btnX = contentX + (artifactW - btnLabelW - btnFile.width) / 2;
+  const btnBase = btnTop + btnH / 2 + 22 * s;
+  parts.push(
+    textPath(display, 'IMPORT ', btnX, btnBase, 60 * s, PAPER),
+    trackedText(mono, 'workouts.csv…', btnX + btnLabelW, btnBase, 44 * s, PAPER, 0).svg,
+  );
+  arrow(btnTop + btnH + 92 * s);
+
+  // 03 INSIGHT — stat tiles (stats screen's grammar).
+  y = btnTop + btnH + 330 * s;
+  stepLabel('03', 'INSIGHT', 'THE NUMBERS YOU NEVER HAD', y);
+  const tiles: [value: string, label: string, color: string][] = [
+    ['372', 'WODS', INK],
+    ['23', 'PRS', GOLD],
+    ['30', 'WK STREAK', ACCENT],
+  ];
+  const tileTop = y + 128 * s;
+  const tileW = 298 * s;
+  const tileH = 280 * s;
+  const tileGap = 28 * s;
+  tiles.forEach(([value, label, color], i) => {
+    const tx = contentX + i * (tileW + tileGap);
+    parts.push(
+      `<rect x="${tx}" y="${tileTop}" width="${tileW}" height="${tileH}" rx="${24 * s}" fill="${CARD}" stroke="${HAIRLINE}" stroke-width="${2.5 * s}"/>`,
+      trackedText(mono, value, tx + 34 * s, tileTop + 128 * s, 84 * s, color, 0).svg,
+      trackedText(mono, label, tx + 34 * s, tileTop + 200 * s, 30 * s, INK_SOFT, 3 * s).svg,
+    );
+  });
+
+  return parts.join('');
 }
 
 // ---------------------------------------------------------------------------
@@ -291,7 +396,9 @@ async function renderSlide(slide: Slide, device: Device, index: number) {
     );
   }
 
-  if (!slide.shot) {
+  if (slide.diagram) {
+    parts.push(importDiagram(margin, headlineBottom + 60 * s, s));
+  } else if (!slide.shot) {
     // Type-only slide: fill the field with a giant ghost of the "W" mark
     // (the app icon's glyph), bleeding off the bottom-right corner.
     const wSize = 2300 * s;
