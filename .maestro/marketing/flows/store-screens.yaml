@@ -31,6 +31,8 @@ appId: com.christophermark.wodview
 - inputText: 'murph'
 - pressKey: Enter
 - waitForAnimationToEnd
+- takeScreenshot: .maestro/marketing/raw/search
+- waitForAnimationToEnd
 - tapOn:
     text: '.*"MURPH".*'
     index: 0

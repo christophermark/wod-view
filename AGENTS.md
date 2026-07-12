@@ -24,10 +24,13 @@ its brief.
 - `npm test` / `npm run typecheck` / `npx eslint .` / `npm run format`
 - `npx expo start --ios` — run in the iOS simulator (Expo Go).
 - `npm run e2e` — Maestro e2e flows with screenshots (see "E2E self-verification" below).
-- `npm run screenshots` — regenerate App Store marketing screenshots
+- `npm run screenshots` — regenerate raw App Store marketing screenshots
   (`.maestro/marketing/`, isolated from the e2e suite; see
   `docs/app-store/screenshots.md`). Temporarily swaps the bundled dataset to the
   synthetic sample so no personal data or preview banner appears, restores on exit.
+- `npm run store-previews` — compose the raw shots into the branded store images
+  (iPhone 6.9" + iPad 13"). The `/store-previews` skill wraps capture → compose →
+  visual verification; slide copy lives in `scripts/compose-store-previews.ts`.
 - `npm run verify:release-bundle` — release-blocking check that a production
   `expo export` contains no personal-dataset strings. Run before every store build.
 - CI (`.github/workflows/ci.yml`) runs tsc, eslint (0 warnings), prettier --check, jest.
