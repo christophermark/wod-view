@@ -85,3 +85,12 @@ with the reasoning, so any of them can be revisited with context.
   → Resolved same day: description, review notes, and the non-affiliation
   line now name both services ("your gym app's export — SugarWOD and
   Chalk It Pro supported"), matching the import slide.
+
+- **Public contact email corrected to chrismarkapps@gmail.com** (Chris,
+  2026-07-12) — replaced on the live privacy/support pages, review notes,
+  and checklist. Earlier entries citing the git-identity address are
+  historical.
+- **Privacy policy will eventually move to Chris's personal site** — plan
+  brief at `docs/personal-site-privacy-policy-plan.md`. GitHub Pages stays
+  canonical until that work happens; the ASC fields should use whichever
+  URL is live at submission time.

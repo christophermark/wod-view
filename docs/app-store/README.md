@@ -32,9 +32,9 @@ State of the App Store readiness work. Files here:
    `com.christophermark.wodview` (register it in the developer portal if the
    picker doesn't offer it — `eas build` can also do this automatically),
    SKU e.g. `wodview-001`. This is the moment the name is actually reserved.
-4. **Confirm the public contact email** (christophercmark@gmail.com is on the
-   privacy/support pages now) and fill your phone number into the App Review
-   contact fields.
+4. **Fill your phone number** into the App Review contact fields (the public
+   contact email is chrismarkapps@gmail.com, confirmed 2026-07-12, already on
+   the privacy/support pages).
 5. **Build & upload:** `eas build --platform ios --profile production` then
    `eas submit --platform ios` (first run walks through App Store Connect auth).
 6. **Fill in App Store Connect** from `store-listing.md` (all fields), upload

@@ -27,7 +27,7 @@
 ## Contact info for the review form
 
 - First name / last name: Christopher Mark
-- Email: christophercmark@gmail.com (confirm — must be reachable during review)
+- Email: chrismarkapps@gmail.com (must be reachable during review)
 - Phone: ← Chris to fill in
 
 ## Guideline risk assessment
