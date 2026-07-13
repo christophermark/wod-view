@@ -1,9 +1,9 @@
 # App Review notes (paste into App Store Connect → App Review Information)
 
 > WOD View is a viewer for a user's own workout-history export (a CSV file
-> that the SugarWOD service emails to its users on request). There are no
-> accounts and no login — all data is imported by the user and stored only
-> on-device.
+> that gym-workout services — SugarWOD and Chalk It Pro are supported —
+> email to their users on request). There are no accounts and no login —
+> all data is imported by the user and stored only on-device.
 >
 > TO REVIEW WITH A POPULATED APP (no export file needed):
 >
@@ -17,7 +17,8 @@
 >    tapping EXIT returns to the welcome screen.
 >
 > The real import path (welcome screen → "IMPORT workouts.csv…") opens the
-> system file picker for the CSV attachment SugarWOD emails to the user.
+> system file picker for the CSV export; the app detects which service's
+> format it is and parses it on-device.
 > The app makes no network requests; the only outbound touch is a help
 > button that opens SugarWOD's public help page in an in-app browser view.
 >

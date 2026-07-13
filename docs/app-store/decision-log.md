@@ -82,3 +82,6 @@ with the reasoning, so any of them can be revisited with context.
 - Note for pre-submission: the app now also imports Chalk It Pro exports;
   the description in store-listing.md still tells only the SugarWOD story —
   decide whether to mention Chalk It Pro there before filling in ASC.
+  → Resolved same day: description, review notes, and the non-affiliation
+  line now name both services ("your gym app's export — SugarWOD and
+  Chalk It Pro supported"), matching the import slide.
