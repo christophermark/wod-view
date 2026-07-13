@@ -1,6 +1,42 @@
 # WOD View
 
-A clean, athletic archive viewer for exported [SugarWOD](https://www.sugarwod.com/) workouts, built with Expo + React Native.
+<p align="center">
+  <img src="assets/images/logo-wordmark.png" alt="WOD View" width="360" />
+</p>
+
+<p align="center">
+  <strong>Every rep. Every PR. Analyzed.</strong><br />
+  A fast, private iPhone archive for the workout history you already own.
+</p>
+
+<p align="center">
+  <a href="https://www.christophermark.me/wod-view">Website</a> ·
+  <a href="https://www.christophermark.me/wod-view/support">Support</a> ·
+  <a href="https://www.christophermark.me/wod-view/privacy">Privacy</a>
+</p>
+
+WOD View turns a SugarWOD workout-history export into a searchable training log, calendar, and lifetime stats dashboard. Import a CSV on your iPhone and the app parses everything on-device—no account, server, analytics, ads, or subscription.
+
+<table>
+  <tr>
+    <td align="center"><img src="docs/images/log.png" alt="The WOD View workout log" width="280" /></td>
+    <td align="center"><img src="docs/images/stats.png" alt="Lifetime workout stats and lift bests" width="280" /></td>
+    <td align="center"><img src="docs/images/workout.png" alt="Workout detail with a personal record" width="280" /></td>
+  </tr>
+  <tr>
+    <td align="center"><strong>Find any workout</strong></td>
+    <td align="center"><strong>See the long view</strong></td>
+    <td align="center"><strong>Keep the full story</strong></td>
+  </tr>
+</table>
+
+## How it works
+
+1. Request your workout-history export from SugarWOD.
+2. Save the CSV from the export email to Files on your iPhone.
+3. Import it into WOD View. Your history is parsed and stored entirely on-device.
+
+No export handy? Preview mode includes three years of deterministic sample workouts, so every screen can be explored before importing personal data.
 
 ## Screens
 
@@ -8,6 +44,10 @@ A clean, athletic archive viewer for exported [SugarWOD](https://www.sugarwod.co
 - **Calendar** — month grid of training days; gold days are PR days. Tap a day to see what you did.
 - **Stats** — lifetime stat tiles, WODs-per-year chart (or per-month when a year is selected via the year filter), barbell lift bests, most/least-programmed movements, and log milestones.
 - **Workout detail** — full whiteboard description, your score (with PR treatment), and athlete notes.
+
+## Private by architecture
+
+WOD View has no backend and no account system. Imported workout history never leaves the device, and the app includes no analytics, advertising, or crash-reporting SDKs. Clear the import in Settings or delete the app and the local data is gone. See the full [privacy policy](https://www.christophermark.me/wod-view/privacy).
 
 ## Data
 
