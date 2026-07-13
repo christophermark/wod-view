@@ -75,7 +75,7 @@ const SLIDES: Slide[] = [
     lines: [
       [{ text: 'EVERY REP.' }],
       [{ text: 'EVERY PR.' }],
-      [{ text: 'STILL YOURS.', accent: true }],
+      [{ text: 'ANALYZED.', accent: true }],
     ],
     bg: 'ink',
   },
@@ -83,23 +83,26 @@ const SLIDES: Slide[] = [
     shot: null,
     name: 'import',
     eyebrow: 'HOW IT WORKS',
-    lines: [[{ text: 'BRING YOUR' }], [{ text: 'HISTORY ' }, { text: 'HOME.', accent: true }]],
+    lines: [[{ text: 'IMPORT YOUR' }], [{ text: 'WORKOUTS ' }, { text: 'HERE.', accent: true }]],
     bg: 'paper',
     diagram: true,
     footer: 'IMPORT TAKES ABOUT TWO MINUTES.',
   },
   {
-    shot: 'workout',
-    name: 'workout',
-    eyebrow: 'THE WORKOUT',
-    lines: [[{ text: 'PR DAY, ' }, { text: 'ON RECORD.', accent: true }]],
-    bg: 'paper',
-  },
-  {
     shot: 'stats',
     name: 'stats',
     eyebrow: 'THE STATS',
-    lines: [[{ text: 'YOUR NUMBERS, ' }, { text: 'LIFETIME.', accent: true }]],
+    lines: [
+      [{ text: 'THE WORKOUT STATS' }],
+      [{ text: 'YOU ALWAYS ' }, { text: 'CRAVED.', accent: true }],
+    ],
+    bg: 'paper',
+  },
+  {
+    shot: 'workout',
+    name: 'workout',
+    eyebrow: 'THE WORKOUT',
+    lines: [[{ text: 'PR DAYS, ' }, { text: 'ORGANIZED.', accent: true }]],
     bg: 'paper',
   },
   {
@@ -202,10 +205,21 @@ function importDiagram(margin: number, contentTop: number, s: number): string {
   const contentX = margin + 118 * s;
   const artifactW = 950 * s;
 
-  const stepLabel = (n: string, label: string, sub: string, baseline: number) => {
+  // Renders number + label + sub lines; returns the y where the step's
+  // artifact should start. Sub lines shrink to fit the text column.
+  const maxSubW = artifactW + 60 * s;
+  const stepLabel = (n: string, label: string, subs: string[], baseline: number): number => {
     parts.push(trackedText(mono, n, margin, baseline - 10 * s, 40 * s, ACCENT, 4 * s).svg);
     parts.push(textPath(display, label, contentX, baseline, 88 * s, INK));
-    parts.push(trackedText(mono, sub, contentX, baseline + 78 * s, 40 * s, INK_SOFT, 3 * s).svg);
+    let subY = baseline + 78 * s;
+    for (const sub of subs) {
+      let size = 40 * s;
+      const probe = trackedText(mono, sub, 0, 0, size, INK_SOFT, 3 * s);
+      if (probe.width > maxSubW) size *= maxSubW / probe.width;
+      parts.push(trackedText(mono, sub, contentX, subY, size, INK_SOFT, 3 * s).svg);
+      subY += 58 * s;
+    }
+    return subY - 58 * s + 50 * s;
   };
   const arrow = (y: number) => {
     const ax = contentX + 90 * s;
@@ -216,8 +230,12 @@ function importDiagram(margin: number, contentTop: number, s: number): string {
 
   // 01 EXPORT — the csv chip (settings screen's grammar).
   let y = contentTop + 110 * s;
-  stepLabel('01', 'EXPORT', 'THE CSV YOUR GYM APP EMAILS YOU', y);
-  const chipTop = y + 128 * s;
+  const chipTop = stepLabel(
+    '01',
+    'EXPORT',
+    ['YOUR WORKOUT DATA FROM YOUR GYM APP', '(SUGARWOD AND CHALK IT PRO SUPPORTED)'],
+    y,
+  );
   const chipH = 170 * s;
   parts.push(
     `<rect x="${contentX}" y="${chipTop}" width="${artifactW}" height="${chipH}" rx="${24 * s}" fill="${CARD}" stroke="${HAIRLINE}" stroke-width="${2.5 * s}"/>`,
@@ -240,9 +258,8 @@ function importDiagram(margin: number, contentTop: number, s: number): string {
   arrow(chipTop + chipH + 92 * s);
 
   // 02 IMPORT — the app's actual button.
-  y = chipTop + chipH + 330 * s;
-  stepLabel('02', 'IMPORT', 'ONE TAP. PARSED ON THIS PHONE.', y);
-  const btnTop = y + 128 * s;
+  y = chipTop + chipH + 300 * s;
+  const btnTop = stepLabel('02', 'IMPORT', ['ONE TAP. PARSED ON THIS PHONE.'], y);
   const btnH = 160 * s;
   parts.push(
     `<rect x="${contentX}" y="${btnTop}" width="${artifactW}" height="${btnH}" rx="${20 * s}" fill="${INK}"/>`,
@@ -258,14 +275,14 @@ function importDiagram(margin: number, contentTop: number, s: number): string {
   arrow(btnTop + btnH + 92 * s);
 
   // 03 INSIGHT — stat tiles (stats screen's grammar).
-  y = btnTop + btnH + 330 * s;
-  stepLabel('03', 'INSIGHT', 'THE NUMBERS YOU NEVER HAD', y);
+  y = btnTop + btnH + 300 * s;
+  const tileTopFromLabel = stepLabel('03', 'INSIGHT', ['THE NUMBERS YOU NEVER HAD'], y);
   const tiles: [value: string, label: string, color: string][] = [
     ['372', 'WODS', INK],
     ['23', 'PRS', GOLD],
     ['30', 'WK STREAK', ACCENT],
   ];
-  const tileTop = y + 128 * s;
+  const tileTop = tileTopFromLabel;
   const tileW = 298 * s;
   const tileH = 280 * s;
   const tileGap = 28 * s;

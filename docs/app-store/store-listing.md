@@ -113,12 +113,14 @@ ever added, this answer must be redone.
 
 ## Trademark decisions (guideline 2.3.7)
 
-- **"SugarWOD" appears only in the description**, as a factual compatibility
+- **"SugarWOD" appears in the description** as a factual compatibility
   statement ("turns the workout-history export from SugarWOD into…") plus an
-  explicit non-affiliation line. It is kept **out** of the name, subtitle,
-  keywords, promotional text, and screenshots. Nominative compatibility
-  references in descriptions are standard practice; trademarks in
-  name/subtitle/keywords are the classic 2.3.7 rejection.
+  explicit non-affiliation line, and — per Chris's call, 2026-07-12 — as one
+  compatibility line on the import preview slide ("SugarWOD and Chalk It Pro
+  supported"). It stays **out** of the name, subtitle, keywords, and
+  promotional text. Nominative compatibility references are standard
+  practice; trademarks in name/subtitle/keywords are the classic 2.3.7
+  rejection.
 - **"CrossFit" appears nowhere** in the app or metadata. CrossFit, LLC
   enforces its mark aggressively; the copy uses "WOD", "training", "metcon",
   "box"-free phrasing instead. "WOD" itself is generic in the App Store
