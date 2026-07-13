@@ -94,3 +94,10 @@ with the reasoning, so any of them can be revisited with context.
   brief at `docs/personal-site-privacy-policy-plan.md`. GitHub Pages stays
   canonical until that work happens; the ASC fields should use whichever
   URL is live at submission time.
+
+- **Build pipeline switched to local Xcode archive** (Chris's preference,
+  2026-07-12): `npx expo prebuild -p ios --clean` → archive in Xcode →
+  upload from the Organizer. No "eject" — prebuild is the modern CNG flow
+  and ios/ stays gitignored, regenerated output. `ios.buildNumber` added to
+  app.json as the build-number source of truth (EAS remote autoIncrement
+  only applies to EAS builds). eas.json kept as a working fallback.
