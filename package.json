@@ -59,6 +59,8 @@
     "phone": "expo run:ios --device --configuration Release --no-bundler",
     "prerebuild:ios": "npm test && npm run typecheck && npm run verify:release-bundle",
     "rebuild:ios": "expo prebuild --platform ios --clean",
+    "version:minor": "tsx scripts/bump-version.ts minor",
+    "version:patch": "tsx scripts/bump-version.ts patch",
     "web": "expo start --web",
     "lint": "expo lint",
     "convert": "tsx scripts/convert-workouts.ts",

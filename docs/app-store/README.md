@@ -82,3 +82,7 @@ truth for this path.
 - **Every upload needs a higher `ios.buildNumber`** in app.json (App Store
   Connect rejects duplicates for the same version). Bump it there — not in
   Xcode, where `prebuild --clean` would erase it — and commit the bump.
+- **New versions ship via the `/release` skill** (or by hand:
+  `npm run version:minor` / `version:patch`, which sync both files, reset
+  the build number, commit, tag `vX.Y.Z`, and push; the skill adds the
+  judgment — bump type, GitHub release notes — plus the gated rebuild).
