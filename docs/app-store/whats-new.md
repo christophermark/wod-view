@@ -17,6 +17,10 @@ instead (`.claude/skills/release/internal-release-notes.md`). Never include
 anything from the personal dataset (the AGENTS.md privacy rule applies here
 too).
 
+## v1.0.1
+
+Chalk It Pro exports are now supported alongside SugarWOD — import either from the same screen. Small copy fixes and polish.
+
 ## v1.0.0
 
 Initial release. Import your SugarWOD export and own your training history —
