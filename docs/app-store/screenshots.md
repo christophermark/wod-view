@@ -2,12 +2,15 @@
 
 > **The store set is now the branded compositions**, not these bare
 > screenshots: `npm run store-previews` frames the raw captures in the brand
-> canvas (headline + device frame) at iPhone 6.9" **and** iPad 13" sizes,
-> emitting `.maestro/marketing/out/store/`. The `store-previews` skill
-> (`.claude/skills/store-previews/`) wraps the whole capture → compose →
-> verify workflow; slide copy lives in `scripts/compose-store-previews.ts`.
-> The iPad set becomes uploadable only once the app ships iPad support.
-> Everything below documents the raw-capture stage it builds on.
+> canvas (headline + device frame) at iPhone 6.9", iPhone 6.5", **and** iPad
+> 13" sizes, emitting `.maestro/marketing/out/store/`. The 6.5" set exists
+> because App Store Connect treats it as a separate required upload bucket
+> (1284×2778, not auto-waived by supplying the 6.9" set). The
+> `store-previews` skill (`.claude/skills/store-previews/`) wraps the whole
+> capture → compose → verify workflow; slide copy lives in
+> `scripts/compose-store-previews.ts`. The iPad set becomes uploadable only
+> once the app ships iPad support. Everything below documents the
+> raw-capture stage it builds on.
 
 App Store screenshots are regenerated on demand, never hand-captured:
 

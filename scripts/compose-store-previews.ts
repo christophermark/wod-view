@@ -7,10 +7,12 @@
 //
 //   npm run store-previews          (raw screenshots must exist — npm run screenshots)
 //
-// Emits every slide at both accepted store sizes (App Store Connect specs,
-// July 2026): iPhone 6.9" 1320x2868, iPad 13" 2048x2732. The iPad set is
-// uploadable only if/when the app ships iPad support — generated anyway so
-// it's ready. Slide copy lives in SLIDES below; edit it there, never the PNGs.
+// Emits every slide at all accepted store sizes (App Store Connect specs,
+// July 2026): iPhone 6.9" 1320x2868, iPhone 6.5" 1284x2778 (a separate
+// required upload bucket in ASC, not auto-waived by the 6.9" set), iPad 13"
+// 2048x2732. The iPad set is uploadable only if/when the app ships iPad
+// support — generated anyway so it's ready. Slide copy lives in SLIDES
+// below; edit it there, never the PNGs.
 // Follows the generate-brand-assets.ts pattern: opentype.js text → SVG paths
 // → sharp, so nothing depends on installed system fonts.
 
@@ -144,6 +146,9 @@ interface Device {
 
 const DEVICES: Device[] = [
   { dir: 'iphone-6.9', w: 1320, h: 2868, margin: 96, shotFraction: 0.8 },
+  // App Store Connect's separate "iPhone 6.5" Display" bucket accepts either
+  // 1242x2688 or 1284x2778 — 1284x2778 is the newer/larger of the two.
+  { dir: 'iphone-6.5', w: 1284, h: 2778, margin: 96, shotFraction: 0.8 },
   { dir: 'ipad-13', w: 2048, h: 2732, margin: 144, shotFraction: 0.46 },
 ];
 

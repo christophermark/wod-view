@@ -62,7 +62,9 @@ truth for this path.
    question is pre-answered by `ITSAppUsesNonExemptEncryption`. Wait for the
    "processing complete" email (~15 min).
 6. **Fill in App Store Connect** from `store-listing.md` (all fields), upload
-   screenshots from `.maestro/marketing/out/store/iphone-6.9/`, answer the
+   screenshots from `.maestro/marketing/out/store/iphone-6.9/` **and**
+   `iphone-6.5/` — ASC treats these as separate required buckets, the 6.9"
+   set does not auto-cover the 6.5" one — answer the
    privacy questionnaire ("no data collected") and age rating questionnaire
    (all None/No), paste `review-notes.md` into App Review Information plus
    your phone number, attach the processed build to the 1.0 version.

@@ -1,6 +1,6 @@
 ---
 name: store-previews
-description: This skill should be used to regenerate WOD View's App Store preview images — branded "meet card" compositions (headline + framed app screenshot) at iPhone 6.9" and iPad 13" sizes. Trigger on requests like "regenerate the store previews/screenshots", "update the App Store images", after any UI change that alters the marketed screens, or when slide copy needs to change. It captures fresh screenshots with Maestro, composes them with the brand type system, and visually verifies the results.
+description: This skill should be used to regenerate WOD View's App Store preview images — branded "meet card" compositions (headline + framed app screenshot) at iPhone 6.9", iPhone 6.5", and iPad 13" sizes. Trigger on requests like "regenerate the store previews/screenshots", "update the App Store images", after any UI change that alters the marketed screens, or when slide copy needs to change. It captures fresh screenshots with Maestro, composes them with the brand type system, and visually verifies the results.
 ---
 
 # App Store preview generation
@@ -17,8 +17,10 @@ convention — same as `generate-brand-assets.ts`):
    (`scripts/compose-store-previews.ts`): frames each raw shot in the branded
    canvas — mono eyebrow, Barlow Condensed Black headline with the closing
    phrase in signal red, ink device frame bleeding off the bottom — and emits
-   `.maestro/marketing/out/store/{iphone-6.9,ipad-13}/NN-*.png` at exact
-   accepted App Store Connect sizes (1320×2868, 2048×2732).
+   `.maestro/marketing/out/store/{iphone-6.9,iphone-6.5,ipad-13}/NN-*.png` at
+   exact accepted App Store Connect sizes (1320×2868, 1284×2778, 2048×2732).
+   The 6.5" set exists because ASC shows "iPhone 6.5" Display" as its own
+   required upload bucket, separate from and not waived by the 6.9" set.
 
 ## Workflow
 
@@ -44,15 +46,15 @@ Compose-only reruns are cheap — iterate copy/layout without recapturing.
 ### 3. Verify with your eyes — mandatory
 
 Read several output PNGs (at minimum the first slide, one paper slide, and
-the type-only closer, plus one iPad file). Check:
+the type-only closer, plus one iPhone 6.5" file and one iPad file). Check:
 
 - headline not clipped or overflowing (auto-fit shrinks oversize lines, but
   confirm), no mangled glyphs;
 - screenshots show the **synthetic sample data** (372 WODs, "MURPH",
   "Power Clean 3x5") — never real history, never the red PREVIEW banner;
 - screenshots reflect the current UI (stale raws = rerun capture);
-- files named `NN-<name>-1320x2868.png` / `NN-<name>-2048x2732.png` — the
-  script hard-fails on any other dimensions.
+- files named `NN-<name>-1320x2868.png` / `NN-<name>-1284x2778.png` /
+  `NN-<name>-2048x2732.png` — the script hard-fails on any other dimensions.
 
 ### 4. Editing the deck
 
