@@ -107,7 +107,10 @@ console.log(
 );
 console.log(`store release notes → ${noteFiles.join(', ')}`);
 
-git(`commit -m "v${next}" -- package.json app.json fastlane/metadata`);
+// `git add` first: a pathspec-only commit skips untracked files, and each
+// release creates a brand-new Play changelog file (changelogs/<code>.txt).
+git(`add -- package.json app.json fastlane/metadata`);
+git(`commit -m "v${next}"`);
 git(`tag -a "v${next}" -m "WOD View v${next}"`);
 console.log(`committed and tagged v${next} (not pushed)`);
 console.log('next: npm run deploy:build, then push HEAD and the tag once it succeeds.');
