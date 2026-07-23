@@ -155,10 +155,13 @@ than the HEAD commit (a stale build from before your latest changes).
 - `deploy:submit:android` uploads the AAB to the **production** track with
   the versionCode's changelog. Play reviews it automatically and it goes
   live on approval (managed publishing must stay off, which is the
-  default). Until the app's first Play release is live, keep
-  `PLAY_RELEASE_STATUS=draft` set — the API rejects non-draft releases
-  before then, and a draft still needs one manual rollout in the Play
-  Console. Remove it once live.
+  default). Two temporary overrides in `fastlane/.env`, both to remove once
+  outgrown: while the developer account is still working through Google's
+  production-access requirement (12+ closed testers for 14 days), set
+  `PLAY_TRACK=alpha` so submissions land on closed testing instead; and
+  before the app's _first_ published Play release, set
+  `PLAY_RELEASE_STATUS=draft` — the API rejects non-draft releases until
+  then, and a draft still needs one manual rollout in the Play Console.
 - `deploy:testflight` returns without waiting for Apple's processing. Select
   tester groups in App Store Connect.
 - `deploy:app-store` uploads only the binary — no listing copy, screenshots,

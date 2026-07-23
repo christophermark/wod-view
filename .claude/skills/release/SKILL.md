@@ -122,10 +122,16 @@ changelog; it goes live once Play's review passes. Individual halves:
   (internal track) — binaries land unsubmitted, everything after that is
   manual.
 
-Caveats: until the app's first Play release is live, keep
-`PLAY_RELEASE_STATUS=draft` in `fastlane/.env` (the API rejects non-draft
-releases before then — a draft still needs one manual Play Console rollout).
-Afterward remove it so `submit` releases automatically.
+Caveats — check `fastlane/.env` for these temporary overrides and confirm
+with Chris whether they still apply before assuming full automation:
+
+- `PLAY_TRACK=alpha` routes Android submissions to closed testing while
+  Google's production-access requirement (12+ testers for 14 days) is
+  pending on the developer account (in effect since 2026-07-23). Remove
+  once Google grants production access.
+- `PLAY_RELEASE_STATUS=draft` is only needed before the app's first
+  published Play release (no longer the case — v1.0.0 is live on closed
+  testing).
 
 Tell Chris the version, `ios.buildNumber`, `android.versionCode`, what was
 submitted where, and anything the release notes flagged.

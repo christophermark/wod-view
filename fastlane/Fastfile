@@ -253,7 +253,7 @@ platform :android do
     )
   end
 
-  desc "Upload the built AAB to the production track with release notes (goes live once Play review passes)"
+  desc "Upload the built AAB with release notes to production (or PLAY_TRACK override); live once Play review passes"
   lane :submit do
     json_key = File.expand_path(required_environment_variable("GOOGLE_PLAY_JSON_KEY_PATH"))
     aab = require_release_artifact(AAB_PATH, "npm run deploy:build:android")
@@ -266,7 +266,10 @@ platform :android do
       package_name: ANDROID_PACKAGE,
       aab: aab,
       json_key: json_key,
-      track: "production",
+      # Production, unless overridden — set PLAY_TRACK=alpha in fastlane/.env
+      # while Google's production-access requirement (12+ closed testers for
+      # 14 days) is still pending on the developer account.
+      track: ENV.fetch("PLAY_TRACK", "production"),
       # Until the app's first Play release is live, the API only accepts
       # draft releases — set PLAY_RELEASE_STATUS=draft in fastlane/.env.
       release_status: ENV.fetch("PLAY_RELEASE_STATUS", "completed"),
