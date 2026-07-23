@@ -80,10 +80,14 @@ recommended location for key material is outside the checkout entirely.
    upload `build/fastlane/WODView.aab` in the Play Console (Internal testing
    → Create release). This enrolls the app in Play App Signing and registers
    the upload key. Every upload after that can go through `deploy:play`.
-5. Create a service account so Fastlane can upload: Play Console → Users and
-   permissions → invite the service account you create in Google Cloud
-   (IAM → Service Accounts → create + JSON key), granting it release
-   permission for WOD View. Save the JSON outside the repository and set
+5. Give Fastlane a service account it can upload as. A service account is a
+   per-developer-account credential, not a per-app one: an existing account
+   already linked to the Play Console (e.g. from another app) can simply be
+   granted WOD View under Users and permissions → the account → App
+   permissions → Add app, with "Release apps to testing tracks" and
+   "Release to production". Otherwise create one in Google Cloud (IAM →
+   Service Accounts → create + JSON key) and invite it in the Play Console
+   with those grants. Save the JSON outside the repository and set
    `GOOGLE_PLAY_JSON_KEY_PATH` in `fastlane/.env`. Until the app's first
    Play release is actually live, also set `PLAY_RELEASE_STATUS=draft` — the
    API rejects non-draft releases before then.
