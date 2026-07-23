@@ -1,6 +1,6 @@
 ---
 name: release
-description: This skill should be used to cut a WOD View release — write both kinds of release notes (user-facing store notes + internal GitHub notes), bump the version (minor or patch), build both signed store artifacts (IPA + AAB) with the gated Fastlane pipeline, push the tag, publish the GitHub release, and submit to both stores for review (they go live automatically on approval). Trigger on requests like "cut a release", "push a release", "bump the version", "release v1.1", "prepare a new build for the stores". The mechanics are scripted; choosing the bump type and writing the release notes are the model's job.
+description: This skill should be used to cut a WOD View release — write both kinds of release notes (user-facing store notes + internal GitHub notes), bump the version (minor or patch), build both signed store artifacts (IPA + AAB) with the gated Fastlane pipeline, push the tag, publish the GitHub release, and submit to both stores for review (they go live automatically on approval). Trigger on requests like "cut a release", "push a release", "bump the version", "release v1.1", "prepare a new build for the stores". Ends by independently verifying both stores' states and publishing a release-report artifact. The mechanics are scripted; choosing the bump type and writing the release notes are the model's job.
 ---
 
 # Cutting a WOD View release
@@ -141,6 +141,27 @@ submitted where, and anything the release notes flagged.
 If anything store-visible changed, regenerate previews via the
 `/store-previews` skill and re-read `docs/app-store/store-listing.md` for
 copy that went stale.
+
+### 9. Verify and publish the release report (artifact)
+
+Close out with an independent verification pass — check, don't trust the
+lanes' own output:
+
+- the `vX.Y.Z` tag and GitHub release exist on origin;
+- App Store Connect shows the version waiting for review (ASC API via the
+  fastlane key);
+- Google Play shows the new versionCode on the intended track (a short
+  read-only edits→tracks query with the service-account key from
+  `fastlane/.env`).
+
+Then publish a **private Artifact** release report (load the
+artifact-design skill first; title "WOD View vX.Y.Z release report") so the
+release outcome survives context clearing: version + `ios.buildNumber` +
+`android.versionCode`, gate and build results, both sets of release notes,
+what was submitted where with the verified store states, and any follow-ups
+or temporary overrides still in force (`PLAY_TRACK`, pending
+production-access clock, collateral not regenerated, …). Anything that
+failed or was skipped goes in the report plainly.
 
 ## Re-uploading the same version
 
