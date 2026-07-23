@@ -59,9 +59,9 @@ recommended location for key material is outside the checkout entirely.
    it up somewhere safe:
 
    ```sh
-   mkdir -p ~/.android-keys
+   mkdir -p ~/.keystores/wodview
    keytool -genkeypair -v \
-     -keystore ~/.android-keys/wodview-upload.keystore \
+     -keystore ~/.keystores/wodview/wodview-upload.keystore \
      -alias wodview-upload -keyalg RSA -keysize 2048 -validity 10000
    ```
 
