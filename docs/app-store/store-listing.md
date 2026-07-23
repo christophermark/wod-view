@@ -33,6 +33,16 @@ Your training history, turned into insight. PRs, streaks, lift bests, and your b
 
 156 chars. Deliberately trademark-free (see "Trademark decisions" below).
 
+## Play Store short description (80 chars max)
+
+```
+Every rep. Every PR. Analyzed. Your workout history, private on your phone.
+```
+
+75 chars. Google Play Console's equivalent of the subtitle + promotional text:
+leads with the brand line, then the privacy hook. Trademark-free (see
+"Trademark decisions" below).
+
 ## Description (4000 chars max)
 
 ```
