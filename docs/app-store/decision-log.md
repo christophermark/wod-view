@@ -119,3 +119,20 @@ with the reasoning, so any of them can be revisited with context.
   Scoped to that custom domain only: the live GitHub Pages URLs
   (`christophermark.github.io/wod-view/…`, tied to the repo name) are
   untouched.
+
+## 2026-07-23
+
+- **GitHub Pages fully retired** (completing the plan in
+  `docs/personal-site-privacy-policy-plan.md`): `docs/privacy/` and
+  `docs/support/` are now minimal redirect stubs to
+  `https://www.christophermark.me/wodview/privacy` and `…/wodview/support`.
+  The support URL in store-listing.md (and the checklist in README.md) now
+  points at the personal site too — if App Store Connect / Play Console still
+  hold the old `github.io` support URL, update them at the next release.
+- **`docs/app-intent.md` created** — single source of truth for the durable
+  product facts (platforms, import sources + exact branding, canonical URLs,
+  contact email) after a sweep found stragglers: "iPhone-first/iPhone-only"
+  framing (the app ships on iOS **and** Android; "no iPad support" is the
+  accurate phrase), the GitHub Pages pointers above, and SugarWOD-only copy
+  in README.md (now "SugarWOD and Chalk It Pro supported", matching the
+  store listing). In-app import copy stays SugarWOD-only on purpose.

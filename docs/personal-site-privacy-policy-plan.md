@@ -1,5 +1,13 @@
 # Plan: move the WOD View privacy policy onto Chris's personal site
 
+> **Status: DONE (July 2026).** The pages live at
+> https://www.christophermark.me/wodview/privacy and `…/wodview/support`
+> (source: the `~/dev/christophermark.me` Next.js repo — note the chosen URL
+> namespace is `/wodview/…`, not the `/apps/wod-view/…` suggested below).
+> `docs/privacy/` and `docs/support/` in this repo are now minimal redirect
+> stubs, and the repo's references point at the personal-site URLs. Kept for
+> historical context only.
+
 > Self-contained brief, same convention as `docs/features/`. Paste it (or
 > point a session at this file) when starting the work — likely a session
 > running in the personal site's repo, not this one. That session may read

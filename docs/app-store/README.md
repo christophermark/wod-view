@@ -11,8 +11,10 @@ State of the App Store readiness work. Files here:
 
 - [x] `app.json`: `userInterfaceStyle: "light"`, `ITSAppUsesNonExemptEncryption: false`,
       `ios.buildNumber` (bump per upload — see rules below)
-- [x] Privacy policy live: https://christophermark.github.io/wod-view/privacy/
-- [x] Support page live: https://christophermark.github.io/wod-view/support/
+- [x] Privacy policy live: https://www.christophermark.me/wodview/privacy
+- [x] Support page live: https://www.christophermark.me/wodview/support
+      (the old GitHub Pages URLs are redirect stubs in `docs/privacy/` and
+      `docs/support/`)
 - [x] Store listing copy, keywords, category, age-rating answers (store-listing.md)
 - [x] App Review notes with the preview-mode walkthrough (review-notes.md)
 - [x] Branded store previews (`npm run screenshots` + `npm run store-previews`,

@@ -32,8 +32,8 @@ npm run screenshots     # → .maestro/marketing/out/*.png
 
 Five portrait shots at the simulator's native 1320×2868 — an accepted App
 Store 6.9"-class size (Apple also accepts 1290×2796 and 1260×2736; one 6.9"
-set auto-scales to every smaller iPhone shelf, and iPad is not required for
-this iPhone-only app). Store upload order is baked into the filenames:
+set auto-scales to every smaller iPhone shelf, and iPad is not required while
+the app has no iPad support). Store upload order is baked into the filenames:
 
 1. `01-log` — the LOG tab, years of workouts
 2. `02-workout` — MURPH workout detail

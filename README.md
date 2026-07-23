@@ -6,7 +6,7 @@
 
 <p align="center">
   <strong>Every rep. Every PR. Analyzed.</strong><br />
-  A fast, private iPhone archive for the workout history you already own.
+  A fast, private phone archive for the workout history you already own — on iOS and Android.
 </p>
 
 <p align="center">
@@ -15,7 +15,7 @@
   <a href="https://www.christophermark.me/wodview/privacy">Privacy</a>
 </p>
 
-WOD View turns a SugarWOD workout-history export into a searchable training log, calendar, and lifetime stats dashboard. Import a CSV on your iPhone and the app parses everything on-device—no account, server, analytics, ads, or subscription.
+WOD View turns your gym app's workout-history export — SugarWOD and Chalk It Pro supported — into a searchable training log, calendar, and lifetime stats dashboard. Import a CSV on your phone and the app parses everything on-device—no account, server, analytics, ads, or subscription.
 
 <table>
   <tr>
@@ -32,8 +32,8 @@ WOD View turns a SugarWOD workout-history export into a searchable training log,
 
 ## How it works
 
-1. Request your workout-history export from SugarWOD.
-2. Save the CSV from the export email to Files on your iPhone.
+1. Request your workout-history export from SugarWOD or Chalk It Pro.
+2. Save the CSV from the export email to your phone.
 3. Import it into WOD View. Your history is parsed and stored entirely on-device.
 
 No export handy? Preview mode includes three years of deterministic sample workouts, so every screen can be explored before importing personal data.

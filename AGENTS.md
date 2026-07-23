@@ -1,9 +1,13 @@
 # WOD View — agent guide
 
-Personal phone app (Expo SDK 57 / expo-router / TypeScript strict) for browsing archived
-SugarWOD workouts — iPhone-first, released to both the App Store and Google Play. Read the
-exact versioned docs at https://docs.expo.dev/versions/v57.0.0/ before writing
-Expo-specific code — APIs have changed.
+Personal phone app (Expo SDK 57 / expo-router / TypeScript strict) that turns the
+workout-history export from a previous gym app (SugarWOD and Chalk It Pro supported) into
+a private on-device training archive — phone-first on both iOS and Android, released to
+the App Store and Google Play. Durable product facts (platforms, import sources, URLs,
+contact email) live in `docs/app-intent.md` — check it before writing user-facing copy,
+and update it when any of those truths change. Read the exact versioned docs at
+https://docs.expo.dev/versions/v57.0.0/ before writing Expo-specific code — APIs have
+changed.
 
 Planned analytics features live as self-contained briefs in `docs/features/` (see the
 README there for build order and conventions). When asked to implement one, start from
@@ -30,7 +34,7 @@ its brief.
   `docs/app-store/screenshots.md`). Temporarily swaps the bundled dataset to the
   synthetic sample so no personal data or preview banner appears, restores on exit.
 - `npm run store-previews` — compose the raw shots into the branded store images
-  (iPhone 6.9" + iPad 13"). The `/store-previews` skill wraps capture → compose →
+  (App Store iPhone/iPad sizes + Google Play sets). The `/store-previews` skill wraps capture → compose →
   visual verification; slide copy lives in `scripts/compose-store-previews.ts`.
 - `npm run verify:release-bundle` — release-blocking check that the production
   `expo export` (iOS + Android) contains no personal-dataset strings. Run before
@@ -48,8 +52,11 @@ its brief.
 - CI (`.github/workflows/ci.yml`) runs tsc, eslint (0 warnings), prettier --check, jest.
 
 App Store submission state, listing copy, and pipeline docs live in `docs/app-store/`
-(start at its README). The privacy policy and support pages are GitHub Pages off
-`docs/privacy/` and `docs/support/` — keep them true if data handling ever changes.
+(start at its README). The website, privacy policy, and support pages live on Chris's
+personal site — https://www.christophermark.me/wodview (+ `/privacy`, `/support`), source
+in the `~/dev/christophermark.me` repo — keep them true if data handling ever changes.
+`docs/privacy/` and `docs/support/` here are only redirect stubs for the retired GitHub
+Pages URLs.
 
 ## Public repository — hard rule
 
@@ -79,9 +86,10 @@ dependency graphs. If you touch that require, re-verify with `npm run verify:rel
   `parse-workouts-csv.ts`) stay free of React/React Native/Node imports.** They are pure,
   unit-tested, and shared with the Node convert script.
 - The import flow parses through `parseWorkoutsCsv()` (`parse-workouts-csv.ts`), which
-  detects the source app by CSV header: SugarWOD or Chalk It Pro. Chalk It Pro support is
-  deliberately unadvertised — all user-facing import copy mentions only SugarWOD, and
-  unknown files fail with the SugarWOD-flavored error.
+  detects the source app by CSV header: SugarWOD or Chalk It Pro. Store listings and the
+  website name both services, but in-app import copy deliberately mentions only SugarWOD
+  (Chris's call — revisit only when he says so), and unknown files fail with the
+  SugarWOD-flavored error.
 - **Screens get data only from `useWorkouts()`** (`src/lib/data-context.tsx`), never by
   importing JSON or module-level singletons. The provider switches between three sources:
   `bundled` (dev-only test mode, empty in production), `imported` (in-app CSV import,

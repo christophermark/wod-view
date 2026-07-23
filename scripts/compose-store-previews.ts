@@ -542,7 +542,7 @@ async function main() {
   console.log(
     `\nStore previews: ${OUT.replace(`${ROOT}/`, '')}/{${DEVICES.map((d) => d.dir).join(',')}}`,
   );
-  console.log('iPad set is uploadable only once the app ships iPad support (iPhone-only today).');
+  console.log('iPad set is uploadable only once the app ships iPad support (none today).');
   console.log('Play uploads: play-phone + play-tablet-7 + play-tablet-10 + feature graphic;');
   console.log('the Play listing icon is assets/images/play-icon.png (generate-brand-assets.ts).');
 }

@@ -116,7 +116,7 @@ treatment claims, no loot boxes/IAP. Expected result: **4+**.
 ## URLs
 
 - **Privacy policy URL:** https://www.christophermark.me/wodview/privacy
-- **Support URL:** https://christophermark.github.io/wod-view/support/
+- **Support URL:** https://www.christophermark.me/wodview/support
 - Marketing URL: optional, leave empty (or reuse the support page).
 
 ## Copyright
