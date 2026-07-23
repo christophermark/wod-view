@@ -43,6 +43,25 @@ Every rep. Every PR. Analyzed. Your workout history, private on your phone.
 leads with the brand line, then the privacy hook. Trademark-free (see
 "Trademark decisions" below).
 
+## Play Store graphic assets
+
+All generated, never hand-edited:
+
+- **App icon** (512×512, required): `assets/images/play-icon.png` — the same
+  full-bleed paper "W" art as the App Store icon, from
+  `scripts/generate-brand-assets.ts`. Play applies its own corner mask.
+- **Feature graphic** (1024×500, required):
+  `.maestro/marketing/out/store/feature-graphic-1024x500.png` from
+  `npm run store-previews` — ink hero grammar (EVERY REP. / EVERY PR. /
+  ANALYZED.), pure branding, no screenshot, nothing critical near the edges
+  (Play crops/dims it in some placements).
+- **Screenshots**: `npm run store-previews` emits dedicated Play sets at
+  exact 9:16 — `play-phone` 1440×2560, `play-tablet-7` 1080×1920,
+  `play-tablet-10` 2160×3840 — because Play hard-rejects anything taller
+  than 2:1 (the iPhone App Store canvases are ~2.17:1) and 9:16 at ≥1080px
+  is required for promotion/featuring eligibility. Upload all seven slides
+  per bucket (Play allows up to 8; ≥4 needed for featuring).
+
 ## Description (4000 chars max)
 
 ```

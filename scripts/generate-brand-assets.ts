@@ -135,6 +135,10 @@ async function main() {
   // App icon (App Store listing uses this same 1024px art).
   await png(iconSvg(1024, 0.62, { bg: PAPER }), join(IMAGES, 'icon.png'), 1024);
 
+  // Google Play listing icon: 512x512, full-bleed square (Play applies its
+  // own corner mask, same as the in-app adaptive icon does).
+  await png(iconSvg(1024, 0.62, { bg: PAPER }), join(IMAGES, 'play-icon.png'), 512);
+
   // iOS appearance variants (app.json ios.icon): dark and tinted must sit on
   // transparent ground — the system supplies the dark/tinted backdrop.
   await png(iconSvg(1024, 0.62, { body: PAPER }), join(IMAGES, 'ios-icon-dark.png'), 1024);

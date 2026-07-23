@@ -1,6 +1,6 @@
 ---
 name: store-previews
-description: This skill should be used to regenerate WOD View's App Store preview images — branded "meet card" compositions (headline + framed app screenshot) at iPhone 6.9", iPhone 6.5", and iPad 13" sizes. Trigger on requests like "regenerate the store previews/screenshots", "update the App Store images", after any UI change that alters the marketed screens, or when slide copy needs to change. It captures fresh screenshots with Maestro, composes them with the brand type system, and visually verifies the results.
+description: This skill should be used to regenerate WOD View's store preview images — branded "meet card" compositions (headline + framed app screenshot) at App Store sizes (iPhone 6.9", iPhone 6.5", iPad 13") and Google Play sizes (9:16 phone + 7"/10" tablet sets, plus the 1024×500 feature graphic). Trigger on requests like "regenerate the store previews/screenshots", "update the App Store/Play Store images", after any UI change that alters the marketed screens, or when slide copy needs to change. It captures fresh screenshots with Maestro, composes them with the brand type system, and visually verifies the results.
 ---
 
 # App Store preview generation
@@ -17,10 +17,16 @@ convention — same as `generate-brand-assets.ts`):
    (`scripts/compose-store-previews.ts`): frames each raw shot in the branded
    canvas — mono eyebrow, Barlow Condensed Black headline with the closing
    phrase in signal red, ink device frame bleeding off the bottom — and emits
-   `.maestro/marketing/out/store/{iphone-6.9,iphone-6.5,ipad-13}/NN-*.png` at
-   exact accepted App Store Connect sizes (1320×2868, 1284×2778, 2048×2732).
-   The 6.5" set exists because ASC shows "iPhone 6.5" Display" as its own
-   required upload bucket, separate from and not waived by the 6.9" set.
+   `.maestro/marketing/out/store/{iphone-6.9,iphone-6.5,ipad-13,play-phone,play-tablet-7,play-tablet-10}/NN-*.png`
+   at exact accepted store sizes — App Store Connect: 1320×2868, 1284×2778,
+   2048×2732; Google Play: 1440×2560, 1080×1920, 2160×3840 (exact 9:16 —
+   Play hard-rejects anything beyond 2:1, which rules out the iPhone
+   canvases, and wants 9:16 at ≥1080px for promotion eligibility). Also
+   emits the Play feature graphic (`feature-graphic-1024x500.png`, pure
+   branding, no screenshot). The 6.5" set exists because ASC shows "iPhone
+   6.5" Display" as its own required upload bucket, separate from and not
+   waived by the 6.9" set. The Play listing icon (512×512) is
+   `assets/images/play-icon.png`, from `generate-brand-assets.ts`.
 
 ## Workflow
 
@@ -46,15 +52,16 @@ Compose-only reruns are cheap — iterate copy/layout without recapturing.
 ### 3. Verify with your eyes — mandatory
 
 Read several output PNGs (at minimum the first slide, one paper slide, and
-the type-only closer, plus one iPhone 6.5" file and one iPad file). Check:
+the type-only closer, plus one iPhone 6.5" file, one iPad file, one Play
+file, and the feature graphic). Check:
 
 - headline not clipped or overflowing (auto-fit shrinks oversize lines, but
   confirm), no mangled glyphs;
 - screenshots show the **synthetic sample data** (372 WODs, "MURPH",
   "Power Clean 3x5") — never real history, never the red PREVIEW banner;
 - screenshots reflect the current UI (stale raws = rerun capture);
-- files named `NN-<name>-1320x2868.png` / `NN-<name>-1284x2778.png` /
-  `NN-<name>-2048x2732.png` — the script hard-fails on any other dimensions.
+- files named `NN-<name>-<WxH>.png` at their device dir's exact size — the
+  script hard-fails on any other dimensions.
 
 ### 4. Editing the deck
 
@@ -74,6 +81,9 @@ the type-only closer, plus one iPhone 6.5" file and one iPad file). Check:
   (runaway contour blanks the rest of the path). All text must be rendered
   at native em size (`font.unitsPerEm`) and scaled via an SVG transform —
   the helpers in the compose script already do this; don't "simplify" it.
+  Fractional **x offsets** into `getPath` trip the same bug (Plex Mono "W"
+  at a float-noisy cursor came back all-NaN), so `trackedText` draws every
+  glyph at x=0 and positions it with a per-glyph SVG translate.
 - App Store Connect rejects PNGs with alpha; the composer strips it.
 - The **iPad set is uploadable only if the app ships iPad support**
   (iPhone-only today, `supportsTablet` unset). Generated regardless so it's

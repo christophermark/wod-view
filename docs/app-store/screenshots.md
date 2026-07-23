@@ -2,10 +2,16 @@
 
 > **The store set is now the branded compositions**, not these bare
 > screenshots: `npm run store-previews` frames the raw captures in the brand
-> canvas (headline + device frame) at iPhone 6.9", iPhone 6.5", **and** iPad
-> 13" sizes, emitting `.maestro/marketing/out/store/`. The 6.5" set exists
-> because App Store Connect treats it as a separate required upload bucket
-> (1284×2778, not auto-waived by supplying the 6.9" set). The
+> canvas (headline + device frame) at iPhone 6.9", iPhone 6.5", and iPad
+> 13" sizes for App Store Connect **plus** three exact-9:16 Google Play sets
+> (phone 1440×2560, 7" tablet 1080×1920, 10" tablet 2160×3840) and the Play
+> feature graphic (1024×500), emitting `.maestro/marketing/out/store/`. The
+> 6.5" set exists because App Store Connect treats it as a separate required
+> upload bucket (1284×2778, not auto-waived by supplying the 6.9" set); the
+> Play sets exist because Play hard-rejects screenshots taller than 2:1
+> (modern iPhone canvases are ~2.17:1) and wants exact 9:16 at ≥1080px for
+> promotion eligibility. The Play listing icon (512×512) is
+> `assets/images/play-icon.png` from `generate-brand-assets.ts`. The
 > `store-previews` skill (`.claude/skills/store-previews/`) wraps the whole
 > capture → compose → verify workflow; slide copy lives in
 > `scripts/compose-store-previews.ts`. The iPad set becomes uploadable only

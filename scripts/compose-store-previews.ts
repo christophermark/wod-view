@@ -7,12 +7,17 @@
 //
 //   npm run store-previews          (raw screenshots must exist — npm run screenshots)
 //
-// Emits every slide at all accepted store sizes (App Store Connect specs,
-// July 2026): iPhone 6.9" 1320x2868, iPhone 6.5" 1284x2778 (a separate
-// required upload bucket in ASC, not auto-waived by the 6.9" set), iPad 13"
-// 2048x2732. The iPad set is uploadable only if/when the app ships iPad
-// support — generated anyway so it's ready. Slide copy lives in SLIDES
-// below; edit it there, never the PNGs.
+// Emits every slide at all accepted store sizes (App Store Connect + Google
+// Play Console specs, July 2026): iPhone 6.9" 1320x2868, iPhone 6.5"
+// 1284x2778 (a separate required upload bucket in ASC, not auto-waived by
+// the 6.9" set), iPad 13" 2048x2732, and three 9:16 Google Play sets —
+// phone 1440x2560, 7" tablet 1080x1920, 10" tablet 2160x3840. Play rejects
+// the iPhone canvases outright (hard 2:1 max aspect; modern iPhones are
+// ~2.17:1) and wants exact 9:16 at ≥1080px for promotion eligibility, hence
+// the dedicated sets. Also emits the Play feature graphic (1024x500).
+// The iPad set is uploadable only if/when the app ships iPad support —
+// generated anyway so it's ready. Slide copy lives in SLIDES below; edit it
+// there, never the PNGs.
 // Follows the generate-brand-assets.ts pattern: opentype.js text → SVG paths
 // → sharp, so nothing depends on installed system fonts.
 
@@ -150,6 +155,15 @@ const DEVICES: Device[] = [
   // 1242x2688 or 1284x2778 — 1284x2778 is the newer/larger of the two.
   { dir: 'iphone-6.5', w: 1284, h: 2778, margin: 96, shotFraction: 0.8 },
   { dir: 'ipad-13', w: 2048, h: 2732, margin: 144, shotFraction: 0.46 },
+  // Google Play sets: exact 9:16 (promotion-eligible; Play's hard limit is
+  // 2:1, which the iPhone canvases above exceed). Same aspect for phone and
+  // both tablet buckets — Play has no separate tablet aspect, just separate
+  // upload slots — so these three render identically, only scaled. Margins
+  // track canvas height (96 at the 2868 reference) to keep the composition
+  // identical across sizes.
+  { dir: 'play-phone', w: 1440, h: 2560, margin: 86, shotFraction: 0.66 },
+  { dir: 'play-tablet-7', w: 1080, h: 1920, margin: 64, shotFraction: 0.66 },
+  { dir: 'play-tablet-10', w: 2160, h: 3840, margin: 129, shotFraction: 0.66 },
 ];
 
 const RAW_W = 1320; // raws must come off an iPhone 17 Pro Max simulator
@@ -189,7 +203,14 @@ function trackedText(
   let cursor = 0;
   const parts: string[] = [];
   for (const ch of text) {
-    parts.push(`<path d="${font.getPath(ch, cursor, 0, upm).toPathData(2)}" fill="${fill}"/>`);
+    // Glyphs are drawn at x=0 and positioned by transform: passing the
+    // accumulated (float-noisy) cursor into getPath can trip the same
+    // opentype.js 2.0 contour bug as fractional sizes — e.g. Plex Mono "W"
+    // at x=6900.000000000001 comes back with every x coordinate NaN.
+    const d = font.getPath(ch, 0, 0, upm).toPathData(2);
+    parts.push(
+      `<g transform="translate(${cursor.toFixed(2)} 0)"><path d="${d}" fill="${fill}"/></g>`,
+    );
     cursor += font.getAdvanceWidth(ch, upm) + trackingEm;
   }
   return {
@@ -459,15 +480,71 @@ async function renderSlide(slide: Slide, device: Device, index: number) {
   console.log(`${device.dir}/${path.basename(outPath)}  ✓`);
 }
 
+// ---------------------------------------------------------------------------
+// Google Play feature graphic (1024x500) — the listing's landscape banner.
+// The ink hero slide's grammar turned sideways: mono eyebrow, headline stack
+// with the last word in red, ghost W bleeding off the right edge. No
+// screenshot — Play crops and dims this asset in some placements, so it
+// stays pure branding with everything important well inside the edges.
+// ---------------------------------------------------------------------------
+
+async function renderFeatureGraphic() {
+  const w = 1024;
+  const h = 500;
+  const margin = 64;
+  const parts: string[] = [`<rect width="${w}" height="${h}" fill="${INK}"/>`];
+
+  const wSize = 760;
+  parts.push(
+    `<g opacity="0.14">${textPath(display, 'W', w - display.getAdvanceWidth('W', wSize) * 0.7, h + 40, wSize, PAPER)}</g>`,
+  );
+
+  const eyebrowY = margin + 26;
+  parts.push(trackedText(mono, 'PERSONAL WOD ARCHIVE', margin, eyebrowY, 24, ACCENT, 4).svg);
+
+  const lines: Segment[][] = [
+    [{ text: 'EVERY REP.' }],
+    [{ text: 'EVERY PR.' }],
+    [{ text: 'ANALYZED.', accent: true }],
+  ];
+  const headSize = 108;
+  const lineHeight = 100;
+  let baseline = eyebrowY + 40 + headSize;
+  for (const line of lines) {
+    let x = margin;
+    for (const seg of line) {
+      parts.push(textPath(display, seg.text, x, baseline, headSize, seg.accent ? ACCENT : PAPER));
+      x += display.getAdvanceWidth(seg.text, headSize);
+    }
+    baseline += lineHeight;
+  }
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${parts.join('')}</svg>`;
+  const outPath = path.join(OUT, `feature-graphic-${w}x${h}.png`);
+  await sharp(Buffer.from(svg), { density: 72 })
+    .removeAlpha()
+    .png({ compressionLevel: 9 })
+    .toFile(outPath);
+  const check = await sharp(outPath).metadata();
+  if (check.width !== w || check.height !== h) {
+    throw new Error(`${outPath} rendered at ${check.width}x${check.height}, expected ${w}x${h}`);
+  }
+  console.log(`${path.basename(outPath)}  ✓`);
+}
+
 async function main() {
   fs.rmSync(OUT, { recursive: true, force: true });
+  fs.mkdirSync(OUT, { recursive: true });
   for (const device of DEVICES) {
     for (const [i, slide] of SLIDES.entries()) await renderSlide(slide, device, i);
   }
+  await renderFeatureGraphic();
   console.log(
     `\nStore previews: ${OUT.replace(`${ROOT}/`, '')}/{${DEVICES.map((d) => d.dir).join(',')}}`,
   );
   console.log('iPad set is uploadable only once the app ships iPad support (iPhone-only today).');
+  console.log('Play uploads: play-phone + play-tablet-7 + play-tablet-10 + feature graphic;');
+  console.log('the Play listing icon is assets/images/play-icon.png (generate-brand-assets.ts).');
 }
 
 main().catch((e) => {
