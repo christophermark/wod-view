@@ -1,0 +1,8 @@
+default_permissions = "wod_view"
+
+[permissions.wod_view]
+description = "Edit this workspace without exposing its root .env file."
+extends = ":workspace"
+
+[permissions.wod_view.filesystem.":workspace_roots"]
+".env" = "deny"

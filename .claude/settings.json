@@ -1,5 +1,21 @@
 {
   "enabledPlugins": {
     "expo@claude-plugins-official": true
+  },
+  "permissions": {
+    "deny": [
+      "Read(.env)",
+      "Read(**/.env)",
+      "Bash(cat .env*)",
+      "Bash(cat fastlane/.env*)",
+      "Bash(head .env*)",
+      "Bash(head fastlane/.env*)",
+      "Bash(tail .env*)",
+      "Bash(tail fastlane/.env*)",
+      "Bash(less .env*)",
+      "Bash(less fastlane/.env*)",
+      "Bash(more .env*)",
+      "Bash(more fastlane/.env*)"
+    ]
   }
 }
