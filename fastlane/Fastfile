@@ -96,6 +96,9 @@ def build_android_aab
     project_dir: File.join(PROJECT_ROOT, "android"),
     task: "bundle",
     build_type: "Release",
+    # The generated command line embeds the signing passwords as -P properties;
+    # never print it (terminal scrollback, CI logs, pasted build errors).
+    print_command: false,
     properties: {
       # AGP's injected-signing properties: sign with the upload key without
       # patching the disposable generated android/ project.
