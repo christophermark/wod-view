@@ -106,3 +106,16 @@ with the reasoning, so any of them can be revisited with context.
   and ios/ stays gitignored, regenerated output. `ios.buildNumber` added to
   app.json as the build-number source of truth (EAS remote autoIncrement
   only applies to EAS builds). eas.json kept as a working fallback.
+
+## 2026-07-22
+
+- **Public contact email corrected again, to chrismarklabs@gmail.com**
+  (Chris) — the 2026-07-12 entry above named chrismarkapps@gmail.com, which
+  was itself wrong. Fixed on the live privacy/support pages, review notes,
+  README, and the personal-site plan doc.
+- **`christophermark.me` links renamed from `/wod-view/…` to
+  `/wodview/…`** — updated the privacy page's self-referencing links and
+  canonical tag, README, and the privacy policy URL in store-listing.md.
+  Scoped to that custom domain only: the live GitHub Pages URLs
+  (`christophermark.github.io/wod-view/…`, tied to the repo name) are
+  untouched.

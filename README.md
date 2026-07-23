@@ -10,9 +10,9 @@
 </p>
 
 <p align="center">
-  <a href="https://www.christophermark.me/wod-view">Website</a> ·
-  <a href="https://www.christophermark.me/wod-view/support">Support</a> ·
-  <a href="https://www.christophermark.me/wod-view/privacy">Privacy</a>
+  <a href="https://www.christophermark.me/wodview">Website</a> ·
+  <a href="https://www.christophermark.me/wodview/support">Support</a> ·
+  <a href="https://www.christophermark.me/wodview/privacy">Privacy</a>
 </p>
 
 WOD View turns a SugarWOD workout-history export into a searchable training log, calendar, and lifetime stats dashboard. Import a CSV on your iPhone and the app parses everything on-device—no account, server, analytics, ads, or subscription.
@@ -47,7 +47,7 @@ No export handy? Preview mode includes three years of deterministic sample worko
 
 ## Private by architecture
 
-WOD View has no backend and no account system. Imported workout history never leaves the device, and the app includes no analytics, advertising, or crash-reporting SDKs. Clear the import in Settings or delete the app and the local data is gone. See the full [privacy policy](https://www.christophermark.me/wod-view/privacy).
+WOD View has no backend and no account system. Imported workout history never leaves the device, and the app includes no analytics, advertising, or crash-reporting SDKs. Clear the import in Settings or delete the app and the local data is gone. See the full [privacy policy](https://www.christophermark.me/wodview/privacy).
 
 ## Data
 

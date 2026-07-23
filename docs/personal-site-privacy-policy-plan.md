@@ -29,7 +29,7 @@ one that's meant to last.
   hairline `#E7E3D8`; Barlow / Barlow Condensed / IBM Plex Mono). Both HTML
   files are self-contained (inline CSS, no external requests) and can be
   lifted nearly verbatim if the site serves static HTML.
-- Contact email everywhere: **chrismarkapps@gmail.com**.
+- Contact email everywhere: **chrismarklabs@gmail.com**.
 
 ## The work
 
