@@ -1,4 +1,5 @@
-# Onboarding walkthrough: hero → import step → back → into preview mode.
+# Onboarding walkthrough: hero → import step → back → into preview mode
+# (preview is the hero's primary CTA; import is the secondary path).
 #
 # Dev builds never show onboarding organically (they boot on the bundled
 # dataset), so this reaches it via settings → DEV TOOLS → VIEW ONBOARDING FLOW.
@@ -19,8 +20,9 @@ appId: com.christophermark.wodview
       text: 'VIEW ONBOARDING FLOW.*'
 - tapOn: 'VIEW ONBOARDING FLOW.*'
 - assertVisible: 'PERSONAL WOD ARCHIVE'
+- assertVisible: 'EXPLORE WITH SAMPLE DATA.*'
 - takeScreenshot: .maestro/screenshots/onboarding-01-hero
-- tapOn: 'GET STARTED.*'
+- tapOn: 'IMPORT YOUR OWN DATA.*'
 - assertVisible: 'LOAD YOUR LOG'
 - assertVisible: 'TRY PREVIEW MODE.*'
 - takeScreenshot: .maestro/screenshots/onboarding-02-import
@@ -33,8 +35,7 @@ appId: com.christophermark.wodview
 - tapOn:
     id: 'onboarding-back'
 - assertVisible: 'PERSONAL WOD ARCHIVE'
-- tapOn: 'GET STARTED.*'
-- tapOn: 'TRY PREVIEW MODE.*'
+- tapOn: 'EXPLORE WITH SAMPLE DATA.*'
 - extendedWaitUntil:
     visible: 'PREVIEW MODE · SAMPLE DATA'
     timeout: 15000
