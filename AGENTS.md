@@ -36,11 +36,15 @@ its brief.
   `expo export` (iOS + Android) contains no personal-dataset strings. Run before
   every store build.
 - `npm run deploy:build` — Fastlane's gated build of both signed store artifacts
-  (IPA + AAB). Upload lanes (`deploy:testflight` / `deploy:app-store` /
-  `deploy:play`) only upload what was built — never rebuild, never submit for
-  review. Versioning via `npm run version:minor|patch` (local commit + tag; push
-  happens after a successful build — the `/release` skill orchestrates). Setup
-  and behavior live in `docs/app-store/deployments.md`.
+  (IPA + AAB). `npm run deploy:submit` is the default release path: submits both
+  stores for review with the release notes; they go live automatically on
+  approval. Upload-only lanes (`deploy:testflight` / `deploy:app-store` /
+  `deploy:play`) upload without submitting, for TestFlight-only or held-back
+  releases. All of them only ship what was built — never rebuild. Versioning via
+  `npm run version:minor|patch` (local commit + tag; also stamps the store
+  release notes from `docs/app-store/whats-new.md` into `fastlane/metadata/`;
+  push happens after a successful build — the `/release` skill orchestrates).
+  Setup and behavior live in `docs/app-store/deployments.md`.
 - CI (`.github/workflows/ci.yml`) runs tsc, eslint (0 warnings), prettier --check, jest.
 
 App Store submission state, listing copy, and pipeline docs live in `docs/app-store/`

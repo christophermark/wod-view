@@ -6,11 +6,14 @@ stores. The model is **build once, upload separately**:
 - `npm run deploy:build` regenerates the disposable native projects, runs the
   release gates once, and produces both signed artifacts:
   `build/fastlane/WODView.ipa` and `build/fastlane/WODView.aab`.
-- The upload commands (`deploy:testflight`, `deploy:app-store`, `deploy:play`)
-  only upload those exact artifacts — they never rebuild, and they refuse to
-  run if the artifact is missing.
-- Nothing here ever submits for App Review or promotes a Play release to
-  production. Those two clicks stay manual on purpose.
+- The upload and submit commands (`deploy:submit`, `deploy:testflight`,
+  `deploy:app-store`, `deploy:play`) only upload those exact artifacts —
+  they never rebuild, and they refuse to run if the artifact is missing.
+- `npm run deploy:submit` is the default release path: it submits both
+  stores for review with the release notes, and each release goes live
+  automatically once its review passes — no store website visits. The
+  upload-only commands remain for TestFlight-only releases or for holding
+  a build back from review.
 
 The release gates are Jest, TypeScript, and `npm run verify:release-bundle`
 (the release-blocking scan proving the personal dataset is absent from both
@@ -96,16 +99,30 @@ npm run deploy:build
 npm run deploy:build:ios
 npm run deploy:build:android
 
-# Upload the built IPA to TestFlight (processing/distribution stays in ASC)
+# DEFAULT RELEASE PATH — submit both stores for review; each goes live
+# automatically once its review passes (iOS: upload + wait for processing +
+# submit with automatic release; Android: production track with changelog)
+npm run deploy:submit
+
+# Or one store at a time
+npm run deploy:submit:ios
+npm run deploy:submit:android
+
+# --- Scoped-down alternatives (nothing below submits for review) ---
+
+# Upload the built IPA to TestFlight only (processing/distribution stays in ASC)
 npm run deploy:testflight
 
-# Upload the built IPA to App Store Connect (binary only; submit manually)
+# Upload the built IPA to App Store Connect (binary only; hold for review)
 npm run deploy:app-store
 
-# Upload the built AAB to Google Play (internal track by default;
-# promote to production manually in the Play Console)
+# Upload the built AAB to Google Play's internal track only
 npm run deploy:play
 ```
+
+If the IPA was already uploaded (e.g. a TestFlight-only release being
+promoted later), submit without re-uploading:
+`bundle exec fastlane ios submit skip_upload:true`.
 
 Every build command requires a completely clean Git worktree and runs the
 release gates before regenerating `ios/` / `android/` with
@@ -122,19 +139,34 @@ than the HEAD commit (a stale build from before your latest changes).
   `/release` skill orchestrates the whole sequence.
 - Re-uploading the **same version** (rejected/failed upload) needs a higher
   `ios.buildNumber` and `android.versionCode` in app.json — hand-edit and
-  commit; no tag, no version bump. ASC rejects duplicate build numbers
-  within a version; Play rejects any versionCode it has ever seen.
+  commit; no tag, no version bump. Rename the Play changelog file
+  (`fastlane/metadata/android/en-US/changelogs/<versionCode>.txt`) to match
+  the new versionCode in the same commit. ASC rejects duplicate build
+  numbers within a version; Play rejects any versionCode it has ever seen.
+- `deploy:submit:ios` uploads the IPA, waits for Apple's processing
+  (~5–30 min), then submits for App Review with the release notes,
+  auto-answered compliance questions (no IDFA, no third-party content,
+  exempt encryption via app.json), and automatic release on approval. It
+  touches no other listing metadata, screenshots, or pricing.
+- `deploy:submit:android` uploads the AAB to the **production** track with
+  the versionCode's changelog. Play reviews it automatically and it goes
+  live on approval (managed publishing must stay off, which is the
+  default). Until the app's first Play release is live, keep
+  `PLAY_RELEASE_STATUS=draft` set — the API rejects non-draft releases
+  before then, and a draft still needs one manual rollout in the Play
+  Console. Remove it once live.
 - `deploy:testflight` returns without waiting for Apple's processing. Select
   tester groups in App Store Connect.
 - `deploy:app-store` uploads only the binary — no listing copy, screenshots,
-  pricing, or review submission. Attach the processed build to the prepared
-  version and submit manually.
+  pricing, or review submission.
 - `deploy:play` uploads only the AAB to the internal track — no listing
-  metadata. Promote to production (and enter release notes) in the Play
-  Console manually.
-- Store release notes live in `docs/app-store/whats-new.md`, committed
-  before the version bump so the tagged commit carries the notes that
-  shipped.
+  metadata, no changelog.
+- User-facing store release notes live in `docs/app-store/whats-new.md`,
+  committed before the version bump; the bump copies the new section into
+  the `fastlane/metadata/` files both submit lanes read, so the tagged
+  commit carries the notes that shipped and both stores get identical
+  text. Internal release notes go in the GitHub release body only (see the
+  guides in `.claude/skills/release/`).
 
 ## Fallbacks and troubleshooting
 

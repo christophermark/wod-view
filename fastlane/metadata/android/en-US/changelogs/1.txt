@@ -1,0 +1,2 @@
+Initial release. Import your SugarWOD export and own your training history —
+the log, the calendar, the stats, all on-device.

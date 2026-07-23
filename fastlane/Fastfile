@@ -1,10 +1,12 @@
 require "fileutils"
+require "json"
 require "shellwords"
 
 default_platform(:ios)
 skip_docs
 
 PROJECT_ROOT = File.expand_path("..", __dir__)
+APP_JSON_PATH = File.join(PROJECT_ROOT, "app.json")
 WORKSPACE = File.join(PROJECT_ROOT, "ios", "WODView.xcworkspace")
 OUTPUT_DIRECTORY = File.join(PROJECT_ROOT, "build", "fastlane")
 IPA_PATH = File.join(OUTPUT_DIRECTORY, "WODView.ipa")
@@ -13,6 +15,21 @@ ANDROID_PACKAGE = "com.christophermark.wodview"
 # Gradle needs a JDK it supports (Homebrew's latest is often too new);
 # Android Studio's bundled JBR is the reliable local default.
 ANDROID_STUDIO_JDK = "/Applications/Android Studio.app/Contents/jbr/Contents/Home"
+
+def expo_config
+  JSON.parse(File.read(APP_JSON_PATH))["expo"]
+end
+
+# User-facing store release notes, written by scripts/bump-version.ts from the
+# newest docs/app-store/whats-new.md section so both stores ship identical text.
+def required_release_notes(path)
+  notes = File.exist?(path) ? File.read(path).strip : ""
+  if notes.empty?
+    UI.user_error!("No release notes at #{path} — the version bump writes them from docs/app-store/whats-new.md.")
+  end
+
+  notes
+end
 
 def required_environment_variable(name)
   value = ENV[name]
@@ -157,6 +174,50 @@ platform :ios do
     )
   end
 
+  desc "Upload the built IPA, wait for processing, and submit for App Review (releases automatically on approval)"
+  lane :submit do |options|
+    api_key = connect_api_key
+    expo = expo_config
+    version = expo["version"]
+    build_number = expo["ios"]["buildNumber"]
+    notes = required_release_notes(File.join(__dir__, "metadata", "en-US", "release_notes.txt"))
+
+    if options[:skip_upload]
+      UI.message("skip_upload set — submitting the already-uploaded #{version} (#{build_number}).")
+    else
+      ipa = require_release_artifact(IPA_PATH, "npm run deploy:build:ios")
+      # pilot uploads and blocks until Apple finishes processing (~5-30 min);
+      # deliver below can only attach a fully processed build. skip_submission
+      # means no beta review — the binary just lands in the shared build pool.
+      upload_to_testflight(
+        api_key: api_key,
+        ipa: ipa,
+        skip_submission: true,
+        skip_waiting_for_build_processing: false
+      )
+    end
+
+    upload_to_app_store(
+      api_key: api_key,
+      app_version: version,
+      build_number: build_number,
+      skip_binary_upload: true,
+      skip_metadata: false,
+      skip_screenshots: true,
+      release_notes: { "en-US" => notes },
+      # No IAP to check, and precheck can't inspect them via API key anyway.
+      precheck_include_in_app_purchases: false,
+      submit_for_review: true,
+      # Release to the store as soon as App Review approves — no manual click.
+      automatic_release: true,
+      force: true,
+      submission_information: {
+        add_id_info_uses_idfa: false,
+        content_rights_contains_third_party_content: false
+      }
+    )
+  end
+
   private_lane :connect_api_key do
     app_store_connect_api_key(
       key_id: required_environment_variable("ASC_KEY_ID"),
@@ -187,6 +248,30 @@ platform :android do
       release_status: ENV.fetch("PLAY_RELEASE_STATUS", "completed"),
       skip_upload_metadata: true,
       skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+
+  desc "Upload the built AAB to the production track with release notes (goes live once Play review passes)"
+  lane :submit do
+    json_key = File.expand_path(required_environment_variable("GOOGLE_PLAY_JSON_KEY_PATH"))
+    aab = require_release_artifact(AAB_PATH, "npm run deploy:build:android")
+    version_code = expo_config["android"]["versionCode"]
+    # supply reads the changelog from fastlane/metadata/android by filename;
+    # require it here so a missing one fails before anything uploads.
+    required_release_notes(File.join(__dir__, "metadata", "android", "en-US", "changelogs", "#{version_code}.txt"))
+
+    upload_to_play_store(
+      package_name: ANDROID_PACKAGE,
+      aab: aab,
+      json_key: json_key,
+      track: "production",
+      # Until the app's first Play release is live, the API only accepts
+      # draft releases — set PLAY_RELEASE_STATUS=draft in fastlane/.env.
+      release_status: ENV.fetch("PLAY_RELEASE_STATUS", "completed"),
+      skip_upload_metadata: true,
+      skip_upload_changelogs: false,
       skip_upload_images: true,
       skip_upload_screenshots: true
     )

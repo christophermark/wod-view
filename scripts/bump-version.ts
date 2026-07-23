@@ -4,8 +4,9 @@
 // CFBundleShortVersionString and versionName), reset ios.buildNumber to "1"
 // (App Store Connect only requires build numbers to be unique within a
 // version), increment android.versionCode (Google Play requires it to
-// increase across ALL uploads, forever — it never resets), then commit and
-// tag vX.Y.Z locally.
+// increase across ALL uploads, forever — it never resets), copy the new
+// version's whats-new.md section into the fastlane store-release-notes
+// metadata files, then commit and tag vX.Y.Z locally.
 //
 //   npm run version:patch   1.0.0 → 1.0.1
 //   npm run version:minor   1.0.0 → 1.1.0
@@ -65,6 +66,36 @@ const [major, minor, patch] = [Number(m[1]), Number(m[2]), Number(m[3])];
 const next = kind === 'minor' ? `${major}.${minor + 1}.0` : `${major}.${minor}.${patch + 1}`;
 const nextVersionCode = (app.expo.android.versionCode ?? 0) + 1;
 
+// The user-facing notes for the new version must already be committed in
+// whats-new.md (so the tagged commit carries the notes that ship). Copy the
+// section verbatim into the fastlane metadata files that deliver (App Store)
+// and supply (Google Play) upload — one source, identical on both stores.
+const whatsNew = fs.readFileSync(path.join(ROOT, 'docs/app-store/whats-new.md'), 'utf8');
+const section = whatsNew.split(/^## /m).find((s) => s.startsWith(`v${next}\n`));
+const notes = section?.slice(section.indexOf('\n') + 1).trim() ?? '';
+if (!notes) {
+  console.error(
+    `docs/app-store/whats-new.md has no "## v${next}" section — write and commit the ` +
+      'user-facing release notes first (.claude/skills/release/user-facing-release-notes.md)',
+  );
+  process.exit(1);
+}
+if (notes.length > 500) {
+  console.error(
+    `release notes are ${notes.length} chars — Google Play caps changelogs at 500 and both ` +
+      'stores ship the same text, so tighten the whats-new.md section first',
+  );
+  process.exit(1);
+}
+const noteFiles = [
+  'fastlane/metadata/en-US/release_notes.txt',
+  `fastlane/metadata/android/en-US/changelogs/${nextVersionCode}.txt`,
+];
+for (const f of noteFiles) {
+  fs.mkdirSync(path.join(ROOT, path.dirname(f)), { recursive: true });
+  fs.writeFileSync(path.join(ROOT, f), notes + '\n');
+}
+
 pkg.version = next;
 app.expo.version = next;
 app.expo.ios.buildNumber = '1';
@@ -74,8 +105,9 @@ write('app.json', app);
 console.log(
   `${m[0]} → ${next} (ios.buildNumber reset to 1, android.versionCode → ${nextVersionCode})`,
 );
+console.log(`store release notes → ${noteFiles.join(', ')}`);
 
-git(`commit -m "v${next}" -- package.json app.json`);
+git(`commit -m "v${next}" -- package.json app.json fastlane/metadata`);
 git(`tag -a "v${next}" -m "WOD View v${next}"`);
 console.log(`committed and tagged v${next} (not pushed)`);
 console.log('next: npm run deploy:build, then push HEAD and the tag once it succeeds.');
