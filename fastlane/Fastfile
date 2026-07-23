@@ -40,11 +40,17 @@ end
 
 # Jest + typecheck + the release-blocking personal-data bundle scan. Run at
 # most once per fastlane invocation so `build_all` doesn't pay for them twice.
+# fastlane's sh runs from fastlane/ — npm looks upward for package.json but
+# the expo CLI does not, so anything invoking it must run from the root.
+def sh_in_project_root(command)
+  Dir.chdir(PROJECT_ROOT) { sh(command) }
+end
+
 def ensure_release_gates
   return if $release_gates_ran
 
   ensure_git_status_clean(show_uncommitted_changes: true)
-  sh("npm run release-gates")
+  sh_in_project_root("npm run release-gates")
   $release_gates_ran = true
 end
 
@@ -52,7 +58,7 @@ def build_ios_ipa
   team_id = required_environment_variable("APPLE_TEAM_ID")
 
   ensure_release_gates
-  sh("npx expo prebuild --platform ios --clean")
+  sh_in_project_root("npx expo prebuild --platform ios --clean")
 
   build_app(
     workspace: WORKSPACE,
@@ -84,7 +90,7 @@ def build_android_aab
   end
 
   ensure_release_gates
-  sh("npx expo prebuild --platform android --clean")
+  sh_in_project_root("npx expo prebuild --platform android --clean")
 
   gradle(
     project_dir: File.join(PROJECT_ROOT, "android"),
