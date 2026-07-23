@@ -136,3 +136,15 @@ with the reasoning, so any of them can be revisited with context.
   accurate phrase), the GitHub Pages pointers above, and SugarWOD-only copy
   in README.md (now "SugarWOD and Chalk It Pro supported", matching the
   store listing). In-app import copy stays SugarWOD-only on purpose.
+- **In-app copy now names both services too** (Chris, same day — reverses
+  the stays-SugarWOD-only stance): onboarding hero + import screen, settings
+  (source row relabeled IMPORTED EXPORT, clear-data copy says "gym app"),
+  import error messages, and a Chalk It Pro note in the export-steps card.
+  The step-by-step walkthrough and help link stay SugarWOD-focused — that's
+  the export flow we have documented steps for.
+- **Marketing page gets store download buttons** (site repo): App Store
+  https://apps.apple.com/us/app/wodview/id6790285943 is live; Google Play is
+  **in closed testing**, so the button links the opt-in page
+  (play.google.com/apps/testing/com.christophermark.wodview). Swap it to the
+  public listing URL once the app is live on Play — reminder recorded in
+  `docs/app-intent.md` and the site repo's AGENTS.md.

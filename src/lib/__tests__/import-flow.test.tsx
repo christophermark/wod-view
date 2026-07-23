@@ -126,7 +126,7 @@ describe('import flow', () => {
       const result = await importCsv(ctx);
 
       expect(result.ok).toBe(false);
-      expect(result.error).toMatch(/isn’t a SugarWOD export/);
+      expect(result.error).toMatch(/isn’t a SugarWOD or Chalk It Pro export/);
       expect(result.error).toMatch(/workouts\.csv/);
       expect(ctx.current.source).toBe('bundled');
       expect(store.has(IMPORTED_URI)).toBe(false);

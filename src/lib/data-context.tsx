@@ -47,7 +47,7 @@ interface WorkoutsContextValue {
   importedCount: number | null;
   /** True when there is no dataset to show — the app must route to onboarding. */
   needsOnboarding: boolean;
-  /** Opens the system file picker and imports a SugarWOD CSV export. */
+  /** Opens the system file picker and imports a workout CSV export (SugarWOD or Chalk It Pro). */
   importCsv(): Promise<ImportResult>;
   /** Switches back to the bundled dataset (dev-only test mode). */
   useBundled(): void;
@@ -113,14 +113,14 @@ export function WorkoutsProvider({ children }: { children: ReactNode }) {
       });
       if (picked.canceled) return { ok: false, canceled: true };
       if (picked.result.size > MAX_IMPORT_FILE_BYTES) {
-        return { ok: false, error: 'That file is too large to be a SugarWOD export.' };
+        return { ok: false, error: 'That file is too large to be a workout export.' };
       }
       const csv = await picked.result.text();
       const parsed = parseWorkoutsCsv(csv);
       if (parsed.length === 0) {
         return {
           ok: false,
-          error: `No workouts in that file. Make sure you picked the ${SUGARWOD_EXPORT_FILENAME} attachment from SugarWOD’s email.`,
+          error: `No workouts in that file. Make sure you picked your SugarWOD ${SUGARWOD_EXPORT_FILENAME} attachment or your Chalk It Pro export.`,
         };
       }
       importedDataFile().write(JSON.stringify(parsed));
@@ -132,7 +132,7 @@ export function WorkoutsProvider({ children }: { children: ReactNode }) {
       if (e instanceof WrongFileError) {
         return {
           ok: false,
-          error: `That file isn’t a SugarWOD export. Look for the ${SUGARWOD_EXPORT_FILENAME} attachment in the email SugarWOD sent you.`,
+          error: `That file isn’t a SugarWOD or Chalk It Pro export. Look for the ${SUGARWOD_EXPORT_FILENAME} attachment in the email SugarWOD sent you, or the CSV Chalk It Pro exported.`,
         };
       }
       return { ok: false, error: e instanceof Error ? e.message : 'Import failed.' };

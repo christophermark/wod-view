@@ -43,8 +43,8 @@ function HeroStep({ onContinue }: { onContinue: () => void }) {
           <Text style={{ color: colors.accent }}>ANALYZED.</Text>
         </Text>
         <Text style={styles.heroBody}>
-          WOD View turns your SugarWOD export into a fast, private training archive that lives
-          entirely on your phone. No account. No servers. Just your history.
+          WOD View turns your SugarWOD or Chalk It Pro export into a fast, private training archive
+          that lives entirely on your phone. No account. No servers. Just your history.
         </Text>
 
         <View style={styles.props}>
@@ -107,7 +107,8 @@ function ImportStep({ onBack }: { onBack: () => void }) {
 
         <Text style={styles.importTitle}>LOAD YOUR LOG</Text>
         <Text style={styles.heroBody}>
-          Grab your workout history from SugarWOD and bring it home. Takes about two minutes.
+          Grab your workout history from SugarWOD or Chalk It Pro and bring it home. Takes about two
+          minutes.
         </Text>
 
         <ExportStepsCard style={{ marginTop: spacing.xl }} />

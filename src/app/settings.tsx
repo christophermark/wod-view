@@ -38,7 +38,7 @@ export default function SettingsScreen() {
     const count = importedCount ?? 0;
     Alert.alert(
       'Clear your data?',
-      `This removes the ${count} ${count === 1 ? 'workout' : 'workouts'} you imported from this device and takes you back to the welcome screen. Your SugarWOD account and export file aren’t touched, so you can bring your history back any time.`,
+      `This removes the ${count} ${count === 1 ? 'workout' : 'workouts'} you imported from this device and takes you back to the welcome screen. Your gym app account and export file aren’t touched, so you can bring your history back any time.`,
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -81,7 +81,7 @@ export default function SettingsScreen() {
             />
           )}
           <SourceRow
-            label="SUGARWOD EXPORT"
+            label="IMPORTED EXPORT"
             sub={
               importedCount != null ? `${importedCount} workouts on device` : 'Nothing imported yet'
             }
@@ -126,8 +126,8 @@ export default function SettingsScreen() {
             <View style={[styles.card, styles.stepsCard]}>
               <Text style={styles.dataBody}>
                 Your workouts live only on this device — nothing is ever uploaded, and nothing is
-                deleted from SugarWOD. Want a clean slate? Clear what’s here and re-import whenever
-                you’re ready.
+                deleted from your gym app. Want a clean slate? Clear what’s here and re-import
+                whenever you’re ready.
               </Text>
               <Pressable
                 onPress={handleReset}

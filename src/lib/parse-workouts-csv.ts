@@ -1,7 +1,7 @@
 // Routes a picked CSV to the right per-app parser by trying each format's
-// header check. The UI stays SugarWOD-branded — Chalk It Pro support is
-// intentionally silent — so when no format matches, the SugarWOD-flavored
-// WrongFileError is the one surfaced to the import flow.
+// header check. When no format matches, the SugarWOD WrongFileError is the one
+// surfaced to the import flow (SugarWOD is the primary source; the import
+// screens name both services and translate the error accordingly).
 
 import { Workout } from './workouts';
 import { WrongFileError, parseSugarwodCsv } from './parse-sugarwod';

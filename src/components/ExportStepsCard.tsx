@@ -33,6 +33,10 @@ export function ExportStepsCard({ style }: { style?: StyleProp<ViewStyle> }) {
         </View>
       </View>
 
+      <Text style={styles.altSourceNote}>
+        Coming from Chalk It Pro instead? Its CSV export imports just the same.
+      </Text>
+
       <Pressable
         onPress={() => WebBrowser.openBrowserAsync(SUGARWOD_EXPORT_HELP_URL)}
         hitSlop={8}
@@ -121,6 +125,13 @@ const styles = StyleSheet.create({
     lineHeight: 17,
     color: colors.inkSoft,
     marginTop: 2,
+  },
+  altSourceNote: {
+    fontFamily: fonts.body,
+    fontSize: 12,
+    lineHeight: 17,
+    color: colors.inkSoft,
+    marginTop: spacing.md,
   },
   helpLink: {
     marginTop: spacing.lg,

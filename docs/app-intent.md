@@ -17,10 +17,18 @@ dashboard. No accounts, no servers, no analytics, no subscription.
   Google Play. Phone-first; no iPad/tablet UI yet (`supportsTablet` unset).
 - **Import sources:** **SugarWOD** and **Chalk It Pro** (exact branding —
   "Chalk It Pro" with spaces; chalkitpro.com stylizes it CHALK IT PRO in store
-  listings). Store listings and the website name both. In-app import copy
-  deliberately mentions only SugarWOD (Chris's call — revisit only when he
-  says so). Never use "CrossFit" anywhere (trademark; see
-  `docs/app-store/store-listing.md`).
+  listings). Every surface names both — store listings, website, and in-app
+  import screens (since 2026-07-23); the step-by-step export walkthrough stays
+  SugarWOD-focused with a Chalk It Pro note. Never use "CrossFit" anywhere
+  (trademark; see `docs/app-store/store-listing.md`).
+- **Store listings:** App Store —
+  https://apps.apple.com/us/app/wodview/id6790285943 (live). Google Play —
+  **in closed testing** as of 2026-07-23; the opt-in link is
+  https://play.google.com/apps/testing/com.christophermark.wodview, and the
+  public listing will be
+  https://play.google.com/store/apps/details?id=com.christophermark.wodview.
+  **Reminder for Chris:** once the app is live on Play, swap the marketing
+  page's Google Play button (and this bullet) to the public listing URL.
 - **Website:** https://www.christophermark.me/wodview — the `/wodview/…`
   namespace is canonical (not `/wod-view/…`, and not GitHub Pages, which is
   retired to redirect stubs in `docs/privacy/` and `docs/support/`). Pages:
