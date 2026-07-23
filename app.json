@@ -2,7 +2,7 @@
   "expo": {
     "name": "WOD View",
     "slug": "wod-view",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "wodview",
@@ -28,7 +28,7 @@
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.christophermark.wodview",
-      "versionCode": 1
+      "versionCode": 2
     },
     "web": {
       "output": "static",
