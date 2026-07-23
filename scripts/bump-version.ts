@@ -1,38 +1,44 @@
 #!/usr/bin/env npx tsx
 // Bump the app version in lockstep across package.json and app.json (the
 // native source of truth — prebuild stamps expo.version into
-// CFBundleShortVersionString), reset ios.buildNumber to "1" (App Store
-// Connect only requires build numbers to be unique within a version), then
-// commit, tag vX.Y.Z, and push.
+// CFBundleShortVersionString and versionName), reset ios.buildNumber to "1"
+// (App Store Connect only requires build numbers to be unique within a
+// version), increment android.versionCode (Google Play requires it to
+// increase across ALL uploads, forever — it never resets), then commit and
+// tag vX.Y.Z locally.
 //
 //   npm run version:patch   1.0.0 → 1.0.1
 //   npm run version:minor   1.0.0 → 1.1.0
 //
-// Pass --no-push to stop after the local commit + tag (used by tests).
-// Re-uploading the SAME version needs a higher ios.buildNumber instead —
-// bump that by hand in app.json (see docs/app-store/README.md).
-// The /release skill wraps this with the judgment calls (which bump type,
-// what changed, the archive steps that follow).
+// Deliberately does NOT push: the tag is published (git push + GitHub
+// release) only after `npm run deploy:build` proves the tagged commit
+// actually builds, so a failed archive never leaves a remote tag for a
+// build that doesn't exist. The /release skill wraps this with the
+// judgment calls (bump type, release notes, the ordering around it).
+//
+// Re-uploading the SAME version needs a higher ios.buildNumber and
+// android.versionCode instead — bump those by hand in app.json (see
+// docs/app-store/deployments.md).
 
 import { execSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 
 const ROOT = path.join(__dirname, '..');
-const args = process.argv.slice(2);
-const kind = args[0];
-const push = !args.includes('--no-push');
+const kind = process.argv[2];
 if (kind !== 'minor' && kind !== 'patch') {
-  console.error('usage: bump-version.ts <minor|patch> [--no-push]');
+  console.error('usage: bump-version.ts <minor|patch>');
   process.exit(1);
 }
 
 const git = (cmd: string) => execSync(`git ${cmd}`, { cwd: ROOT, stdio: 'pipe' }).toString();
 
-// The version commit must contain nothing but the bump: refuse if either
-// file already has uncommitted changes (another session may be mid-edit).
-if (git('status --porcelain -- package.json app.json').trim() !== '') {
-  console.error('package.json or app.json has uncommitted changes — commit or stash them first.');
+// The version commit must contain nothing but the bump, and the tag must
+// point at a tree that can be rebuilt verbatim: refuse unless the entire
+// worktree is clean (another session may be mid-edit).
+if (git('status --porcelain').trim() !== '') {
+  console.error('worktree is not clean — commit or stash everything first:');
+  console.error(git('status --porcelain'));
   process.exit(1);
 }
 
@@ -57,21 +63,19 @@ if (!m) {
 }
 const [major, minor, patch] = [Number(m[1]), Number(m[2]), Number(m[3])];
 const next = kind === 'minor' ? `${major}.${minor + 1}.0` : `${major}.${minor}.${patch + 1}`;
+const nextVersionCode = (app.expo.android.versionCode ?? 0) + 1;
 
 pkg.version = next;
 app.expo.version = next;
 app.expo.ios.buildNumber = '1';
+app.expo.android.versionCode = nextVersionCode;
 write('package.json', pkg);
 write('app.json', app);
-console.log(`${m[0]} → ${next} (ios.buildNumber reset to 1)`);
+console.log(
+  `${m[0]} → ${next} (ios.buildNumber reset to 1, android.versionCode → ${nextVersionCode})`,
+);
 
 git(`commit -m "v${next}" -- package.json app.json`);
 git(`tag -a "v${next}" -m "WOD View v${next}"`);
-console.log(`committed and tagged v${next}`);
-
-if (push) {
-  execSync(`git push origin HEAD "v${next}"`, { cwd: ROOT, stdio: 'inherit' });
-  console.log(`pushed HEAD and v${next} — next: npm run rebuild:ios, then archive in Xcode.`);
-} else {
-  console.log('(--no-push: not pushed)');
-}
+console.log(`committed and tagged v${next} (not pushed)`);
+console.log('next: npm run deploy:build, then push HEAD and the tag once it succeeds.');

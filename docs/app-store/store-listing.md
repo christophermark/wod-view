@@ -1,11 +1,17 @@
 # WOD View — App Store listing content
 
 Everything below is ready to paste into App Store Connect. Character limits are
-noted where Apple enforces them; all copy has been counted against them.
+noted where Apple enforces them; all copy has been counted against them. Each
+field is a fenced code block, plain text, one line per paragraph — copy it
+straight out with no quote markers, bold asterisks, or mid-sentence line
+breaks to strip, and let App Store Connect's text fields do their own word
+wrap.
 
 ## Name (30 chars max)
 
-> **WOD View**
+```
+WOD View
+```
 
 8 chars. No existing App Store app uses this name (checked July 2026); final
 confirmation happens when the app record is created in App Store Connect —
@@ -13,63 +19,53 @@ Apple checks name uniqueness at that moment.
 
 ## Subtitle (30 chars max)
 
-> **Every rep. Every PR. Yours.**
+```
+Every rep. Every PR. Analyzed.
+```
 
-27 chars. Matches the onboarding hero line, which is the brand voice.
+30 chars. Matches the onboarding hero line, which is the brand voice.
 
 ## Promotional text (170 chars max, editable without a new build)
 
-> Your whole training history — every workout, PR, and coach note — in your
-> pocket and nowhere else. Import your export once and own your archive.
+```
+Your training history, turned into insight. PRs, streaks, lift bests, and your biggest months — surfaced automatically from years of workouts, private on your phone.
+```
 
-148 chars. Deliberately trademark-free (see "Trademark decisions" below).
+156 chars. Deliberately trademark-free (see "Trademark decisions" below).
 
 ## Description (4000 chars max)
 
-> WOD View turns your gym app's workout-history export — SugarWOD and
-> Chalk It Pro supported — into a fast, private training archive that lives
-> entirely on your phone. No account. No servers. No subscription. Just your
-> history.
->
-> THE LOG
-> Every workout you ever wrote down, restored line by line. Titles, full
-> descriptions, scores, Rx or scaled, PRs, and your notes — searchable and
-> fast, even across years of history.
->
-> THE CALENDAR
-> Your attendance in black and red. Streaks, gaps, biggest months — the honest
-> picture of how you actually train.
->
-> THE STATS
-> Lifetime numbers from your whole archive: total workouts, PR count, lift
-> bests, the movements you meet most often.
->
-> BRING YOUR HISTORY HOME
-> Your training log belongs to you. Request your data export from SugarWOD
-> or Chalk It Pro (it arrives as a CSV), open it on your phone, and import
-> it with one tap. WOD View detects the format and parses the whole file
-> on-device — it even restores the line breaks SugarWOD's export strips out
-> of workout descriptions.
->
-> PRIVATE BY ARCHITECTURE
-> Everything stays on your device. WOD View has no account system, no backend,
-> no analytics, and no ads. Your data is never uploaded anywhere — the app
-> simply has nowhere to send it. Clear it from Settings or delete the app, and
-> it's gone. Importing never changes anything in your gym app account.
->
-> TRY IT FIRST
-> No export handy? Preview mode loads three years of realistic sample data so
-> you can explore every screen. Your real import is one tap away whenever
-> you're ready.
->
-> WOD View is an independent app and is not affiliated with or endorsed by
-> SugarWOD or Chalk It Pro.
+```
+WOD View turns your gym app's workout-history export — SugarWOD and Chalk It Pro supported — into a fast, private training archive that lives entirely on your phone. No account. No servers. No subscription. Just your history.
+
+THE LOG
+Every workout you ever wrote down, restored line by line. Titles, full descriptions, scores, Rx or scaled, PRs, and your notes — searchable and fast, even across years of history.
+
+BRING YOUR HISTORY HOME
+Your training log belongs to you. Request your data export from SugarWOD or Chalk It Pro (it arrives as a CSV), open it on your phone, and import it with one tap. WOD View detects the format and parses the whole file on-device — it even restores the line breaks SugarWOD's export strips out of workout descriptions.
+
+THE STATS
+Lifetime numbers from your whole archive: total workouts, PR count, lift bests, the movements you meet most often.
+
+THE CALENDAR
+Your attendance in black and red. Streaks, gaps, biggest months — the honest picture of how you actually train.
+
+PRIVATE BY ARCHITECTURE
+Everything stays on your device. WOD View has no account system, no backend, no analytics, and no ads. Your data is never uploaded anywhere — the app simply has nowhere to send it. Clear it from Settings or delete the app, and it's gone. Importing never changes anything in your gym app account.
+
+TRY IT FIRST
+No export handy? Preview mode loads three years of realistic sample data so you can explore every screen. Your real import is one tap away whenever you're ready.
+
+WOD View is an independent app and is not affiliated with or endorsed by SugarWOD or Chalk It Pro.
+```
 
 ~1650 chars.
 
 ## Keywords (100 chars max)
 
-> workout,log,archive,training,history,gym,barbell,metcon,pr,lifting,offline,csv,import,strength
+```
+workout,log,archive,training,history,gym,barbell,metcon,pr,lifting,offline,csv,import,strength
+```
 
 94 chars. "wod" and "view" are omitted (words in the app name are already
 indexed). "sugarwod" and "crossfit" are omitted deliberately — see below.
@@ -90,13 +86,15 @@ treatment claims, no loot boxes/IAP. Expected result: **4+**.
 
 ## URLs
 
-- **Privacy policy URL:** https://christophermark.github.io/wod-view/privacy/
+- **Privacy policy URL:** https://www.christophermark.me/wod-view/privacy
 - **Support URL:** https://christophermark.github.io/wod-view/support/
 - Marketing URL: optional, leave empty (or reuse the support page).
 
 ## Copyright
 
-> © 2026 Christopher Mark
+```
+© 2026 Christopher Mark
+```
 
 ## App Privacy questionnaire
 

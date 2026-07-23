@@ -1,0 +1,151 @@
+# Store deployments (Fastlane)
+
+Fastlane is the local-first deployment path for WOD View, covering both
+stores. The model is **build once, upload separately**:
+
+- `npm run deploy:build` regenerates the disposable native projects, runs the
+  release gates once, and produces both signed artifacts:
+  `build/fastlane/WODView.ipa` and `build/fastlane/WODView.aab`.
+- The upload commands (`deploy:testflight`, `deploy:app-store`, `deploy:play`)
+  only upload those exact artifacts — they never rebuild, and they refuse to
+  run if the artifact is missing.
+- Nothing here ever submits for App Review or promotes a Play release to
+  production. Those two clicks stay manual on purpose.
+
+The release gates are Jest, TypeScript, and `npm run verify:release-bundle`
+(the release-blocking scan proving the personal dataset is absent from both
+platforms' production JS bundles).
+
+## One-time setup — shared
+
+1. Install the Ruby version in `.ruby-version` (rbenv is fine), then install
+   the locked gems:
+
+   ```sh
+   bundle install
+   ```
+
+2. Copy the environment template and fill it in as you complete the platform
+   setup below. Fastlane loads it automatically on every lane:
+
+   ```sh
+   cp fastlane/.env.default fastlane/.env   # fastlane/.env is gitignored
+   ```
+
+Never commit credentials. `fastlane/.env`, `*.p8`, `*.keystore`, `*.jks`, and
+`fastlane/*.json` are all ignored as a last line of defense, but the
+recommended location for key material is outside the checkout entirely.
+
+## One-time setup — iOS
+
+1. Sign in to the publishing Apple ID in Xcode and confirm the distribution
+   certificate is available. Fastlane uses Xcode automatic signing; it does
+   not store certificates or provisioning profiles in this repository.
+2. In App Store Connect, create a team API key under Users and Access →
+   Integrations (App Manager role is sufficient). Keep the downloaded `.p8`
+   outside the repository; fill in `APPLE_TEAM_ID`, `ASC_KEY_ID`,
+   `ASC_ISSUER_ID`, and `ASC_KEY_PATH` in `fastlane/.env`. `APPLE_TEAM_ID` is
+   the 10-character Developer Portal team ID, not the numeric ASC team ID.
+3. Create the WOD View app record in App Store Connect before the first
+   upload. Its bundle ID must be `com.christophermark.wodview`.
+
+## One-time setup — Android
+
+1. Prerequisites: Android Studio (its bundled JDK is used automatically when
+   `JAVA_HOME` is unset) and the Android SDK (`~/Library/Android/sdk`).
+2. Generate the **upload keystore** and keep it outside the repository.
+   Google Play signs the app it ships (Play App Signing); this key only
+   authenticates uploads, but losing it still means a support ticket — back
+   it up somewhere safe:
+
+   ```sh
+   mkdir -p ~/.android-keys
+   keytool -genkeypair -v \
+     -keystore ~/.android-keys/wodview-upload.keystore \
+     -alias wodview-upload -keyalg RSA -keysize 2048 -validity 10000
+   ```
+
+   Fill in the four `WODVIEW_ANDROID_*` values in `fastlane/.env`.
+
+3. In the [Play Console](https://play.google.com/console) (one-time $25
+   developer registration), create the app: name **WOD View**, package
+   `com.christophermark.wodview`, free, and work through the app-content
+   questionnaires (privacy policy URL, data-safety form — "no data
+   collected", same answers as the Apple privacy questionnaire in
+   `store-listing.md`).
+4. **First upload is manual:** run `npm run deploy:build:android`, then
+   upload `build/fastlane/WODView.aab` in the Play Console (Internal testing
+   → Create release). This enrolls the app in Play App Signing and registers
+   the upload key. Every upload after that can go through `deploy:play`.
+5. Create a service account so Fastlane can upload: Play Console → Users and
+   permissions → invite the service account you create in Google Cloud
+   (IAM → Service Accounts → create + JSON key), granting it release
+   permission for WOD View. Save the JSON outside the repository and set
+   `GOOGLE_PLAY_JSON_KEY_PATH` in `fastlane/.env`. Until the app's first
+   Play release is actually live, also set `PLAY_RELEASE_STATUS=draft` — the
+   API rejects non-draft releases before then.
+
+## Commands
+
+```sh
+# Build both signed store artifacts (gates run once):
+#   build/fastlane/WODView.ipa + build/fastlane/WODView.aab
+npm run deploy:build
+
+# Or one platform at a time
+npm run deploy:build:ios
+npm run deploy:build:android
+
+# Upload the built IPA to TestFlight (processing/distribution stays in ASC)
+npm run deploy:testflight
+
+# Upload the built IPA to App Store Connect (binary only; submit manually)
+npm run deploy:app-store
+
+# Upload the built AAB to Google Play (internal track by default;
+# promote to production manually in the Play Console)
+npm run deploy:play
+```
+
+Every build command requires a completely clean Git worktree and runs the
+release gates before regenerating `ios/` / `android/` with
+`expo prebuild --clean`. The upload commands warn if the artifact is older
+than the HEAD commit (a stale build from before your latest changes).
+
+## Release behavior
+
+- Versioning is handled by `npm run version:minor` / `version:patch`
+  (`scripts/bump-version.ts`): bumps `expo.version` in lockstep with
+  package.json, resets `ios.buildNumber` to "1", increments
+  `android.versionCode`, commits and tags locally **without pushing** — the
+  tag is pushed only after `deploy:build` proves the commit builds. The
+  `/release` skill orchestrates the whole sequence.
+- Re-uploading the **same version** (rejected/failed upload) needs a higher
+  `ios.buildNumber` and `android.versionCode` in app.json — hand-edit and
+  commit; no tag, no version bump. ASC rejects duplicate build numbers
+  within a version; Play rejects any versionCode it has ever seen.
+- `deploy:testflight` returns without waiting for Apple's processing. Select
+  tester groups in App Store Connect.
+- `deploy:app-store` uploads only the binary — no listing copy, screenshots,
+  pricing, or review submission. Attach the processed build to the prepared
+  version and submit manually.
+- `deploy:play` uploads only the AAB to the internal track — no listing
+  metadata. Promote to production (and enter release notes) in the Play
+  Console manually.
+- Store release notes live in `docs/app-store/whats-new.md`, committed
+  before the version bump so the tagged commit carries the notes that
+  shipped.
+
+## Fallbacks and troubleshooting
+
+- Xcode Organizer remains the manual iOS fallback: `npm run rebuild:ios`,
+  open `ios/WODView.xcworkspace`, archive, upload.
+- EAS Build/Submit remains the cloud fallback configured in `eas.json`.
+- If automatic iOS signing fails, open the generated workspace once and
+  verify the team under Signing & Capabilities. Do not edit generated native
+  settings as a permanent fix; native configuration belongs in `app.json` or
+  the Fastlane build options.
+- If Gradle fails with a JDK/toolchain error, the Homebrew `java` on PATH is
+  probably too new — point `JAVA_HOME` in `fastlane/.env` at Android
+  Studio's bundled JDK (the Fastfile already falls back to it when
+  `JAVA_HOME` is unset).

@@ -1,0 +1,185 @@
+require "fileutils"
+require "shellwords"
+
+default_platform(:ios)
+skip_docs
+
+PROJECT_ROOT = File.expand_path("..", __dir__)
+WORKSPACE = File.join(PROJECT_ROOT, "ios", "WODView.xcworkspace")
+OUTPUT_DIRECTORY = File.join(PROJECT_ROOT, "build", "fastlane")
+IPA_PATH = File.join(OUTPUT_DIRECTORY, "WODView.ipa")
+AAB_PATH = File.join(OUTPUT_DIRECTORY, "WODView.aab")
+ANDROID_PACKAGE = "com.christophermark.wodview"
+# Gradle needs a JDK it supports (Homebrew's latest is often too new);
+# Android Studio's bundled JBR is the reliable local default.
+ANDROID_STUDIO_JDK = "/Applications/Android Studio.app/Contents/jbr/Contents/Home"
+
+def required_environment_variable(name)
+  value = ENV[name]
+  if value.to_s.strip.empty?
+    UI.user_error!("Set #{name} before running this lane (fastlane/.env is the place — see fastlane/.env.default).")
+  end
+
+  value
+end
+
+# Upload lanes never build: they take the artifact `deploy:build` produced,
+# so one archive serves TestFlight, App Store Connect, and Google Play.
+def require_release_artifact(path, build_command)
+  unless File.exist?(path)
+    UI.user_error!("#{File.basename(path)} not found — run `#{build_command}` first; upload lanes never build.")
+  end
+
+  head_committed_at = `git -C #{PROJECT_ROOT.shellescape} log -1 --format=%ct`.strip.to_i
+  if head_committed_at.positive? && File.mtime(path).to_i < head_committed_at
+    UI.important("#{File.basename(path)} predates the HEAD commit — it may be stale. Rebuild if the code changed.")
+  end
+
+  path
+end
+
+# Jest + typecheck + the release-blocking personal-data bundle scan. Run at
+# most once per fastlane invocation so `build_all` doesn't pay for them twice.
+def ensure_release_gates
+  return if $release_gates_ran
+
+  ensure_git_status_clean(show_uncommitted_changes: true)
+  sh("npm run release-gates")
+  $release_gates_ran = true
+end
+
+def build_ios_ipa
+  team_id = required_environment_variable("APPLE_TEAM_ID")
+
+  ensure_release_gates
+  sh("npx expo prebuild --platform ios --clean")
+
+  build_app(
+    workspace: WORKSPACE,
+    scheme: "WODView",
+    configuration: "Release",
+    clean: true,
+    export_team_id: team_id,
+    export_options: {
+      method: "app-store-connect",
+      signingStyle: "automatic",
+      teamID: team_id
+    },
+    xcargs: "CODE_SIGN_STYLE=Automatic DEVELOPMENT_TEAM=#{team_id} -allowProvisioningUpdates",
+    output_directory: OUTPUT_DIRECTORY,
+    output_name: "WODView.ipa"
+  )
+end
+
+def build_android_aab
+  keystore = File.expand_path(required_environment_variable("WODVIEW_ANDROID_KEYSTORE_PATH"))
+  UI.user_error!("Keystore not found at #{keystore}") unless File.exist?(keystore)
+  store_password = required_environment_variable("WODVIEW_ANDROID_KEYSTORE_PASSWORD")
+  key_alias = required_environment_variable("WODVIEW_ANDROID_KEY_ALIAS")
+  key_password = required_environment_variable("WODVIEW_ANDROID_KEY_PASSWORD")
+
+  if ENV["JAVA_HOME"].to_s.strip.empty? && File.directory?(ANDROID_STUDIO_JDK)
+    ENV["JAVA_HOME"] = ANDROID_STUDIO_JDK
+    UI.message("JAVA_HOME not set — using Android Studio's bundled JDK.")
+  end
+
+  ensure_release_gates
+  sh("npx expo prebuild --platform android --clean")
+
+  gradle(
+    project_dir: File.join(PROJECT_ROOT, "android"),
+    task: "bundle",
+    build_type: "Release",
+    properties: {
+      # AGP's injected-signing properties: sign with the upload key without
+      # patching the disposable generated android/ project.
+      "android.injected.signing.store.file" => keystore,
+      "android.injected.signing.store.password" => store_password,
+      "android.injected.signing.key.alias" => key_alias,
+      "android.injected.signing.key.password" => key_password
+    }
+  )
+
+  aab = lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH]
+  UI.user_error!("Gradle finished but produced no .aab") if aab.to_s.empty?
+  FileUtils.mkdir_p(OUTPUT_DIRECTORY)
+  FileUtils.cp(aab, AAB_PATH)
+  UI.success("Signed bundle at #{AAB_PATH}")
+end
+
+desc "Run release gates once, then build both store artifacts (IPA + AAB)"
+lane :build_all do
+  build_ios_ipa
+  build_android_aab
+end
+
+platform :ios do
+  desc "Run release gates and build a signed App Store IPA"
+  lane :build do
+    build_ios_ipa
+  end
+
+  desc "Upload the built IPA to TestFlight"
+  lane :beta do
+    api_key = connect_api_key
+    ipa = require_release_artifact(IPA_PATH, "npm run deploy:build:ios")
+
+    upload_to_testflight(
+      api_key: api_key,
+      ipa: ipa,
+      skip_submission: true,
+      skip_waiting_for_build_processing: true
+    )
+  end
+
+  desc "Upload the built IPA to App Store Connect without submitting for review"
+  lane :app_store do
+    api_key = connect_api_key
+    ipa = require_release_artifact(IPA_PATH, "npm run deploy:build:ios")
+
+    upload_to_app_store(
+      api_key: api_key,
+      ipa: ipa,
+      skip_app_version_update: true,
+      skip_metadata: true,
+      skip_screenshots: true,
+      submit_for_review: false,
+      force: true
+    )
+  end
+
+  private_lane :connect_api_key do
+    app_store_connect_api_key(
+      key_id: required_environment_variable("ASC_KEY_ID"),
+      issuer_id: required_environment_variable("ASC_ISSUER_ID"),
+      key_filepath: File.expand_path(required_environment_variable("ASC_KEY_PATH"))
+    )
+  end
+end
+
+platform :android do
+  desc "Run release gates and build a signed Play Store AAB"
+  lane :build do
+    build_android_aab
+  end
+
+  desc "Upload the built AAB to Google Play (internal track by default; never touches store listing)"
+  lane :play do
+    json_key = File.expand_path(required_environment_variable("GOOGLE_PLAY_JSON_KEY_PATH"))
+    aab = require_release_artifact(AAB_PATH, "npm run deploy:build:android")
+
+    upload_to_play_store(
+      package_name: ANDROID_PACKAGE,
+      aab: aab,
+      json_key: json_key,
+      track: ENV.fetch("PLAY_TRACK", "internal"),
+      # Until the app's first Play release is live, the API only accepts
+      # draft releases — set PLAY_RELEASE_STATUS=draft in fastlane/.env.
+      release_status: ENV.fetch("PLAY_RELEASE_STATUS", "completed"),
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+end

@@ -1,8 +1,9 @@
 # WOD View — agent guide
 
-Personal iPhone app (Expo SDK 57 / expo-router / TypeScript strict) for browsing archived
-SugarWOD workouts. Read the exact versioned docs at https://docs.expo.dev/versions/v57.0.0/
-before writing Expo-specific code — APIs have changed.
+Personal phone app (Expo SDK 57 / expo-router / TypeScript strict) for browsing archived
+SugarWOD workouts — iPhone-first, released to both the App Store and Google Play. Read the
+exact versioned docs at https://docs.expo.dev/versions/v57.0.0/ before writing
+Expo-specific code — APIs have changed.
 
 Planned analytics features live as self-contained briefs in `docs/features/` (see the
 README there for build order and conventions). When asked to implement one, start from
@@ -31,8 +32,15 @@ its brief.
 - `npm run store-previews` — compose the raw shots into the branded store images
   (iPhone 6.9" + iPad 13"). The `/store-previews` skill wraps capture → compose →
   visual verification; slide copy lives in `scripts/compose-store-previews.ts`.
-- `npm run verify:release-bundle` — release-blocking check that a production
-  `expo export` contains no personal-dataset strings. Run before every store build.
+- `npm run verify:release-bundle` — release-blocking check that the production
+  `expo export` (iOS + Android) contains no personal-dataset strings. Run before
+  every store build.
+- `npm run deploy:build` — Fastlane's gated build of both signed store artifacts
+  (IPA + AAB). Upload lanes (`deploy:testflight` / `deploy:app-store` /
+  `deploy:play`) only upload what was built — never rebuild, never submit for
+  review. Versioning via `npm run version:minor|patch` (local commit + tag; push
+  happens after a successful build — the `/release` skill orchestrates). Setup
+  and behavior live in `docs/app-store/deployments.md`.
 - CI (`.github/workflows/ci.yml`) runs tsc, eslint (0 warnings), prettier --check, jest.
 
 App Store submission state, listing copy, and pipeline docs live in `docs/app-store/`

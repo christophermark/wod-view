@@ -33,6 +33,20 @@ yarn-error.*
 # local env files
 .env*.local
 
+# Fastlane build output, generated reports, and local secrets
+# (.env.default is the committed template; .env holds the real values)
+/build/fastlane/
+/fastlane/.env
+/fastlane/*.json
+/fastlane/Preview.html
+/fastlane/report.xml
+/fastlane/screenshots/
+/fastlane/test_output/
+/vendor/bundle/
+
+# Android signing material (keep keystores outside the repo anyway)
+*.keystore
+
 # typescript
 *.tsbuildinfo
 

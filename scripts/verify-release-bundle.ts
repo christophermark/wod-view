@@ -1,8 +1,9 @@
 #!/usr/bin/env npx tsx
-// Release gate: prove the production JS bundle contains no personal workout
-// data. Runs `npx expo export` (a real production Metro build, which must
-// strip the __DEV__-guarded require of src/data/workouts.json) and scans the
-// output for strings that exist only in the personal dataset.
+// Release gate: prove the production JS bundles contain no personal workout
+// data. Runs `npx expo export` for both store platforms (a real production
+// Metro build, which must strip the __DEV__-guarded require of
+// src/data/workouts.json) and scans the output for strings that exist only
+// in the personal dataset.
 //
 //   npm run verify:release-bundle
 //
@@ -58,11 +59,14 @@ function sampleEvenly<T>(arr: T[], n: number): T[] {
 function main() {
   const exportDir = fs.mkdtempSync(path.join(os.tmpdir(), 'wodview-export-'));
 
-  console.log('Exporting production iOS bundle (this takes a minute or two)…');
-  execSync(`npx expo export --platform ios --output-dir ${JSON.stringify(exportDir)}`, {
-    cwd: root,
-    stdio: ['ignore', 'ignore', 'inherit'],
-  });
+  console.log('Exporting production iOS + Android bundles (this takes a few minutes)…');
+  execSync(
+    `npx expo export --platform ios --platform android --output-dir ${JSON.stringify(exportDir)}`,
+    {
+      cwd: root,
+      stdio: ['ignore', 'ignore', 'inherit'],
+    },
+  );
 
   // Concatenate every exported file into one buffer to scan (bundles may be
   // plain JS or Hermes bytecode; ASCII string data is greppable in both).

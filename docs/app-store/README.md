@@ -21,10 +21,13 @@ State of the App Store readiness work. Files here:
 - [x] Preview/review path verified in a Release-configuration build (onboarding →
       preview → all tabs; no dev UI; banner EXIT returns to onboarding)
 
-## Build pipeline: local Xcode archive (chosen 2026-07-12)
+## Build pipeline: local Fastlane (chosen 2026-07-22)
 
-Chris builds locally, so the primary path is `npx expo prebuild` + Xcode
-archive + upload from the Organizer — no Expo account needed. `ios/` is
+Supersedes the 2026-07-12 "local Xcode archive" choice. Chris builds locally. The primary path is the gated Fastlane pipeline in
+`deployments.md` — `npm run deploy:build` produces both signed store
+artifacts, and the upload lanes push them to TestFlight / App Store
+Connect / Google Play without ever submitting for review. The Xcode
+Organizer flow below remains the manual iOS fallback. `ios/` is
 disposable generated output (gitignored): regenerate it, never hand-edit it;
 every native setting lives in `app.json`. `eas.json` stays in the repo as a
 working fallback (`eas build -p ios --profile production` + `eas submit`)
