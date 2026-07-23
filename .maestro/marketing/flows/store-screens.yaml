@@ -57,7 +57,7 @@ appId: com.christophermark.wodview
 - takeScreenshot: .maestro/marketing/raw/calendar
 - waitForAnimationToEnd
 
-# Onboarding hero ("EVERY REP. EVERY PR. STILL YOURS.") — reachable in dev
+# Onboarding hero ("EVERY REP. EVERY PR. ANALYZED.") — reachable in dev
 # builds via settings → DEV TOOLS.
 - tapOn: 'LOG, tab.*'
 - tapOn:

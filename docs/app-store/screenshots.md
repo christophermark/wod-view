@@ -33,7 +33,7 @@ this iPhone-only app). Store upload order is baked into the filenames:
 2. `02-workout` — MURPH workout detail
 3. `03-stats` — lifetime stats
 4. `04-calendar` — attendance calendar
-5. `05-onboarding` — the "EVERY REP. EVERY PR. STILL YOURS." hero
+5. `05-onboarding` — the "EVERY REP. EVERY PR. ANALYZED." hero
 
 Output PNGs are alpha-stripped (App Store Connect rejects transparency) and
 dimension-verified by `scripts/process-marketing-screenshots.ts` — a wrong

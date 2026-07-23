@@ -40,7 +40,7 @@ function HeroStep({ onContinue }: { onContinue: () => void }) {
         <Text style={styles.eyebrow}>PERSONAL WOD ARCHIVE</Text>
         <Text style={styles.heroTitle}>
           EVERY REP.{'\n'}EVERY PR.{'\n'}
-          <Text style={{ color: colors.accent }}>STILL YOURS.</Text>
+          <Text style={{ color: colors.accent }}>ANALYZED.</Text>
         </Text>
         <Text style={styles.heroBody}>
           WOD View turns your SugarWOD export into a fast, private training archive that lives
