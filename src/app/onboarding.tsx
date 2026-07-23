@@ -17,14 +17,21 @@ const VALUE_PROPS: [title: string, sub: string][] = [
 export default function OnboardingScreen() {
   const [step, setStep] = useState<'hero' | 'import'>('hero');
   return step === 'hero' ? (
-    <HeroStep onContinue={() => setStep('import')} />
+    <HeroStep onImport={() => setStep('import')} />
   ) : (
     <ImportStep onBack={() => setStep('hero')} />
   );
 }
 
-function HeroStep({ onContinue }: { onContinue: () => void }) {
+function HeroStep({ onImport }: { onImport: () => void }) {
+  const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { enterPreview } = useWorkouts();
+
+  const handlePreview = () => {
+    enterPreview();
+    router.replace('/');
+  };
   return (
     <View style={styles.screen}>
       <ScrollView
@@ -61,9 +68,15 @@ function HeroStep({ onContinue }: { onContinue: () => void }) {
 
         <View style={{ flex: 1 }} />
         <Pressable
-          onPress={onContinue}
+          onPress={handlePreview}
           style={({ pressed }) => [styles.primaryBtn, pressed && { opacity: 0.85 }]}>
-          <Text style={styles.primaryBtnText}>GET STARTED ›</Text>
+          <Text style={styles.primaryBtnText}>EXPLORE WITH SAMPLE DATA ›</Text>
+        </Pressable>
+        <Text style={styles.btnHint}>Three years of sample workouts — no export needed.</Text>
+        <Pressable
+          onPress={onImport}
+          style={({ pressed }) => [styles.heroSecondaryBtn, pressed && { opacity: 0.7 }]}>
+          <Text style={styles.heroSecondaryBtnText}>IMPORT YOUR OWN DATA ›</Text>
         </Pressable>
         <Text style={styles.footnote}>Your data never leaves this device.</Text>
       </ScrollView>
@@ -219,6 +232,27 @@ const styles = StyleSheet.create({
     fontSize: 15,
     letterSpacing: 0,
     color: colors.paper,
+  },
+  btnHint: {
+    fontFamily: fonts.body,
+    fontSize: 12,
+    color: colors.inkFaint,
+    textAlign: 'center',
+    marginTop: spacing.sm,
+  },
+  heroSecondaryBtn: {
+    borderRadius: radii.md,
+    borderWidth: 1.5,
+    borderColor: colors.ink,
+    marginTop: spacing.lg,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  heroSecondaryBtnText: {
+    fontFamily: fonts.display,
+    fontSize: 16,
+    letterSpacing: 1.2,
+    color: colors.ink,
   },
   footnote: {
     fontFamily: fonts.body,
