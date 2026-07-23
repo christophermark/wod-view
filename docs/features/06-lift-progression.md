@@ -2,6 +2,8 @@
 
 **Effort:** M · **Depends on:** 03 (lift-name parsing from descriptions) · **Status:** done
 
+Intent and design principles: [06-lift-progression-principles.md](06-lift-progression-principles.md).
+
 ## Why
 
 The most-loved feature of every strength app (Hevy/Strong: e1RM progression,
