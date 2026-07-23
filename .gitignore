@@ -30,8 +30,18 @@ yarn-error.*
 .DS_Store
 *.pem
 
-# local env files
+# env files — this repo is PUBLIC; no secrets, anywhere, ever.
+# Only the all-commented fastlane template is allowed back in.
+.env
+.env.*
 .env*.local
+!fastlane/.env.default
+
+# credential files that tooling might drop in the tree (defensive)
+credentials.json
+*service-account*.json
+google-services.json
+GoogleService-Info.plist
 
 # Fastlane build output, generated reports, and local secrets
 # (.env.default is the committed template; .env holds the real values)

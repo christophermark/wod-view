@@ -47,6 +47,15 @@ App Store submission state, listing copy, and pipeline docs live in `docs/app-st
 (start at its README). The privacy policy and support pages are GitHub Pages off
 `docs/privacy/` and `docs/support/` — keep them true if data handling ever changes.
 
+## Public repository — hard rule
+
+This repo is **public on GitHub**. Never commit secrets: API keys, `.p8`/keystore
+files, service-account JSON, `fastlane/.env`, tokens, or anything derived from them.
+Whenever a change introduces tooling that can produce credentials, local config, or
+machine-specific output, add defensive `.gitignore` entries **in the same change** —
+don't rely on remembering not to `git add` them. Committed templates (like
+`fastlane/.env.default`) must be placeholder-only with every line commented out.
+
 ## Data privacy — hard rule
 
 `data/workouts.csv` and `src/data/workouts.json` contain personal workout history and are
