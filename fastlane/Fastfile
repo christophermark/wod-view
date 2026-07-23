@@ -67,7 +67,7 @@ def build_ios_ipa
     clean: true,
     export_team_id: team_id,
     export_options: {
-      method: "app-store-connect",
+      method: "app-store",
       signingStyle: "automatic",
       teamID: team_id
     },
