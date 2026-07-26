@@ -3,6 +3,7 @@
     "expo@claude-plugins-official": true
   },
   "permissions": {
+    "allow": ["Bash(gh release create:*)"],
     "deny": [
       "Read(.env)",
       "Read(**/.env)",
