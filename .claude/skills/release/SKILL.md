@@ -105,11 +105,12 @@ NOTES
 )
 ```
 
-In auto permission mode the classifier may block `gh release create`
-outright (it never reaches Chris as an approvable prompt — observed
-2026-07-25). Don't retry variants more than once; hand Chris the exact
-command to run via `!`, or ask for `"Bash(gh release create:*)"` in
-`permissions.allow`, and move on — nothing downstream depends on it.
+`"Bash(gh release create:*)"` is allowlisted in `.claude/settings.local.json`
+(added 2026-07-25 after the auto-mode classifier blocked it with no
+approvable prompt), so this normally just works. That file is untracked and
+machine-specific — if the command is ever blocked anyway, don't retry
+variants more than once; hand Chris the exact command to run via `!` and
+move on — nothing downstream depends on it.
 
 ### 7. Submit to the stores
 
@@ -157,6 +158,18 @@ submitted where, and anything the release notes flagged.
 If anything store-visible changed, regenerate previews via the
 `/store-previews` skill and re-read `docs/app-store/store-listing.md` for
 copy that went stale.
+
+"Store-visible" means visible in a marketed slide — check before spending a
+capture/compose cycle (the v1.0.1 run regenerated everything for what
+turned out to be a no-op). The slides (`SLIDES` in
+`scripts/compose-store-previews.ts`) use only the **log, stats, workout,
+calendar, and search** captures; slides 02 (import) and 07 (private) are
+type-only, drawn from copy in the compose script itself; the onboarding
+capture is taken by the flow but used by no slide. So: a change is
+store-visible only if it touches one of those five screens *or* the compose
+script's `SLIDES` copy — and when judging whether copy in a fresh render is
+"new", check its provenance (`git log -S '<the text>'`) against what was
+last uploaded, not against your expectations.
 
 ### 9. Verify and publish the release report (artifact)
 
