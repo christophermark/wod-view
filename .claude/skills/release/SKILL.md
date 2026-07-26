@@ -86,6 +86,13 @@ the exact tagged commit.
 git tag -d vX.Y.Z && git reset --hard HEAD~1
 ```
 
+Unwind **before** writing any fix: `git reset --hard` discards uncommitted
+edits, so a fix made first gets silently thrown away with the bump commit.
+When running lanes in the background with output redirected to a log file,
+check the command's real exit status (`echo "EXIT:$?"` at the end of the
+redirect) — the harness's task notification only reflects the wrapper
+shell, which exits 0 even when the lane failed.
+
 ### 6. Publish the release
 
 Only now does anything go remote:
@@ -97,6 +104,12 @@ gh release create "vX.Y.Z" --title "WOD View vX.Y.Z" --notes-file <(cat <<'NOTES
 NOTES
 )
 ```
+
+In auto permission mode the classifier may block `gh release create`
+outright (it never reaches Chris as an approvable prompt — observed
+2026-07-25). Don't retry variants more than once; hand Chris the exact
+command to run via `!`, or ask for `"Bash(gh release create:*)"` in
+`permissions.allow`, and move on — nothing downstream depends on it.
 
 ### 7. Submit to the stores
 
@@ -122,8 +135,11 @@ changelog; it goes live once Play's review passes. Individual halves:
   (internal track) — binaries land unsubmitted, everything after that is
   manual.
 
-Caveats — check `fastlane/.env` for these temporary overrides and confirm
-with Chris whether they still apply before assuming full automation:
+Caveats — these temporary overrides live in `fastlane/.env`, which agents
+**cannot read** (access is deliberately denied); don't burn a permission
+prompt trying. Rely on memory and this list, confirm with Chris whether
+they still apply, and read the actual routing from the submit lane's own
+output (it prints the track it targets):
 
 - `PLAY_TRACK=alpha` routes Android submissions to closed testing while
   Google's production-access requirement (12+ testers for 14 days) is
@@ -153,6 +169,12 @@ lanes' own output:
 - Google Play shows the new versionCode on the intended track (a short
   read-only edits→tracks query with the service-account key from
   `fastlane/.env`).
+
+In auto permission mode the classifier may block even read-only
+credentialed calls (`bundle exec fastlane run …` — observed 2026-07-25).
+If blocked, don't hunt for workarounds: cite the submit lane's own success
+lines as evidence, mark the store states "unverified (permission-blocked)"
+in the report, and give Chris the two verification commands to run.
 
 Then publish a **private Artifact** release report (load the
 artifact-design skill first; title "WOD View vX.Y.Z release report") so the
