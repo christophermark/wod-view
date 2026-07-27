@@ -1,4 +1,5 @@
 import { useRouter } from 'expo-router';
+import { SymbolView } from 'expo-symbols';
 import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -101,7 +102,15 @@ export default function StatsScreen() {
       }}>
       <View style={styles.header}>
         <Text style={styles.heading}>STATS</Text>
-        <Text style={styles.headerMeta}>{year == null ? 'LIFETIME' : String(year)}</Text>
+        <View style={styles.headerRight}>
+          <Text style={styles.headerMeta}>{year == null ? 'LIFETIME' : String(year)}</Text>
+          <Pressable
+            onPress={() => router.push('/settings')}
+            hitSlop={10}
+            testID="stats-settings-button">
+            <SymbolView name="gearshape.fill" tintColor={colors.inkFaint} size={16} />
+          </Pressable>
+        </View>
       </View>
 
       <View>
@@ -340,6 +349,11 @@ const styles = StyleSheet.create({
     fontSize: 34,
     letterSpacing: 0.5,
     color: colors.ink,
+  },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
   },
   headerMeta: {
     fontFamily: fonts.mono,

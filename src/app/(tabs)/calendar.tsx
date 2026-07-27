@@ -1,3 +1,5 @@
+import { useRouter } from 'expo-router';
+import { SymbolView } from 'expo-symbols';
 import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -19,6 +21,7 @@ function isoFor(year: number, month: number, day: number) {
 
 export default function CalendarScreen() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const { workouts, workoutsByDate } = useWorkouts();
   const latest = parseDate(workouts[0].date);
   const earliest = parseDate(workouts[workouts.length - 1].date);
@@ -60,7 +63,15 @@ export default function CalendarScreen() {
     <View style={[styles.screen, { paddingTop: insets.top + spacing.md }]}>
       <View style={styles.header}>
         <Text style={styles.heading}>CALENDAR</Text>
-        <Text style={styles.headerMeta}>{monthCount} THIS MONTH</Text>
+        <View style={styles.headerRight}>
+          <Text style={styles.headerMeta}>{monthCount} THIS MONTH</Text>
+          <Pressable
+            onPress={() => router.push('/settings')}
+            hitSlop={10}
+            testID="calendar-settings-button">
+            <SymbolView name="gearshape.fill" tintColor={colors.inkFaint} size={16} />
+          </Pressable>
+        </View>
       </View>
 
       <View style={styles.calendarCard}>
@@ -167,6 +178,11 @@ const styles = StyleSheet.create({
     fontSize: 34,
     letterSpacing: 0.5,
     color: colors.ink,
+  },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
   },
   headerMeta: {
     fontFamily: fonts.mono,
