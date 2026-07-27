@@ -17,6 +17,10 @@ instead (`.claude/skills/release/internal-release-notes.md`). Never include
 anything from the personal dataset (the AGENTS.md privacy rule applies here
 too).
 
+## v1.0.2
+
+Onboarding now starts with a working app: explore three years of sample data — log, calendar, and stats — before importing your own history. When you're ready, the sample-data banner jumps straight to import. Also fixed: the least-programmed stat now only ranks movements that actually appear in your log.
+
 ## v1.0.1
 
 Chalk It Pro exports are now supported alongside SugarWOD — import either from the same screen. Small copy fixes and polish.
