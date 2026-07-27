@@ -73,9 +73,12 @@ export default function StatsScreen() {
   const maxMonthCount = monthCounts ? Math.max(...monthCounts, 1) : 1;
 
   const movements = useMemo(() => {
-    const counts = stats.movementCounts;
+    // Both modes only rank movements that actually appear in the log — a
+    // detectable movement with zero appearances isn't "least programmed",
+    // it's just absent.
+    const counts = stats.movementCounts.filter((m) => m.count > 0);
     return movementMode === 'most'
-      ? counts.filter((m) => m.count > 0).slice(0, 10)
+      ? counts.slice(0, 10)
       : [...counts].sort((a, b) => a.count - b.count).slice(0, 10);
   }, [stats, movementMode]);
   const maxMovement = Math.max(...movements.map((m) => m.count), 1);
@@ -267,7 +270,7 @@ export default function StatsScreen() {
         <Text style={styles.footnote}>
           {movementMode === 'most'
             ? 'times appearing in a workout description'
-            : 'rarest of the movements the app can detect'}
+            : 'rarest movements that appear in your log'}
         </Text>
       </View>
 
