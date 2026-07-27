@@ -73,8 +73,10 @@ example
 /.maestro/marketing/raw/
 /.maestro/marketing/out/
 
-# personal workout data (SugarWOD export + generated JSON)
-/data/workouts.csv
+# personal workout data (workout-history exports + generated JSON) — every CSV
+# in data/ is presumed personal except the committed synthetic sample
+/data/*.csv
+!/data/workouts.sample.csv
 /src/data/workouts.json
 # generated from the committed sample CSV on postinstall
 /src/data/preview-workouts.json
