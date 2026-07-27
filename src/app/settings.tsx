@@ -93,8 +93,13 @@ export default function SettingsScreen() {
           {__DEV__ && (
             <SourceRow
               label="PREVIEW MODE"
-              sub="Synthetic sample data + exit banner"
+              sub={
+                importedCount != null
+                  ? 'Unavailable while imported data exists'
+                  : 'Synthetic sample data + exit banner'
+              }
               active={source === 'preview'}
+              disabled={importedCount != null}
               onPress={enterPreview}
               divider
             />

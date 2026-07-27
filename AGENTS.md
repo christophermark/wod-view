@@ -94,7 +94,8 @@ dependency graphs. If you touch that require, re-verify with `npm run verify:rel
   importing JSON or module-level singletons. The provider switches between three sources:
   `bundled` (dev-only test mode, empty in production), `imported` (in-app CSV import,
   persisted via expo-file-system), and `preview` (committed synthetic sample data for App
-  Store reviewers, with a persistent exit banner rendered by the root layout).
+  Store reviewers; the root layout renders a persistent "SAMPLE DATA" banner whose
+  tap deep-links to the onboarding import step, plus a ✕ that exits preview).
 - Production first launch has no data: `needsOnboarding` gates the main screens behind
   `Stack.Protected` in `_layout.tsx` and routes to `onboarding.tsx` (import or preview).
 - **All colors/fonts/spacing come from `src/theme.ts` tokens.** No hardcoded hex values or
@@ -135,6 +136,13 @@ Flow-writing gotchas (all learned the hard way — see comments in the flows):
   `waitForAnimationToEnd`.
 
 ## Gotchas
+
+- Exiting sample data (banner ✕) falls back to imported data if any, else to
+  "no data" → onboarding in production. In dev builds the bundled test dataset
+  backstops instead, so ✕ appears to jump to test mode — a dev-only artifact.
+  Production semantics are pinned by `src/lib/__tests__/preview-rules.test.tsx`
+  (bundled mocked empty); the imported-data-disables-preview rule lives in
+  `enterPreview()` and is exercised end-to-end by `.maestro/flows/import.yaml`.
 
 - Adding a native module (`npx expo install <pkg>`) requires rebuilding the dev
   app; use `npx expo prebuild -p ios --clean && npx expo run:ios`. Incremental

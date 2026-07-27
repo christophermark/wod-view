@@ -1,5 +1,7 @@
-# Onboarding walkthrough: hero → import step → back → into preview mode
-# (preview is the hero's primary CTA; import is the secondary path).
+# Onboarding walkthrough: hero → import step → back → into sample data →
+# banner → import step (from the app) → back into the app.
+# (Sample data is the hero's primary CTA; import is the secondary text action.
+# Once on sample data, the banner is the import path.)
 #
 # Dev builds never show onboarding organically (they boot on the bundled
 # dataset), so this reaches it via settings → DEV TOOLS → VIEW ONBOARDING FLOW.
@@ -24,7 +26,7 @@ appId: com.christophermark.wodview
 - takeScreenshot: .maestro/screenshots/onboarding-01-hero
 - tapOn: 'IMPORT YOUR OWN DATA.*'
 - assertVisible: 'LOAD YOUR LOG'
-- assertVisible: 'TRY PREVIEW MODE.*'
+- assertVisible: 'No export yet?.*'
 - takeScreenshot: .maestro/screenshots/onboarding-02-import
 # The settings screen sits under onboarding in the stack and leaks its own
 # occluded "‹ BACK" into the a11y hierarchy — the testID disambiguates.
@@ -37,7 +39,21 @@ appId: com.christophermark.wodview
 - assertVisible: 'PERSONAL WOD ARCHIVE'
 - tapOn: 'EXPLORE WITH SAMPLE DATA.*'
 - extendedWaitUntil:
-    visible: 'PREVIEW MODE · SAMPLE DATA'
+    visible: 'SAMPLE DATA — IMPORT YOUR OWN.*'
     timeout: 15000
 - assertVisible: 'WOD VIEW'
-- takeScreenshot: .maestro/screenshots/onboarding-03-preview-entered
+- takeScreenshot: .maestro/screenshots/onboarding-03-sample-data-entered
+# The banner is the import path once on sample data: it deep-links to the
+# import step, which hides its own sample-data link (already there) and whose
+# BACK returns to the app rather than the marketing hero.
+- waitForAnimationToEnd:
+    timeout: 3000
+- tapOn: 'SAMPLE DATA — IMPORT YOUR OWN.*'
+- assertVisible: 'LOAD YOUR LOG'
+- assertNotVisible: 'No export yet?.*'
+- takeScreenshot: .maestro/screenshots/onboarding-04-import-from-banner
+- waitForAnimationToEnd:
+    timeout: 3000
+- tapOn:
+    id: 'onboarding-back'
+- assertVisible: 'WOD VIEW'

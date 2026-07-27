@@ -1,4 +1,4 @@
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -15,11 +15,25 @@ const VALUE_PROPS: [title: string, sub: string][] = [
 ];
 
 export default function OnboardingScreen() {
-  const [step, setStep] = useState<'hero' | 'import'>('hero');
+  const router = useRouter();
+  // The sample-data banner deep-links here with ?step=import; in that case
+  // BACK returns to the app instead of unwinding to the marketing hero.
+  const { step: stepParam } = useLocalSearchParams<{ step?: string }>();
+  const startOnImport = stepParam === 'import';
+  const [step, setStep] = useState<'hero' | 'import'>(startOnImport ? 'import' : 'hero');
+
+  const handleBack = () => {
+    if (startOnImport && router.canGoBack()) {
+      router.back();
+    } else {
+      setStep('hero');
+    }
+  };
+
   return step === 'hero' ? (
     <HeroStep onImport={() => setStep('import')} />
   ) : (
-    <ImportStep onBack={() => setStep('hero')} />
+    <ImportStep onBack={handleBack} />
   );
 }
 
@@ -75,8 +89,9 @@ function HeroStep({ onImport }: { onImport: () => void }) {
         <Text style={styles.btnHint}>Three years of sample workouts — no export needed.</Text>
         <Pressable
           onPress={onImport}
-          style={({ pressed }) => [styles.heroSecondaryBtn, pressed && { opacity: 0.7 }]}>
-          <Text style={styles.heroSecondaryBtnText}>IMPORT YOUR OWN DATA ›</Text>
+          hitSlop={8}
+          style={({ pressed }) => [styles.secondaryLink, pressed && { opacity: 0.7 }]}>
+          <Text style={styles.secondaryLinkText}>IMPORT YOUR OWN DATA ›</Text>
         </Pressable>
         <Text style={styles.footnote}>Your data never leaves this device.</Text>
       </ScrollView>
@@ -87,7 +102,7 @@ function HeroStep({ onImport }: { onImport: () => void }) {
 function ImportStep({ onBack }: { onBack: () => void }) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { importCsv, enterPreview } = useWorkouts();
+  const { importCsv, enterPreview, source } = useWorkouts();
   const [error, setError] = useState<string | null>(null);
 
   const handleImport = async () => {
@@ -135,17 +150,16 @@ function ImportStep({ onBack }: { onBack: () => void }) {
         </Pressable>
         {error && <Text style={styles.error}>{error}</Text>}
 
-        <View style={styles.previewCard}>
-          <Text style={styles.previewCardSub}>
-            No export handy? Explore the app with three years of sample data. Your real import is
-            one tap away whenever you’re ready.
-          </Text>
+        {source !== 'preview' && (
           <Pressable
             onPress={handlePreview}
-            style={({ pressed }) => [styles.secondaryBtn, pressed && { opacity: 0.7 }]}>
-            <Text style={styles.secondaryBtnText}>TRY PREVIEW MODE ›</Text>
+            hitSlop={8}
+            style={({ pressed }) => [styles.sampleLink, pressed && { opacity: 0.7 }]}>
+            <Text style={styles.sampleLinkText}>
+              No export yet? <Text style={styles.sampleLinkAction}>Explore with sample data ›</Text>
+            </Text>
           </Pressable>
-        </View>
+        )}
       </ScrollView>
     </View>
   );
@@ -240,19 +254,16 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: spacing.sm,
   },
-  heroSecondaryBtn: {
-    borderRadius: radii.md,
-    borderWidth: 1.5,
-    borderColor: colors.ink,
+  secondaryLink: {
     marginTop: spacing.lg,
-    paddingVertical: 14,
+    paddingVertical: spacing.sm,
     alignItems: 'center',
   },
-  heroSecondaryBtnText: {
+  secondaryLinkText: {
     fontFamily: fonts.display,
     fontSize: 16,
     letterSpacing: 1.2,
-    color: colors.ink,
+    color: colors.accent,
   },
   footnote: {
     fontFamily: fonts.body,
@@ -292,32 +303,20 @@ const styles = StyleSheet.create({
     color: colors.accent,
     marginTop: spacing.md,
   },
-  previewCard: {
-    marginTop: spacing.xxl,
-    borderRadius: radii.lg,
-    borderWidth: 1,
-    borderColor: colors.hairline,
-    backgroundColor: colors.accentSoft,
-    padding: spacing.lg,
-  },
-  previewCardSub: {
-    fontFamily: fonts.body,
-    fontSize: 13,
-    lineHeight: 19,
-    color: colors.inkSoft,
-  },
-  secondaryBtn: {
-    borderRadius: radii.md,
-    borderWidth: 1.5,
-    borderColor: colors.accent,
-    marginTop: spacing.md,
-    paddingVertical: 14,
+  sampleLink: {
+    marginTop: spacing.xl,
+    paddingVertical: spacing.sm,
     alignItems: 'center',
   },
-  secondaryBtnText: {
-    fontFamily: fonts.display,
-    fontSize: 16,
-    letterSpacing: 1.2,
+  sampleLinkText: {
+    fontFamily: fonts.body,
+    fontSize: 14,
+    lineHeight: 20,
+    color: colors.inkSoft,
+    textAlign: 'center',
+  },
+  sampleLinkAction: {
+    fontFamily: fonts.bodySemi,
     color: colors.accent,
   },
 });

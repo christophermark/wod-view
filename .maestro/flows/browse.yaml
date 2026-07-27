@@ -39,7 +39,8 @@ appId: com.christophermark.wodview
 - tapOn:
     id: 'settings-back'
 - assertVisible: 'WOD VIEW'
-- tapOn: 'EXIT' # preview banner exit → back to the bundled dataset in dev
-- assertNotVisible: 'PREVIEW MODE · SAMPLE DATA'
+- tapOn:
+    id: 'preview-exit' # banner ✕ exits sample data → back to the bundled dataset in dev
+- assertNotVisible: 'SAMPLE DATA — IMPORT YOUR OWN.*'
 - assertVisible: 'WOD VIEW'
 - takeScreenshot: .maestro/screenshots/browse-08-after-exit-preview

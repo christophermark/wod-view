@@ -1,0 +1,65 @@
+# In-app CSV import, end to end through the real system document picker:
+# onboarding import step → IMPORT → Files "On My iPhone" → workouts.csv →
+# LOG shows the imported dataset (no sample-data banner) → settings shows
+# preview mode disabled (imported data ⇒ sample data is off-limits).
+#
+# Requires the sample CSV seeded into the simulator's local Files storage —
+# scripts/e2e.sh does that before running flows (exact filename workouts.csv).
+# Deterministic sample facts: 372 workouts, newest "Power Clean 3x5".
+appId: com.christophermark.wodview
+---
+- runFlow: ../subflows/dismiss-open-dialog.yaml
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible: 'WOD VIEW'
+    timeout: 60000 # first launch waits on Metro bundling + font load
+- tapOn:
+    id: 'settings-button'
+- assertVisible: 'SETTINGS'
+- scrollUntilVisible:
+    element:
+      text: 'VIEW ONBOARDING FLOW.*'
+- tapOn: 'VIEW ONBOARDING FLOW.*'
+- assertVisible: 'PERSONAL WOD ARCHIVE'
+- tapOn: 'IMPORT YOUR OWN DATA.*'
+- assertVisible: 'LOAD YOUR LOG'
+- tapOn: 'IMPORT workouts.csv.*'
+# System document picker (opens on Recents). A fresh picker session's Browse
+# tab shows the Locations list first; a previously-navigated one reopens
+# directly inside "On My iPhone" (which holds only the seeded CSV).
+- extendedWaitUntil:
+    visible: 'Browse'
+    timeout: 10000
+- tapOn: 'Browse'
+- waitForAnimationToEnd:
+    timeout: 3000
+- runFlow:
+    when:
+      visible: 'Locations'
+    commands:
+      - tapOn: 'On My iPhone'
+      - waitForAnimationToEnd:
+          timeout: 3000
+- assertVisible: 'On My iPhone'
+- assertVisible: 'workouts'
+# Text-matching the tile only selects/thumbnails it — the pick needs a
+# coordinate tap on the first grid slot (tuned for the 19.5:9 phone sims).
+- waitForAnimationToEnd:
+    timeout: 3000
+- tapOn:
+    point: 17%,27%
+# Back in the app on the imported dataset: right count, no sample-data banner.
+- extendedWaitUntil:
+    visible: '372 WODS.*'
+    timeout: 15000
+- assertNotVisible: 'SAMPLE DATA — IMPORT YOUR OWN.*'
+- takeScreenshot: .maestro/screenshots/import-01-imported-log
+# Imported data ⇒ preview is off-limits: dev source row reads as unavailable,
+# and tapping it must not enter sample data (enterPreview guard).
+- tapOn:
+    id: 'settings-button'
+- assertVisible: 'PREVIEW MODE, Unavailable while imported data exists.*'
+- tapOn: 'PREVIEW MODE, Unavailable.*'
+- assertNotVisible: 'SAMPLE DATA — IMPORT YOUR OWN.*'
+- takeScreenshot: .maestro/screenshots/import-02-preview-disabled

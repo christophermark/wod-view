@@ -150,9 +150,13 @@ export function WorkoutsProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const enterPreview = useCallback(() => {
+    // Sample data is an onboarding trial, not a mode of the real app: once a
+    // user has imported their own history, preview is off-limits (the settings
+    // dev row disables itself for the same reason).
+    if (imported) return;
     setSource('preview');
     writeSourcePref('preview');
-  }, []);
+  }, [imported]);
 
   const exitPreview = useCallback(() => {
     // Back to imported data if any exists; otherwise 'bundled', which in

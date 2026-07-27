@@ -11,7 +11,7 @@ import {
 } from '@expo-google-fonts/barlow-condensed';
 import { IBMPlexMono_500Medium, IBMPlexMono_600SemiBold } from '@expo-google-fonts/ibm-plex-mono';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
@@ -82,12 +82,27 @@ function AppShell() {
 
 function PreviewBanner() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const { exitPreview } = useWorkouts();
   return (
     <View style={[styles.banner, { paddingTop: insets.top + spacing.xs }]}>
-      <Text style={styles.bannerLabel}>PREVIEW MODE · SAMPLE DATA</Text>
-      <Pressable onPress={exitPreview} hitSlop={12} style={styles.bannerExit}>
-        <Text style={styles.bannerExitText}>EXIT</Text>
+      <Pressable
+        onPress={() => router.navigate({ pathname: '/onboarding', params: { step: 'import' } })}
+        hitSlop={8}
+        accessibilityRole="button"
+        style={({ pressed }) => [styles.bannerAction, pressed && { opacity: 0.8 }]}>
+        <Text style={styles.bannerLabel}>
+          SAMPLE DATA — <Text style={styles.bannerActionText}>IMPORT YOUR OWN ›</Text>
+        </Text>
+      </Pressable>
+      <Pressable
+        onPress={exitPreview}
+        hitSlop={12}
+        accessibilityRole="button"
+        accessibilityLabel="Exit sample data"
+        style={styles.bannerExit}
+        testID="preview-exit">
+        <Text style={styles.bannerExitText}>✕</Text>
       </Pressable>
     </View>
   );
@@ -106,23 +121,27 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.sm,
   },
+  bannerAction: {
+    flex: 1,
+    paddingVertical: 2,
+  },
   bannerLabel: {
     fontFamily: fonts.monoBold,
     fontSize: 11,
     letterSpacing: 1.2,
     color: colors.paper,
   },
+  bannerActionText: {
+    textDecorationLine: 'underline',
+  },
   bannerExit: {
-    borderWidth: 1.5,
-    borderColor: colors.paper,
-    borderRadius: 4,
-    paddingHorizontal: spacing.sm,
+    paddingHorizontal: spacing.xs,
     paddingVertical: 2,
   },
   bannerExitText: {
     fontFamily: fonts.display,
-    fontSize: 13,
-    letterSpacing: 1.2,
+    fontSize: 14,
+    lineHeight: 16,
     color: colors.paper,
   },
 });
