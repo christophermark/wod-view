@@ -57,7 +57,7 @@ file, and the feature graphic). Check:
 
 - headline not clipped or overflowing (auto-fit shrinks oversize lines, but
   confirm), no mangled glyphs;
-- screenshots show the **synthetic sample data** (372 WODs, "MURPH",
+- screenshots show the **synthetic sample data** (377 WODs, "MURPH",
   "Power Clean 3x5") — never real history, never the red PREVIEW banner;
 - screenshots reflect the current UI (stale raws = rerun capture);
 - files named `NN-<name>-<WxH>.png` at their device dir's exact size — the
