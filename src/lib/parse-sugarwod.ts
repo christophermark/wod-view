@@ -55,7 +55,8 @@ export function restoreLineBreaks(text: string): string {
   // Runs of 2+ spaces are line breaks the export flattened
   t = t.replace(/ {2,}/g, '\n');
   // ")After Round 3", "Pull-UpsDirectly", "CAP.Then" — word/closer glued to a capitalized word
-  t = t.replace(/(?<!\bMc)(?<!Sugar)(?<=[a-z#%")\].!?…])(?=[A-Z][a-z])/g, '\n');
+  // (brand names with internal capitals — McKenzie, SugarWOD, CrossFit — stay whole)
+  t = t.replace(/(?<!\bMc)(?<!Sugar)(?<!\bCross)(?<=[a-z#%")\].!?…])(?=[A-Z][a-z])/g, '\n');
   // "…Pull-UpsRX+…", ")RX", "workRx+" — glued to an all-caps token like RX/HSPU/EMOM
   t = t.replace(/(?<=[a-z#%")\].!?…])(?=[A-Z]{2,}\b)/g, '\n');
   // "14#30 KB", "20\"30 Cal", ")21 Wall Balls" — unit/closer glued to a leading count

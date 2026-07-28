@@ -48,6 +48,8 @@ describe('restoreLineBreaks', () => {
     'T2B and C2B work',
     'log results to SugarWod.',
     'WOD by McGregor',
+    'a CrossFit hero WOD',
+    'The CrossFit Open starts soon',
   ])('leaves %j intact', (input) => {
     expect(restoreLineBreaks(input)).toBe(input);
   });

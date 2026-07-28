@@ -128,6 +128,62 @@ describe('detectMovements — expanded spellings (July 2026 coverage sweep)', ()
   });
 });
 
+describe('detectMovements — second-archive sweep (July 2026)', () => {
+  // Aliases and movements surfaced by sweeping a second local archive.
+  // Cases are synthetic recreations, not archive content.
+  const CASES: [description: string, expected: string][] = [
+    ['15 Deads 225#', 'Deadlifts'],
+    ['10 DB Deads 50s', 'Deadlifts'],
+    ['20 KB Russian Swings 53#', 'KB Swings'],
+    ['25 Russian Swings 35#', 'KB Swings'],
+    ['10 HPC 95#', 'Cleans'],
+    ['10 HPC 95#', 'Hang Cleans'],
+    ['10 Chin-Ups', 'Pull-Ups'],
+    ['1000m Ski', 'Ski Erg'],
+    ['15 Cal Ski', 'Ski Erg'],
+    ['Camber Bar Bench 5x5', 'Bench Press'],
+    ['Back Pause Squat 5x3', 'Back Squats'],
+    ['12 DB Front Rack Squats 50s', 'Front Squats'],
+    ['10 Single Arm Overhead DB Squats 35#', 'Overhead Squats'],
+    ['5 Single-Leg Squats each side', 'Pistols'],
+    ['Prowler Push 4 x 50ft', 'Sled Work'],
+    ['100 Single Unders', 'Single Unders'],
+    ['60 Single-Unders', 'Single Unders'],
+    ['Snatch Pull 3x3 @ 110%', 'Snatch Pulls'],
+    ['Snatch Balance 3x2', 'Snatch Balance'],
+    ['Clean Pull 4x3 @ 105%', 'Clean Pulls'],
+    ['Clean High Pulls 3x5', 'Clean Pulls'],
+    ['Sots Press 5x5 45#', 'Sots Press'],
+  ];
+
+  test.each(CASES)('%s → %s', (description, expected) => {
+    expect(names(description)).toContain(expected);
+  });
+
+  test('accessory-lift variants still roll up to their parent display movement', () => {
+    expect(names('Snatch Pull 3x3 @ 110%')).toContain('Snatches');
+    expect(names('Snatch Balance 3x2')).toContain('Snatches');
+    expect(names('Clean Pull 4x3 @ 105%')).toContain('Cleans');
+  });
+
+  test('"skill" and "skier" do not count as Ski Erg', () => {
+    expect(names('Skill work: handstand holds')).not.toContain('Ski Erg');
+    expect(names('Skier squats x 20')).not.toContain('Ski Erg');
+  });
+
+  test('"benchmarks" chatter does not count as Bench Press', () => {
+    expect(names('Log this one to benchmarks too')).not.toContain('Bench Press');
+  });
+
+  test('single unders do not count as Double Unders', () => {
+    expect(names('100 Single Unders')).not.toContain('Double Unders');
+  });
+
+  test('"deadstop" phrasing does not trigger the deads slang', () => {
+    expect(names('Deadstop rows 4x8')).not.toContain('Deadlifts');
+  });
+});
+
 describe('detectMovements — rep estimation', () => {
   test('rep ladder applies its sum to movements on and after the ladder line', () => {
     const desc = 'FOR TIME\n21-15-9\nThrusters 95#\nPull-Ups';

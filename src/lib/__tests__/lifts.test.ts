@@ -71,6 +71,18 @@ describe('attribution', () => {
     expect(pages[0].lift).toBe('Power Cleans + Push Jerks');
   });
 
+  it('overloaded accessory lifts stay off the parent page: Snatch Pull is not Snatches', () => {
+    const list = [
+      workout({ barbellLift: 'Snatch', scoreType: 'Load', sets: [loadSet(155)] }),
+      workout({ barbellLift: 'Snatch Pull', scoreType: 'Load', sets: [loadSet(205)] }),
+      workout({ barbellLift: 'Snatch Balance', scoreType: 'Load', sets: [loadSet(165)] }),
+    ];
+    const pages = liftPages(list);
+    expect(pages.map((p) => p.lift).sort()).toEqual(['Snatch Balance', 'Snatch Pulls', 'Snatches']);
+    const snatch = pages.find((p) => p.lift === 'Snatches')!;
+    expect(snatch.allTimeMax).toBe(155);
+  });
+
   it('produces no pages for non-Load workouts', () => {
     const list = [
       workout({ description: 'Back Squat 5x5', scoreType: 'Reps', sets: [loadSet(225)] }),

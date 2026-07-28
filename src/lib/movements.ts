@@ -38,7 +38,7 @@ export const MOVEMENT_DEFS: MovementDef[] = [
   { name: 'Box Jumps', pattern: /box jump/i, modality: 'gymnastics', equipment: 'box' },
   {
     name: 'Deadlifts',
-    pattern: /deadlift|\bdls?\b/i,
+    pattern: /deadlift|\bdls?\b|\bdeads\b/i,
     modality: 'weightlifting',
     equipment: 'barbell',
     barbellLift: true,
@@ -49,7 +49,7 @@ export const MOVEMENT_DEFS: MovementDef[] = [
     modality: 'monostructural',
     equipment: 'rope',
   },
-  { name: 'Pull-Ups', pattern: /pull-? ?up/i, modality: 'gymnastics', equipment: 'rig' },
+  { name: 'Pull-Ups', pattern: /pull-? ?up|chin-? ?up/i, modality: 'gymnastics', equipment: 'rig' },
   { name: 'Push-Ups', pattern: /push-? ?up/i, modality: 'gymnastics' },
   {
     name: 'Running',
@@ -64,7 +64,8 @@ export const MOVEMENT_DEFS: MovementDef[] = [
   },
   {
     name: 'KB Swings',
-    pattern: /(kb|kettlebell).{0,20}swing|swing.{0,20}(kb|kettlebell)|(american|freedom) swings?/i,
+    pattern:
+      /(kb|kettlebell).{0,20}swing|swing.{0,20}(kb|kettlebell)|(american|freedom|russian) swings?/i,
     modality: 'weightlifting',
     equipment: 'kettlebell',
   },
@@ -77,7 +78,7 @@ export const MOVEMENT_DEFS: MovementDef[] = [
   },
   {
     name: 'Cleans',
-    pattern: /\bclean(?!\s*up\b)/i,
+    pattern: /\bclean(?!\s*up\b)|\bhpc\b/i,
     modality: 'weightlifting',
     equipment: 'barbell',
     barbellLift: true,
@@ -91,14 +92,14 @@ export const MOVEMENT_DEFS: MovementDef[] = [
   },
   {
     name: 'Front Squats',
-    pattern: /front squat/i,
+    pattern: /front (rack )?squat/i,
     modality: 'weightlifting',
     equipment: 'barbell',
     barbellLift: true,
   },
   {
     name: 'Back Squats',
-    pattern: /back squat/i,
+    pattern: /back (pause )?squat/i,
     modality: 'weightlifting',
     equipment: 'barbell',
     barbellLift: true,
@@ -122,7 +123,7 @@ export const MOVEMENT_DEFS: MovementDef[] = [
   },
   {
     name: 'Overhead Squats',
-    pattern: /overhead squat|ohs/i,
+    pattern: /overhead (db |dumbbell )?squat|ohs/i,
     modality: 'weightlifting',
     equipment: 'barbell',
     barbellLift: true,
@@ -133,7 +134,7 @@ export const MOVEMENT_DEFS: MovementDef[] = [
   { name: 'Air Squats', pattern: /air squat/i, modality: 'gymnastics' },
   {
     name: 'Bench Press',
-    pattern: /bench press/i,
+    pattern: /\bbench\b/i,
     modality: 'weightlifting',
     equipment: 'barbell',
     barbellLift: true,
@@ -158,8 +159,8 @@ export const MOVEMENT_DEFS: MovementDef[] = [
     modality: 'monostructural',
     equipment: 'bike',
   },
-  { name: 'Ski Erg', pattern: /ski ?erg/i, modality: 'monostructural', equipment: 'ski' },
-  { name: 'Pistols', pattern: /pistol/i, modality: 'gymnastics' },
+  { name: 'Ski Erg', pattern: /ski ?erg|\bski\b/i, modality: 'monostructural', equipment: 'ski' },
+  { name: 'Pistols', pattern: /pistol|single[- ]leg squat/i, modality: 'gymnastics' },
   { name: 'Ring Dips', pattern: /ring dip/i, modality: 'gymnastics', equipment: 'rings' },
   { name: 'Dips', pattern: /\bdips?\b/i, modality: 'gymnastics' },
   { name: 'Ring Rows', pattern: /ring row/i, modality: 'gymnastics', equipment: 'rings' },
@@ -224,7 +225,7 @@ export const MOVEMENT_DEFS: MovementDef[] = [
     modality: 'weightlifting',
     equipment: 'dumbbell',
   },
-  { name: 'Sled Work', pattern: /\bsled\b/i, modality: 'weightlifting', equipment: 'sled' },
+  { name: 'Sled Work', pattern: /\bsled\b|prowler/i, modality: 'weightlifting', equipment: 'sled' },
   {
     name: 'SDHP',
     pattern: /sdhp|sumo (deadlift|dl) high pulls?|dlhps?/i,
@@ -271,6 +272,14 @@ export const MOVEMENT_DEFS: MovementDef[] = [
     modality: 'gymnastics',
     equipment: 'box',
   },
+  // --- Display movements added by the July 2026 sweep against a second
+  // local archive.
+  {
+    name: 'Single Unders',
+    pattern: /single[- ]?unders?/i,
+    modality: 'monostructural',
+    equipment: 'rope',
+  },
   { name: 'Flutter Kicks', pattern: /flutter kicks?/i, modality: 'gymnastics' },
   { name: 'Arch Holds', pattern: /arch (hold|rock)/i, modality: 'gymnastics' },
   { name: 'Handstand Holds', pattern: /handstand (hold|time)/i, modality: 'gymnastics' },
@@ -295,7 +304,7 @@ export const MOVEMENT_DEFS: MovementDef[] = [
   },
   {
     name: 'Hang Cleans',
-    pattern: /hang (power |squat )?clean/i,
+    pattern: /hang (power |squat )?clean|\bhpc\b/i,
     modality: 'weightlifting',
     equipment: 'barbell',
     barbellLift: true,
@@ -348,6 +357,41 @@ export const MOVEMENT_DEFS: MovementDef[] = [
     equipment: 'barbell',
     barbellLift: true,
     variantOf: 'Jerks',
+  },
+  // Pull/balance/press accessory lifts get their own defs so their loads —
+  // typically programmed above the parent lift's max — never land on the
+  // parent's progression page (liftNameFor's longest-match keeps them apart).
+  {
+    name: 'Snatch Pulls',
+    pattern: /snatch (high )?pulls?/i,
+    modality: 'weightlifting',
+    equipment: 'barbell',
+    barbellLift: true,
+    variantOf: 'Snatches',
+  },
+  {
+    name: 'Snatch Balance',
+    pattern: /snatch balance/i,
+    modality: 'weightlifting',
+    equipment: 'barbell',
+    barbellLift: true,
+    variantOf: 'Snatches',
+  },
+  {
+    name: 'Clean Pulls',
+    pattern: /clean (high )?pulls?/i,
+    modality: 'weightlifting',
+    equipment: 'barbell',
+    barbellLift: true,
+    variantOf: 'Cleans',
+  },
+  {
+    name: 'Sots Press',
+    pattern: /sots press/i,
+    modality: 'weightlifting',
+    equipment: 'barbell',
+    barbellLift: true,
+    variantOf: 'Strict Press',
   },
   {
     name: 'Sumo Deadlifts',
