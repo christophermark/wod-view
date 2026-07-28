@@ -1,7 +1,7 @@
 # Lift progression on preview data: stats LIFT BESTS rows → Deadlifts page
 # (max card, load chart, percent table, sessions) → session → workout detail.
 # Deterministic sample facts: Deadlifts is the top lift best (all-time max
-# 315, current max 275, 11 sessions); percent toggle defaults to CURRENT.
+# 325, current max 285, 11 sessions); percent toggle defaults to CURRENT.
 appId: com.christophermark.wodview
 ---
 - runFlow: ../subflows/enter-preview.yaml
@@ -18,9 +18,9 @@ appId: com.christophermark.wodview
 - waitForAnimationToEnd
 - tapOn: 'DEADLIFTS,.*'
 - assertVisible: 'CURRENT MAX'
-# Nested Texts merge: the hero value reads "275 LB".
-- assertVisible: '275 LB'
-- assertVisible: 'ALL-TIME MAX 315 LB.*'
+# Nested Texts merge: the hero value reads "285 LB".
+- assertVisible: '285 LB'
+- assertVisible: 'ALL-TIME MAX 325 LB.*'
 # Chart legend + callout labels (callout defaults to the newest session).
 - assertVisible: 'TOP LOAD'
 - assertVisible: 'EST. 1RM'

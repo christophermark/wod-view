@@ -1,8 +1,10 @@
 # Benchmarks feature on preview data: stats card + retest radar → benchmarks
 # list → Fran detail (timeline, standards caption, history) → attempt →
 # workout detail benchmark chip.
-# Deterministic sample facts: 17 tracked benchmarks; radar tops out with
-# KAREN; Fran has 4 attempts, best 5:05 (INTERMEDIATE — 0:05 OFF ADVANCED).
+# Deterministic sample facts: 19 tracked benchmarks; radar tops out with
+# NANCY; Fran has 4 attempts, best 5:05 (INTERMEDIATE — 0:05 OFF ADVANCED)
+# with the newest attempt on April 10 2026 (the constructed FRAN_ARC in
+# scripts/generate-sample-workouts.ts).
 appId: com.christophermark.wodview
 ---
 - runFlow: ../subflows/enter-preview.yaml
@@ -15,9 +17,9 @@ appId: com.christophermark.wodview
       text: 'RETEST RADAR'
     centerElement: true
 - takeScreenshot: .maestro/screenshots/benchmarks-01-stats-card
-# The card Pressable merges child texts: "17 TRACKED, VIEW ALL ›".
-- assertVisible: '17 TRACKED.*'
-- assertVisible: '.*KAREN.*'
+# The card Pressable merges child texts: "19 TRACKED, VIEW ALL ›".
+- assertVisible: '19 TRACKED.*'
+- assertVisible: '.*NANCY.*'
 - waitForAnimationToEnd
 - tapOn:
     id: 'benchmarks-link'

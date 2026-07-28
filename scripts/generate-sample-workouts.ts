@@ -75,6 +75,15 @@ const MONTH_PLAN: [month: string, sessions: number][] = [
 
 // Memorial Day Murph and the CrossFit Open anchor each year to real dates.
 const MURPH_DATES = ['2024-05-27', '2025-05-26', '2026-05-25'];
+// Fran retests follow a fixed improving arc — the benchmarks e2e flow and the
+// store screenshots pin the finale (5:05, INTERMEDIATE — 0:05 OFF ADVANCED,
+// newest attempt April 10 2026), so the arc is constructed, never sampled.
+const FRAN_ARC: [date: string, secs: number][] = [
+  ['2023-10-12', 412],
+  ['2024-06-14', 383],
+  ['2025-03-21', 341],
+  ['2026-04-10', 305],
+];
 const OPEN_WEEKS: [id: string, date: string][] = [
   ['24.1', '2024-03-01'],
   ['24.2', '2024-03-08'],
@@ -149,12 +158,43 @@ const MOVEMENTS: Movement[] = [
   { line: (r) => `${r} Overhead Squats 95#/65#`, reps: [6, 12] },
   { line: (r) => `${r} Box Step-Ups 24"/20"`, reps: [12, 20] },
   { line: (r) => `${r} Rope Climbs`, reps: [2, 4] },
+  { line: (r) => `${r} Cal Ski`, reps: [10, 18] },
+  { line: (r) => `${r} Cal Bike`, reps: [12, 20] },
+  { line: (r) => `${r} Russian KB Swings 70#/53#`, reps: [15, 25] },
+  { line: (r) => `${r} Single Unders`, reps: [50, 100] },
+  { line: (r) => `${r} HPC 115#/75#`, reps: [6, 12] },
+  { line: (r) => `${r} Goblet Squats 53#/35#`, reps: [12, 20] },
+  { line: (r) => `${r} DB Snatches 50#/35#`, reps: [10, 20] },
+  { line: (r) => `${r} Chest-to-Bar Pull-Ups`, reps: [6, 12] },
 ];
 
 function pickMovements(n: number): string[] {
   const chosen = new Set<Movement>();
   while (chosen.size < n) chosen.add(pick(MOVEMENTS));
   return [...chosen].map((m) => m.line(m.reps ? randInt(m.reps[0], m.reps[1]) : 0));
+}
+
+// Ladder metcons ("21-15-9") list count-less movement lines. The export glues
+// the ladder to the next line ("21-15-9Thrusters…"), and restoreLineBreaks can
+// only re-split a digit→Capital+lowercase seam — so this pool holds classic
+// ladder movements and none that start with an all-caps token (KB, DB, HSPU).
+const LADDER_MOVEMENTS = [
+  'Thrusters 95#/65#',
+  'Deadlifts 225#/155#',
+  'Wall Balls 20#/14#',
+  'Power Cleans 135#/95#',
+  'Box Jumps 24"/20"',
+  'Pull-Ups',
+  'Push-Ups',
+  'Burpees',
+  'Cal Row',
+  'Overhead Squats 95#/65#',
+];
+
+function pickLadderMovements(n: number): string[] {
+  const chosen = new Set<string>();
+  while (chosen.size < n) chosen.add(pick(LADDER_MOVEMENTS));
+  return [...chosen];
 }
 
 const COACHES = ['Dana', 'Marcus', 'Priya', 'Theo', 'Val', 'Jo'];
@@ -235,7 +275,7 @@ function metconForTime(date: string): Row {
     if (chance(0.5)) lines.push(`*${randInt(10, 20)}:00 TIME CAP`);
     secs = randInt(420, 1080);
   } else if (style < 0.6) {
-    lines = [`FOR TIME:`, `21-15-9`, ...pickMovements(2)];
+    lines = [`FOR TIME:`, `21-15-9`, ...pickLadderMovements(2)];
     secs = randInt(300, 720);
   } else {
     const counts = [50, 40, 30, 20, 10];
@@ -346,13 +386,15 @@ const LIFTS: {
   best?: number;
 }[] = [
   { name: 'Back Squat', plural: 'Back Squats', start: 205, gain: 70, weight: 3 },
-  { name: 'Deadlift', plural: 'Deadlifts', start: 255, gain: 90, weight: 3 },
+  { name: 'Deadlift', plural: 'Deadlifts', start: 255, gain: 90, weight: 4 },
   { name: 'Bench Press', plural: 'Bench Press', start: 155, gain: 50, weight: 2 },
   { name: 'Front Squat', plural: 'Front Squats', start: 165, gain: 60, weight: 1 },
   { name: 'Push Press', plural: 'Push Presses', start: 125, gain: 40, weight: 1 },
   { name: 'Power Clean', plural: 'Power Cleans', start: 145, gain: 50, weight: 1 },
   { name: 'Snatch', plural: 'Snatches', start: 95, gain: 40, weight: 1 },
   { name: 'Overhead Squat', plural: 'Overhead Squats', start: 115, gain: 40, weight: 1 },
+  { name: 'Strict Press', plural: 'Strict Presses', start: 95, gain: 30, weight: 2 },
+  { name: 'Power Snatch', plural: 'Power Snatches', start: 85, gain: 35, weight: 1 },
 ];
 const WEIGHTED_LIFTS = LIFTS.flatMap((l) => Array.from({ length: l.weight }, () => l));
 const START_MS = new Date(2023, 6, 1).getTime();
@@ -409,19 +451,96 @@ function strength(date: string): Row {
   };
 }
 
+// Oly accessory days: tagged barbell_lift work the way real gyms program it —
+// pulls and balances loaded relative to (often above) the parent lift. These
+// exercise the taxonomy's accessory-lift variants and liftNameFor's tag
+// handling, including a complex whose tag joins two lifts.
+const ACCESSORIES: { tag: string; desc: string[]; start: number; gain: number }[] = [
+  {
+    tag: 'Snatch Pull',
+    desc: ['4 x 3 Snatch Pulls at 100-105% of your best snatch.'],
+    start: 105,
+    gain: 45,
+  },
+  {
+    tag: 'Snatch Balance',
+    desc: ['Work to a heavy Snatch Balance in a 15:00 window.'],
+    start: 100,
+    gain: 40,
+  },
+  {
+    tag: 'Clean Pull',
+    desc: ['4 x 3 Clean Pulls.', 'Heavier than your best clean — speed off the floor.'],
+    start: 155,
+    gain: 55,
+  },
+  {
+    tag: 'Sots Press',
+    desc: ['5 x 3 Sots Press from the back rack.', 'Stay in the bottom of the squat.'],
+    start: 45,
+    gain: 20,
+  },
+  {
+    tag: 'Pause Back Squat',
+    desc: ['5 x 2 Pause Back Squats.', '3 second pause in the bottom.'],
+    start: 175,
+    gain: 60,
+  },
+  {
+    tag: 'Squat Clean + Push Jerk',
+    desc: ['Complex: 1 Squat Clean + 2 Push Jerks.', 'Build to a heavy complex for the day.'],
+    start: 135,
+    gain: 45,
+  },
+];
+
+function olyAccessory(date: string): Row {
+  const acc = pick(ACCESSORIES);
+  const [y, m, d] = date.split('-').map(Number);
+  const progress = (new Date(y, m - 1, d).getTime() - START_MS) / (END_MS - START_MS);
+  const load = Math.round((acc.start + acc.gain * progress + randInt(-8, 8)) / 5) * 5;
+  return {
+    date,
+    title: `OLY - ${acc.tag}`,
+    description: flatten(acc.desc),
+    raw: load,
+    display: `${load}`,
+    scoreType: 'Load',
+    lift: acc.tag,
+    sets: [{ load, success: true }],
+    notes: note(true),
+    rx: true,
+    pr: false,
+  };
+}
+
 // Benchmarks: repeats improve over time and flag a PR when they beat the
 // previous best.
+const FRAN_LINES = ['FOR TIME:', '21-15-9', 'Thrusters 95#/65#', 'Pull-Ups'];
+
+function fran(date: string, secs: number, pr: boolean): Row {
+  return {
+    date,
+    title: '"FRAN"',
+    description: flatten(FRAN_LINES),
+    raw: secs,
+    display: fmtTime(secs),
+    scoreType: '',
+    lift: '',
+    sets: timeSets(secs),
+    notes: pr ? 'Fran PR — pacing finally clicked' : note(true),
+    rx: true,
+    pr,
+  };
+}
+
+// Fran is excluded here: her attempts follow the constructed FRAN_ARC above.
 const BENCHMARKS: {
   name: string;
   lines: string[];
   range: [number, number];
   best?: number;
 }[] = [
-  {
-    name: 'FRAN',
-    lines: ['FOR TIME:', '21-15-9', 'Thrusters 95#/65#', 'Pull-Ups'],
-    range: [300, 540],
-  },
   {
     name: 'HELEN',
     lines: ['FOR TIME:', '3 Rounds:', '400m Run', '21 KB Swings 53#/35#', '12 Pull-Ups'],
@@ -448,6 +567,21 @@ const BENCHMARKS: {
       '6 Push Jerks 155#/105#',
     ],
     range: [540, 900],
+  },
+  {
+    name: 'DIANE',
+    lines: ['FOR TIME:', '21-15-9', 'Deadlifts 225#/155#', 'Handstand Push-Ups'],
+    range: [360, 660],
+  },
+  {
+    name: 'NANCY',
+    lines: ['FOR TIME:', '5 Rounds:', '400m Run', '15 Overhead Squats 95#/65#'],
+    range: [720, 1020],
+  },
+  {
+    name: 'RANDY',
+    lines: ['FOR TIME:', '75 Power Snatches 75#/55#'],
+    range: [360, 660],
   },
 ];
 
@@ -562,7 +696,7 @@ function skillOrOddity(date: string): Row {
       pr: chance(0.4),
     };
   }
-  if (kind < 0.65) {
+  if (kind < 0.55) {
     const cals = randInt(26, 40);
     return {
       date,
@@ -574,6 +708,23 @@ function skillOrOddity(date: string): Row {
       lift: '',
       sets: [{ calories: cals }],
       notes: chance(0.5) ? 'Saw stars after this one' : '',
+      rx: true,
+      pr: false,
+    };
+  }
+  if (kind < 0.65) {
+    const machine = pick(['Row', 'Ski']);
+    const meters = randInt(2300, 3100);
+    return {
+      date,
+      title: `12:00 Max Meters ${machine}`,
+      description: flatten([`${machine} for max meters in 12:00.`, 'Steady pace, empty the tank.']),
+      raw: meters,
+      display: `${meters}`,
+      scoreType: 'Meters',
+      lift: '',
+      sets: [{ meters }],
+      notes: chance(0.4) ? 'Negative split the back half' : '',
       rx: true,
       pr: false,
     };
@@ -629,6 +780,11 @@ for (const [monthKey, sessions] of MONTH_PLAN) {
       rows.push(murph(date, murphIndex));
       continue;
     }
+    const franArc = FRAN_ARC.findIndex(([d]) => d === date);
+    if (franArc >= 0) {
+      rows.push(fran(date, FRAN_ARC[franArc][1], franArc > 0));
+      continue;
+    }
     const open = OPEN_WEEKS.find(([, d]) => d === date);
     if (open) {
       rows.push(openWorkout(date, open[0]));
@@ -638,7 +794,8 @@ for (const [monthKey, sessions] of MONTH_PLAN) {
     if (r < 0.38) rows.push(metconForTime(date));
     else if (r < 0.62) rows.push(amrap(date));
     else if (r < 0.7) rows.push(emom(date));
-    else if (r < 0.85) rows.push(strength(date));
+    else if (r < 0.82) rows.push(strength(date));
+    else if (r < 0.85) rows.push(olyAccessory(date));
     else if (r < 0.9) rows.push(benchmark(date));
     else rows.push(skillOrOddity(date));
   }
@@ -647,9 +804,33 @@ for (const [monthKey, sessions] of MONTH_PLAN) {
 for (const [i, date] of MURPH_DATES.entries()) {
   if (!rows.some((r) => r.date === date)) rows.push(murph(date, i));
 }
+for (const [i, [date, secs]] of FRAN_ARC.entries()) {
+  if (!rows.some((r) => r.date === date)) rows.push(fran(date, secs, i > 0));
+}
 for (const [id, date] of OPEN_WEEKS) {
   if (!rows.some((r) => r.date === date)) rows.push(openWorkout(date, id));
 }
+// The e2e suite anchors on the newest workout being "Power Clean 3x5" on
+// July 1 2026 — construct it explicitly instead of trusting the PRNG.
+const NEWEST_DATE = '2026-07-01';
+rows.splice(0, rows.length, ...rows.filter((r) => r.date !== NEWEST_DATE));
+rows.push({
+  date: NEWEST_DATE,
+  title: 'Power Clean 3x5',
+  description: flatten(['3 sets of 5 reps.', 'Across, building from last week.']),
+  raw: 165,
+  display: '165',
+  scoreType: 'Load',
+  lift: 'Power Clean',
+  sets: [
+    { load: 155, success: true },
+    { load: 160, success: true },
+    { load: 165, success: true },
+  ],
+  notes: 'Bar speed felt great on all three sets',
+  rx: true,
+  pr: false,
+});
 rows.sort((a, b) => (a.date < b.date ? -1 : 1));
 
 // ---------------------------------------------------------------------------

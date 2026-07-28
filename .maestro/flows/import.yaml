@@ -5,7 +5,7 @@
 #
 # Requires the sample CSV seeded into the simulator's local Files storage —
 # scripts/e2e.sh does that before running flows (exact filename workouts.csv).
-# Deterministic sample facts: 372 workouts, newest "Power Clean 3x5".
+# Deterministic sample facts: 377 workouts, newest "Power Clean 3x5".
 appId: com.christophermark.wodview
 ---
 - runFlow: ../subflows/dismiss-open-dialog.yaml
@@ -51,7 +51,7 @@ appId: com.christophermark.wodview
     point: 17%,27%
 # Back in the app on the imported dataset: right count, no sample-data banner.
 - extendedWaitUntil:
-    visible: '372 WODS.*'
+    visible: '377 WODS.*'
     timeout: 15000
 - assertNotVisible: 'SAMPLE DATA — IMPORT YOUR OWN.*'
 - takeScreenshot: .maestro/screenshots/import-01-imported-log
