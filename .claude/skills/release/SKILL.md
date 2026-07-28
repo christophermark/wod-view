@@ -166,7 +166,7 @@ turned out to be a no-op). The slides (`SLIDES` in
 calendar, and search** captures; slides 02 (import) and 07 (private) are
 type-only, drawn from copy in the compose script itself; the onboarding
 capture is taken by the flow but used by no slide. So: a change is
-store-visible only if it touches one of those five screens *or* the compose
+store-visible only if it touches one of those five screens _or_ the compose
 script's `SLIDES` copy — and when judging whether copy in a fresh render is
 "new", check its provenance (`git log -S '<the text>'`) against what was
 last uploaded, not against your expectations.
