@@ -17,6 +17,10 @@ instead (`.claude/skills/release/internal-release-notes.md`). Never include
 anything from the personal dataset (the AGENTS.md privacy rule applies here
 too).
 
+## v1.0.3
+
+Android: the tab bar and settings icons are visible again. Settings is now reachable from every tab, and the tabs run LOG · STATS · CALENDAR. Stats also read your history more accurately — more movements and spellings are recognized, and accessory lifts like snatch pulls and clean pulls now get their own pages instead of skewing the maxes on the parent lift.
+
 ## v1.0.2
 
 Onboarding now starts with a working app: explore three years of sample data — log, calendar, and stats — before importing your own history. When you're ready, the sample-data banner jumps straight to import. Also fixed: the least-programmed stat now only ranks movements that actually appear in your log.
