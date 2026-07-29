@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { SymbolView } from 'expo-symbols';
+import { Icon } from '@/components/Icon';
 import { useMemo, useState } from 'react';
 import {
   Pressable,
@@ -81,7 +81,7 @@ export default function LogScreen() {
             {stats.total} WODS · SINCE {sinceYear}
           </Text>
           <Pressable onPress={() => router.push('/settings')} hitSlop={10} testID="settings-button">
-            <SymbolView name="gearshape.fill" tintColor={colors.inkFaint} size={16} />
+            <Icon name="gearshape.fill" color={colors.inkFaint} size={16} />
           </Pressable>
         </View>
       </View>

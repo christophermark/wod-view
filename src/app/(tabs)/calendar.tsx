@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { SymbolView } from 'expo-symbols';
+import { Icon } from '@/components/Icon';
 import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -69,7 +69,7 @@ export default function CalendarScreen() {
             onPress={() => router.push('/settings')}
             hitSlop={10}
             testID="calendar-settings-button">
-            <SymbolView name="gearshape.fill" tintColor={colors.inkFaint} size={16} />
+            <Icon name="gearshape.fill" color={colors.inkFaint} size={16} />
           </Pressable>
         </View>
       </View>

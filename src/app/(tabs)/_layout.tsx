@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
-import { SymbolView } from 'expo-symbols';
 
+import { Icon } from '@/components/Icon';
 import { colors, fonts } from '@/theme';
 
 export default function TabLayout() {
@@ -26,24 +26,22 @@ export default function TabLayout() {
         options={{
           title: 'LOG',
           tabBarIcon: ({ color }) => (
-            <SymbolView name="list.bullet.rectangle.portrait" tintColor={color} size={24} />
+            <Icon name="list.bullet.rectangle.portrait" color={color} size={24} />
           ),
-        }}
-      />
-      <Tabs.Screen
-        name="calendar"
-        options={{
-          title: 'CALENDAR',
-          tabBarIcon: ({ color }) => <SymbolView name="calendar" tintColor={color} size={24} />,
         }}
       />
       <Tabs.Screen
         name="stats"
         options={{
           title: 'STATS',
-          tabBarIcon: ({ color }) => (
-            <SymbolView name="chart.bar.fill" tintColor={color} size={24} />
-          ),
+          tabBarIcon: ({ color }) => <Icon name="chart.bar.fill" color={color} size={24} />,
+        }}
+      />
+      <Tabs.Screen
+        name="calendar"
+        options={{
+          title: 'CALENDAR',
+          tabBarIcon: ({ color }) => <Icon name="calendar" color={color} size={24} />,
         }}
       />
     </Tabs>
