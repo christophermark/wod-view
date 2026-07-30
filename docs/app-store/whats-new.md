@@ -19,7 +19,7 @@ too).
 
 ## v1.0.3
 
-Android: the tab bar and settings icons are visible again. Settings is now reachable from every tab, and the tabs run LOG · STATS · CALENDAR. Stats also read your history more accurately — more movements and spellings are recognized, and accessory lifts like snatch pulls and clean pulls now get their own pages instead of skewing the maxes on the parent lift.
+Tab bar and settings icons now render correctly on every device. Settings is reachable from every tab, and the tabs run LOG · STATS · CALENDAR. Stats also read your history more accurately — more movements and spellings are recognized, and accessory lifts like snatch pulls and clean pulls now get their own pages instead of skewing the maxes on the parent lift.
 
 ## v1.0.2
 
