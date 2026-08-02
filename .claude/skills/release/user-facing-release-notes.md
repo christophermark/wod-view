@@ -20,6 +20,17 @@ shape the notes.
 - **Hard limits:** ≤500 characters (Google Play's cap; the bump script
   refuses beyond it). Never include anything from the personal dataset —
   workout text, dates, scores (the AGENTS.md privacy rule applies here).
-- **One text for both stores.** Don't write platform-specific notes unless a
-  change genuinely shipped on only one platform — then say so in the shared
-  text rather than diverging the files.
+- **One text for both stores, and never name a platform in it.** No "iOS",
+  "Android", "iPhone vs. Android", "on Android only". Apple's precheck flags
+  the other platform's name in App Store metadata (observed on v1.0.3) and
+  it's a metadata-rejection risk; beyond that, a reader on one store has no
+  use for the other store's news. This holds even when the fix genuinely
+  shipped on one platform only — describe what's now true for the reader
+  instead of where it was broken:
+
+  > _Android: the tab bar and settings icons are visible again._ →
+  > **Tab bar and settings icons now render correctly on every device.**
+
+  Platform detail belongs in the GitHub release body, where naming iOS and
+  Android freely is correct and useful — see `internal-release-notes.md`.
+  Diverging the two stores' files is a last resort, not the way around this.
