@@ -12,13 +12,19 @@ appId: com.christophermark.wodview
 - runFlow: ../../subflows/dismiss-open-dialog.yaml
 - launchApp:
     clearState: true
-# Dev builds boot straight to the LOG tab on the bundled dataset (swapped to
-# sample data by the runner script). Wait on the search placeholder, not
-# 'WOD VIEW' — the home-screen app icon also matches that label, so it would
-# false-pass if the launch silently failed.
+# Dev builds boot straight to the STATS tab on the bundled dataset (swapped to
+# sample data by the runner script) — STATS is the app's entry point. Wait on
+# a stats-only string, not 'WOD VIEW' — the home-screen app icon also matches
+# that label, so it would false-pass if the launch silently failed.
 - extendedWaitUntil:
-    visible: 'Search movements.*'
+    visible: 'TOTAL WODS'
     timeout: 60000 # first launch waits on Metro bundling + font load
+- waitForAnimationToEnd
+- takeScreenshot: .maestro/marketing/raw/stats
+- waitForAnimationToEnd
+
+- tapOn: 'LOG, tab.*'
+- assertVisible: 'Search movements.*'
 - waitForAnimationToEnd
 - takeScreenshot: .maestro/marketing/raw/log
 
@@ -43,13 +49,7 @@ appId: com.christophermark.wodview
 - waitForAnimationToEnd
 - tapOn:
     id: 'workout-back'
-- assertVisible: 'WOD VIEW'
-
-- tapOn: 'STATS, tab.*'
-- assertVisible: 'LIFETIME'
-- waitForAnimationToEnd
-- takeScreenshot: .maestro/marketing/raw/stats
-- waitForAnimationToEnd
+- assertVisible: 'LOG' # the log heading; the tab button reads "LOG, tab, …"
 
 - tapOn: 'CALENDAR, tab.*'
 - assertVisible: '.*THIS MONTH'

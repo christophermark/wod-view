@@ -11,11 +11,14 @@ appId: com.christophermark.wodview
 - runFlow: ../subflows/dismiss-open-dialog.yaml
 - launchApp:
     clearState: true
+# 'TOTAL WODS', not 'WOD VIEW': matching is case-insensitive, so the wordmark
+# pattern also matches the home-screen app icon and passes mid-launch.
 - extendedWaitUntil:
-    visible: 'WOD VIEW'
+    visible: 'TOTAL WODS'
     timeout: 60000 # first launch waits on Metro bundling + font load
+- waitForAnimationToEnd
 - tapOn:
-    id: 'settings-button'
+    id: 'stats-settings-button'
 - assertVisible: 'SETTINGS'
 - scrollUntilVisible:
     element:
@@ -49,10 +52,13 @@ appId: com.christophermark.wodview
     timeout: 3000
 - tapOn:
     point: 17%,27%
-# Back in the app on the imported dataset: right count, no sample-data banner.
+# Back in the app on the imported dataset — finishing import lands on STATS,
+# the entry point, so the log's count meta is one tab away.
 - extendedWaitUntil:
-    visible: '377 WODS.*'
+    visible: 'TOTAL WODS'
     timeout: 15000
+- tapOn: 'LOG, tab.*'
+- assertVisible: '377 WODS.*'
 - assertNotVisible: 'SAMPLE DATA — IMPORT YOUR OWN.*'
 - takeScreenshot: .maestro/screenshots/import-01-imported-log
 # Imported data ⇒ preview is off-limits: dev source row reads as unavailable,

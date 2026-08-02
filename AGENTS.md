@@ -98,6 +98,9 @@ dependency graphs. If you touch that require, re-verify with `npm run verify:rel
   tap deep-links to the onboarding import step, plus a ✕ that exits preview).
 - Production first launch has no data: `needsOnboarding` gates the main screens behind
   `Stack.Protected` in `_layout.tsx` and routes to `onboarding.tsx` (import or preview).
+- The tab group's index route (`src/app/(tabs)/index.tsx`, which the launch URL "/"
+  resolves to) belongs to STATS — the app's entry point — because the file must be named
+  `index.tsx`; LOG lives at `log.tsx`. Tab bar order is unchanged: LOG · STATS · CALENDAR.
 - **All colors/fonts/spacing come from `src/theme.ts` tokens.** No hardcoded hex values or
   font names in screens. Design direction: "clean athletic light" — paper background, ink
   Barlow Condensed display type, signal-red accent, IBM Plex Mono for scores/measured values.
@@ -127,10 +130,13 @@ Flow-writing gotchas (all learned the hard way — see comments in the flows):
   (`onboarding-back`, `settings-back`, `workout-back`, `benchmark-back`,
   `benchmarks-back`, `lift-back`; also `settings-button`, `log-search`, and the
   per-tab settings gears `calendar-settings-button` / `stats-settings-button` —
-  all three tabs stay mounted, so the gears can't share one testID).
-- Dev builds boot straight to the LOG tab on the bundled dataset — `clearState` does
-  NOT surface onboarding. Flows reach onboarding via settings → DEV TOOLS and preview
-  via settings → PREVIEW MODE row (`.maestro/subflows/enter-preview.yaml`).
+  once visited, all three tabs stay mounted, so the gears can't share one testID).
+- Dev builds boot straight to the STATS tab on the bundled dataset — `clearState` does
+  NOT surface onboarding. Tabs are lazy, so right after launch only STATS exists in the
+  hierarchy: reach settings with `stats-settings-button` (`settings-button` is the LOG
+  screen's gear, and the log heading reads `LOG`, not the `WOD VIEW` wordmark — that now
+  heads STATS). Flows reach onboarding via settings → DEV TOOLS and preview via
+  settings → PREVIEW MODE row (`.maestro/subflows/enter-preview.yaml`).
 - Assertions must only reference the committed synthetic sample data (deterministic:
   newest workout "Power Clean 3x5", "MURPH" exists for search) — never the personal
   bundled dataset.

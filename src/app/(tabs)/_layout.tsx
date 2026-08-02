@@ -22,7 +22,7 @@ export default function TabLayout() {
         },
       }}>
       <Tabs.Screen
-        name="index"
+        name="log"
         options={{
           title: 'LOG',
           tabBarIcon: ({ color }) => (
@@ -30,8 +30,11 @@ export default function TabLayout() {
           ),
         }}
       />
+      {/* Stats is the app's entry point, so it owns the group's index route —
+          the launch URL "/" has to resolve to a file named index.tsx. Tab
+          order stays LOG · STATS · CALENDAR, set by declaration order here. */}
       <Tabs.Screen
-        name="stats"
+        name="index"
         options={{
           title: 'STATS',
           tabBarIcon: ({ color }) => <Icon name="chart.bar.fill" color={color} size={24} />,

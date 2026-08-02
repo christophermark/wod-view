@@ -1,19 +1,26 @@
 # Shared subflow: cold-launch into preview mode (synthetic sample data).
 #
-# Dev builds boot straight to the LOG tab on the bundled dataset (onboarding
-# only gates production first launch), so preview is entered the way a dev
-# would: settings → PREVIEW MODE source row. Leaves the app on the LOG tab
-# with the preview banner showing.
+# Dev builds boot straight to the STATS tab on the bundled dataset (STATS is
+# the app's entry point; onboarding only gates production first launch), so
+# preview is entered the way a dev would: settings → PREVIEW MODE source row.
+# Leaves the app on the STATS tab with the preview banner showing — flows that
+# need the log have to tap the LOG tab themselves.
 appId: com.christophermark.wodview
 ---
 - runFlow: dismiss-open-dialog.yaml
 - launchApp:
     clearState: true
+# 'TOTAL WODS', not the 'WOD VIEW' wordmark: matching is case-insensitive, so
+# the wordmark pattern also matches the home-screen app icon and passes
+# mid-launch, leaving the next tap to hit a half-built hierarchy.
 - extendedWaitUntil:
-    visible: 'WOD VIEW'
+    visible: 'TOTAL WODS'
     timeout: 60000 # first launch waits on Metro bundling + font load
+- waitForAnimationToEnd
+# The landing tab's own gear — `settings-button` belongs to the LOG screen,
+# which isn't mounted yet on a cold launch (tabs are lazy).
 - tapOn:
-    id: 'settings-button'
+    id: 'stats-settings-button'
 - assertVisible: 'SETTINGS'
 # Pressables merge child texts into one accessibility string ("LABEL, subtitle"),
 # so rows/buttons are matched on "LABEL, …" patterns.
@@ -22,6 +29,4 @@ appId: com.christophermark.wodview
 - tapOn:
     id: 'settings-back'
 - assertVisible: 'WOD VIEW'
-# Card a11y text starts with the date rail ("WED, 1, POWER CLEAN 3X5, …"),
-# hence the leading wildcard.
-- assertVisible: '.*POWER CLEAN 3X5.*' # newest workout in the deterministic sample dataset
+- assertVisible: 'LIFETIME' # stats year meta, on the sample dataset

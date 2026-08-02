@@ -18,7 +18,7 @@ year filter):
   Cell states: empty (no workout, `colors.hairline`), trained (`colors.ink`),
   PR day (`colors.gold`), multi-workout day (`colors.accent`). Month initials
   along the top in `fonts.mono` 10pt.
-- Below the grid, two `FactRow`s (existing component pattern in `stats.tsx`):
+- Below the grid, two `FactRow`s (existing component pattern in `index.tsx`):
   CURRENT STREAK (consecutive calendar weeks with ≥1 workout, counting back
   from today) and LONGEST GAP (days between adjacent workouts, with the date
   range, e.g. "23 DAYS · AUG 2–24 2024").
@@ -45,7 +45,7 @@ parameter (no `new Date()` inside lib functions) so tests are deterministic.
 - `src/lib/workouts.ts` — helpers above + tests in
   `src/lib/__tests__/workouts.test.ts` (fixed synthetic dates; year
   boundaries; empty list; single workout; leap year).
-- `src/app/(tabs)/stats.tsx` — render the grid with plain `View`s (cells are
+- `src/app/(tabs)/index.tsx` — render the grid with plain `View`s (cells are
   ~4×4 with 2px gaps; a 53-column grid fits an iPhone width at that size,
   wrap in horizontal `ScrollView` as a fallback).
 

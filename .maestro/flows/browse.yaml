@@ -1,19 +1,24 @@
-# Browse every screen on preview data: log, workout detail, search, calendar,
-# stats, settings, then exit preview via the banner.
+# Browse every screen on preview data: stats (the landing screen), log,
+# workout detail, search, calendar, settings, then exit preview via the banner.
 # Relies on the deterministic sample dataset (newest workout: Power Clean 3x5;
 # "MURPH" exists for search).
 appId: com.christophermark.wodview
 ---
 - runFlow: ../subflows/enter-preview.yaml
-- takeScreenshot: .maestro/screenshots/browse-01-log
+# Lands on STATS — the app's entry point, headed by the WOD VIEW wordmark.
+- takeScreenshot: .maestro/screenshots/browse-01-stats
+# Tab buttons expose "LABEL, tab, n of 3" as their a11y text.
+- tapOn: 'LOG, tab.*'
+- assertVisible: 'LOG' # the log heading is an exact-string match; the tab reads "LOG, tab, …"
+- takeScreenshot: .maestro/screenshots/browse-02-log
 # Cards merge all child texts into one a11y string starting with the date rail
 # ("WED, 1, POWER CLEAN 3X5, …"), hence the leading wildcard.
 - tapOn: '.*POWER CLEAN 3X5.*'
 - assertVisible: 'THE WORKOUT'
-- takeScreenshot: .maestro/screenshots/browse-02-workout-detail
+- takeScreenshot: .maestro/screenshots/browse-03-workout-detail
 - tapOn:
     id: 'workout-back'
-- assertVisible: 'WOD VIEW'
+- assertVisible: 'LOG'
 - tapOn:
     id: 'log-search'
 - inputText: 'murph'
@@ -21,26 +26,24 @@ appId: com.christophermark.wodview
 - assertVisible:
     text: '.*MURPH.*'
     index: 0
-- takeScreenshot: .maestro/screenshots/browse-03-log-search
-# Tab buttons expose "LABEL, tab, n of 3" as their a11y text.
+- takeScreenshot: .maestro/screenshots/browse-04-log-search
 - tapOn: 'CALENDAR, tab.*'
 - assertVisible: '.*THIS MONTH'
-- takeScreenshot: .maestro/screenshots/browse-04-calendar
+- takeScreenshot: .maestro/screenshots/browse-05-calendar
 - tapOn: 'STATS, tab.*'
 - assertVisible: 'LIFETIME'
-- takeScreenshot: .maestro/screenshots/browse-05-stats
 - scroll
 - takeScreenshot: .maestro/screenshots/browse-06-stats-scrolled
 - tapOn: 'LOG, tab.*'
 - tapOn:
-    id: 'settings-button'
+    id: 'settings-button' # the LOG screen's gear
 - assertVisible: 'SETTINGS'
 - takeScreenshot: .maestro/screenshots/browse-07-settings
 - tapOn:
     id: 'settings-back'
-- assertVisible: 'WOD VIEW'
+- assertVisible: 'LOG'
 - tapOn:
     id: 'preview-exit' # banner ✕ exits sample data → back to the bundled dataset in dev
 - assertNotVisible: 'SAMPLE DATA — IMPORT YOUR OWN.*'
-- assertVisible: 'WOD VIEW'
+- assertVisible: 'LOG'
 - takeScreenshot: .maestro/screenshots/browse-08-after-exit-preview

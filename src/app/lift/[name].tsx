@@ -239,7 +239,7 @@ export default function LiftScreen() {
     <View style={styles.screen}>
       <View style={[styles.topBar, { paddingTop: insets.top + spacing.sm }]}>
         <Pressable
-          onPress={() => (router.canGoBack() ? router.back() : router.replace('/stats'))}
+          onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}
           hitSlop={12}
           style={styles.backBtn}
           testID="lift-back">

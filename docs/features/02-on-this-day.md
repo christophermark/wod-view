@@ -10,7 +10,7 @@ loved everywhere it exists, and this app is _made_ of past workouts.
 
 ## UX
 
-On the log tab (`src/app/(tabs)/index.tsx`), a dismissible card above the
+On the log tab (`src/app/(tabs)/log.tsx`), a dismissible card above the
 list, shown only when a past workout (different year, same month/day) exists:
 
 - Eyebrow: `ON THIS DAY · 2024` (display font, accent color).
@@ -41,7 +41,7 @@ then newest — expose as the sort order of the returned array.
 
 - `src/lib/workouts.ts` + tests (multi-year fixtures, Feb 29, no-match,
   same-year exclusion, sort priority).
-- `src/app/(tabs)/index.tsx` — card component; styles from `theme.ts` only.
+- `src/app/(tabs)/log.tsx` — card component; styles from `theme.ts` only.
 
 ## Out of scope
 

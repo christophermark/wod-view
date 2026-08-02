@@ -4,18 +4,24 @@
 # Once on sample data, the banner is the import path.)
 #
 # Dev builds never show onboarding organically (they boot on the bundled
-# dataset), so this reaches it via settings → DEV TOOLS → VIEW ONBOARDING FLOW.
+# dataset, on the STATS entry screen), so this reaches it via settings →
+# DEV TOOLS → VIEW ONBOARDING FLOW.
 # Screenshots land in .maestro/screenshots/ (run via `npm run e2e` from repo root).
 appId: com.christophermark.wodview
 ---
 - runFlow: ../subflows/dismiss-open-dialog.yaml
 - launchApp:
     clearState: true
+# Wait on a string only the in-app STATS screen has. Matching is
+# case-insensitive, so 'WOD VIEW' also matches the home-screen app icon and
+# passes ~1.5s in, mid-launch — the next tap then hits a hierarchy XCUITest
+# can't resolve (kAXErrorInvalidUIElement).
 - extendedWaitUntil:
-    visible: 'WOD VIEW'
+    visible: 'TOTAL WODS'
     timeout: 60000 # first launch waits on Metro bundling + font load
+- waitForAnimationToEnd
 - tapOn:
-    id: 'settings-button'
+    id: 'stats-settings-button'
 - assertVisible: 'SETTINGS'
 - scrollUntilVisible:
     element:

@@ -52,10 +52,10 @@ render `≈` totals and skip nulls.
 ## Migration
 
 `computeStats()` keeps its `movementCounts` API but delegates to
-`MOVEMENT_DEFS`, so `stats.tsx` (MOST/LEAST PROGRAMMED) is unchanged. Keep
-the existing 23 names' output identical where possible — snapshot the current
-counts against the preview dataset before refactoring, and assert parity in a
-test.
+`MOVEMENT_DEFS`, so the stats screen (`src/app/(tabs)/index.tsx`, MOST/LEAST
+PROGRAMMED) is unchanged. Keep the existing 23 names' output identical where
+possible — snapshot the current counts against the preview dataset before
+refactoring, and assert parity in a test.
 
 ## Testing
 
