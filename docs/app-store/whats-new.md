@@ -17,6 +17,10 @@ instead (`.claude/skills/release/internal-release-notes.md`). Never include
 anything from the personal dataset (the AGENTS.md privacy rule applies here
 too).
 
+## v1.0.4
+
+The app now opens on your stats — totals, PRs, RX rate, and lift bests are the first thing you see. The log is one tap away in the tab bar, where it has always been.
+
 ## v1.0.3
 
 Tab bar and settings icons now render correctly on every device. Settings is reachable from every tab, and the tabs run LOG · STATS · CALENDAR. Stats also read your history more accurately — more movements and spellings are recognized, and accessory lifts like snatch pulls and clean pulls now get their own pages instead of skewing the maxes on the parent lift.
