@@ -37,7 +37,13 @@ should cloud builds ever be preferable; note EAS's remote build numbers are
 ignored by local builds — `ios.buildNumber` in app.json is the source of
 truth for this path.
 
-## Needs Chris (in order)
+## First submission — one-time setup (done; kept as the record)
+
+These were the steps to the _first_ App Store submission, in order. They are
+complete — the app has shipped through v1.0.4. Steady-state releases do **not**
+retrace this path: they run the `/release` skill, which builds both artifacts
+and submits both stores without a console visit. Keep this section for the next
+app (and as the manual iOS fallback if Fastlane is ever unavailable).
 
 1. **Apple Developer Program** — confirm enrollment is active for the Apple ID
    that will publish. If not enrolled: https://developer.apple.com/programs/enroll/
@@ -76,7 +82,12 @@ truth for this path.
 7. **Optional but recommended:** TestFlight-install on your own phone and
    run the reviewer path once (onboarding → preview → tabs → import your
    real CSV).
-8. **Submit for review** — the one step that stays manual on purpose.
+8. **Submit for review.** This was manual for the first submission only.
+   Since 2026-07-23 submission is automated: `npm run deploy:submit` sends
+   both stores for review with the release notes and releases automatically
+   on approval. The control point is _scoping the release before it starts_
+   (TestFlight-only, or upload-and-hold via the upload-only lanes) — not
+   clicking a console afterwards. See `deployments.md`.
 
 ## Standing release rules
 
