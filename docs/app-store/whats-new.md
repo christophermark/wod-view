@@ -17,6 +17,10 @@ instead (`.claude/skills/release/internal-release-notes.md`). Never include
 anything from the personal dataset (the AGENTS.md privacy rule applies here
 too).
 
+## v1.0.5
+
+Lift bests now show what you actually lifted. Workouts scored as total weight moved — a whole metcon's tonnage, or a strength day that summed three separate lifts — were being read as one-rep maxes and topping the list. They're now left out, so your real PRs stand on their own.
+
 ## v1.0.4
 
 The app now opens on your stats — totals, PRs, RX rate, and lift bests are the first thing you see. The log is one tap away in the tab bar, where it has always been.
