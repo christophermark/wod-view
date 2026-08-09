@@ -144,7 +144,14 @@ Flow-writing gotchas (all learned the hard way — see comments in the flows):
   settings → PREVIEW MODE row (`.maestro/subflows/enter-preview.yaml`).
 - Assertions must only reference the committed synthetic sample data (deterministic:
   newest workout "Power Clean 3x5", "MURPH" exists for search) — never the personal
-  bundled dataset.
+  bundled dataset. Those anchors are _constructed_ by
+  `generate-sample-workouts.ts`, not incidental: if you change the generator,
+  re-check every flow that names a workout.
+- Anything a flow asserts that depends on "now" expires. The sample's date range
+  is fixed (ends 2026-07-01), so trailing-window values — recent counts, current
+  streak, "this month" — drift out of range as real time passes and the flow
+  fails looking like a UI bug. Assert on facts that don't move, or re-anchor the
+  generator's date range when regenerating.
 - A tap fired immediately after `takeScreenshot` can be swallowed; precede it with
   `waitForAnimationToEnd`.
 
@@ -166,6 +173,13 @@ Flow-writing gotchas (all learned the hard way — see comments in the flows):
 - `.npmrc` sets `legacy-peer-deps` because jest-expo@57 pins `@react-native/jest-preset@^0.85`
   while react-native 0.86 wants 0.86 — remove when jest-expo catches up.
 - TypeScript 6 needs the explicit `"types": ["node", "jest"]` in tsconfig.json.
+- Adding a route file breaks `npx tsc` locally until the typed-routes definitions
+  regenerate ("not assignable to type `Href`"). `experiments.typedRoutes` builds
+  the route union into `.expo/types/router.d.ts`, which tsconfig includes but
+  only the dev server writes — so run `npx expo start` briefly after adding a
+  route. CI never hits this: a fresh checkout has no `.expo/`, so the strict
+  union is never applied. The asymmetry runs the other way too — a genuinely
+  bad `href` can pass in CI and fail locally.
 - `@testing-library/react-native` v14 is fully async: `render`, `renderHook`, and `unmount`
   all return promises that must be awaited, or React reports overlapping `act()` calls.
   `src/lib/__tests__/import-flow.test.tsx` is the working pattern — it also shows the
