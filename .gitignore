@@ -80,3 +80,5 @@ example
 /src/data/workouts.json
 # generated from the committed sample CSV on postinstall
 /src/data/preview-workouts.json
+# generated from every data/*.csv — can contain personal workout data
+/src/data/dev-datasets.json

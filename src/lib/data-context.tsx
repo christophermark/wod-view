@@ -17,14 +17,22 @@ import {
 //
 // The __DEV__ guard below is a privacy boundary, not a convenience: Metro
 // drops requires inside dead __DEV__ branches from the production dependency
-// graph, so the personal "test mode" dataset never ships in release bundles.
-// Release builds start empty and get data via in-app CSV import (or preview
-// mode, which uses the committed synthetic sample data).
-let bundledWorkouts: Workout[] = [];
+// graph, so no dev-only dataset ever ships in release bundles. Release
+// builds start empty and get data via in-app CSV import (or preview mode,
+// which uses the committed synthetic sample data).
+export interface DevDataset {
+  id: string;
+  label: string;
+  file: string;
+  count: number;
+  workouts: Workout[];
+}
+let devDatasets: DevDataset[] = [];
 if (__DEV__) {
-  bundledWorkouts = require('@/data/workouts.json') as Workout[];
+  devDatasets = require('@/data/dev-datasets.json') as DevDataset[];
 }
 const previewWorkouts = require('@/data/preview-workouts.json') as Workout[];
+const EMPTY_WORKOUTS: Workout[] = [];
 
 export type DataSource = 'bundled' | 'imported' | 'preview';
 
@@ -45,12 +53,16 @@ interface WorkoutsContextValue {
   stats: Stats;
   source: DataSource;
   importedCount: number | null;
+  /** Every local data/*.csv the dev build can parse (empty in production). */
+  devDatasets: DevDataset[];
+  /** id of the dev dataset currently backing the bundled source, if any. */
+  bundledDatasetId: string | null;
   /** True when there is no dataset to show — the app must route to onboarding. */
   needsOnboarding: boolean;
   /** Opens the system file picker and imports a workout CSV export (SugarWOD or Chalk It Pro). */
   importCsv(): Promise<ImportResult>;
-  /** Switches back to the bundled dataset (dev-only test mode). */
-  useBundled(): void;
+  /** Switches to the bundled dataset (dev-only test mode), optionally selecting one by id. */
+  useBundled(datasetId?: string): void;
   /** Switches to the previously imported dataset, if one exists on device. */
   useImported(): void;
   /** Enters preview mode: synthetic sample data plus a persistent exit banner. */
@@ -82,19 +94,29 @@ function readImportedWorkouts(): Workout[] | null {
   }
 }
 
-function readSourcePref(): DataSource {
+interface SourcePref {
+  source: DataSource;
+  datasetId: string | null;
+}
+
+function readSourcePref(): SourcePref {
   try {
     const file = sourcePrefFile();
-    if (!file.exists) return 'bundled';
-    return (JSON.parse(file.textSync()).source as DataSource) ?? 'bundled';
+    if (!file.exists) return { source: 'bundled', datasetId: null };
+    const parsed = JSON.parse(file.textSync());
+    // Legacy pref files predate datasetId and only have `source`.
+    return {
+      source: (parsed.source as DataSource) ?? 'bundled',
+      datasetId: (parsed.datasetId as string | undefined) ?? null,
+    };
   } catch {
-    return 'bundled';
+    return { source: 'bundled', datasetId: null };
   }
 }
 
-function writeSourcePref(source: DataSource) {
+function writeSourcePref(pref: SourcePref) {
   try {
-    sourcePrefFile().write(JSON.stringify({ source }));
+    sourcePrefFile().write(JSON.stringify(pref));
   } catch {
     // Preference persistence is best-effort; the session state is already set.
   }
@@ -102,9 +124,16 @@ function writeSourcePref(source: DataSource) {
 
 export function WorkoutsProvider({ children }: { children: ReactNode }) {
   const [imported, setImported] = useState<Workout[] | null>(readImportedWorkouts);
-  const [savedSource, setSource] = useState<DataSource>(readSourcePref);
+  // One read of the pref file, two pieces of state off it.
+  const [savedPref] = useState(readSourcePref);
+  const [savedSource, setSource] = useState<DataSource>(savedPref.source);
+  const [savedDatasetId, setDatasetId] = useState<string | null>(savedPref.datasetId);
   // The saved preference can point at an import that no longer exists on disk.
   const source: DataSource = savedSource === 'imported' && !imported ? 'bundled' : savedSource;
+  // Resolve the saved dataset id against what's actually available: an exact
+  // match, else the first dev dataset, else nothing (production: []).
+  const matchedDataset = devDatasets.find((d) => d.id === savedDatasetId) ?? devDatasets[0] ?? null;
+  const bundledDatasetId = matchedDataset?.id ?? null;
 
   const importCsv = useCallback(async (): Promise<ImportResult> => {
     try {
@@ -126,7 +155,7 @@ export function WorkoutsProvider({ children }: { children: ReactNode }) {
       importedDataFile().write(JSON.stringify(parsed));
       setImported(parsed);
       setSource('imported');
-      writeSourcePref('imported');
+      writeSourcePref({ source: 'imported', datasetId: savedDatasetId });
       return { ok: true, count: parsed.length };
     } catch (e) {
       if (e instanceof WrongFileError) {
@@ -137,17 +166,21 @@ export function WorkoutsProvider({ children }: { children: ReactNode }) {
       }
       return { ok: false, error: e instanceof Error ? e.message : 'Import failed.' };
     }
-  }, []);
+  }, [savedDatasetId]);
 
-  const useBundled = useCallback(() => {
-    setSource('bundled');
-    writeSourcePref('bundled');
-  }, []);
+  const useBundled = useCallback(
+    (datasetId?: string) => {
+      setSource('bundled');
+      if (datasetId !== undefined) setDatasetId(datasetId);
+      writeSourcePref({ source: 'bundled', datasetId: datasetId ?? savedDatasetId });
+    },
+    [savedDatasetId],
+  );
 
   const useImported = useCallback(() => {
     setSource('imported');
-    writeSourcePref('imported');
-  }, []);
+    writeSourcePref({ source: 'imported', datasetId: savedDatasetId });
+  }, [savedDatasetId]);
 
   const enterPreview = useCallback(() => {
     // Sample data is an onboarding trial, not a mode of the real app: once a
@@ -155,16 +188,16 @@ export function WorkoutsProvider({ children }: { children: ReactNode }) {
     // dev row disables itself for the same reason).
     if (imported) return;
     setSource('preview');
-    writeSourcePref('preview');
-  }, [imported]);
+    writeSourcePref({ source: 'preview', datasetId: savedDatasetId });
+  }, [imported, savedDatasetId]);
 
   const exitPreview = useCallback(() => {
     // Back to imported data if any exists; otherwise 'bundled', which in
     // production is empty and routes to onboarding.
     const next: DataSource = imported ? 'imported' : 'bundled';
     setSource(next);
-    writeSourcePref(next);
-  }, [imported]);
+    writeSourcePref({ source: next, datasetId: savedDatasetId });
+  }, [imported, savedDatasetId]);
 
   const resetImportedData = useCallback(() => {
     try {
@@ -175,15 +208,15 @@ export function WorkoutsProvider({ children }: { children: ReactNode }) {
     }
     setImported(null);
     setSource('bundled');
-    writeSourcePref('bundled');
-  }, []);
+    writeSourcePref({ source: 'bundled', datasetId: savedDatasetId });
+  }, [savedDatasetId]);
 
   const workouts =
     source === 'preview'
       ? previewWorkouts
       : source === 'imported' && imported
         ? imported
-        : bundledWorkouts;
+        : (matchedDataset?.workouts ?? EMPTY_WORKOUTS);
 
   const value = useMemo<WorkoutsContextValue>(
     () => ({
@@ -194,6 +227,8 @@ export function WorkoutsProvider({ children }: { children: ReactNode }) {
       stats: computeStats(workouts),
       source,
       importedCount: imported?.length ?? null,
+      devDatasets,
+      bundledDatasetId,
       needsOnboarding: workouts.length === 0,
       importCsv,
       useBundled,
@@ -206,6 +241,7 @@ export function WorkoutsProvider({ children }: { children: ReactNode }) {
       workouts,
       source,
       imported,
+      bundledDatasetId,
       importCsv,
       useBundled,
       useImported,

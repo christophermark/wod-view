@@ -97,7 +97,10 @@ describe('import flow', () => {
 
     // Both the dataset and the source preference are persisted to disk.
     expect(store.has(IMPORTED_URI)).toBe(true);
-    expect(JSON.parse(store.get(SOURCE_PREF_URI)!)).toEqual({ source: 'imported' });
+    expect(JSON.parse(store.get(SOURCE_PREF_URI)!)).toEqual({
+      source: 'imported',
+      datasetId: null,
+    });
 
     // Relaunch: a fresh provider must restore the import from disk alone.
     await first.unmount();
@@ -166,7 +169,10 @@ describe('import flow', () => {
     expect(ctx.current.importedCount).toBeNull();
     expect(ctx.current.source).toBe('bundled');
     expect(store.has(IMPORTED_URI)).toBe(false);
-    expect(JSON.parse(store.get(SOURCE_PREF_URI)!)).toEqual({ source: 'bundled' });
+    expect(JSON.parse(store.get(SOURCE_PREF_URI)!)).toEqual({
+      source: 'bundled',
+      datasetId: null,
+    });
   });
 
   it('falls back gracefully when the persisted import is corrupted', async () => {

@@ -2,8 +2,9 @@
 // Release gate: prove the production JS bundles contain no personal workout
 // data. Runs `npx expo export` for both store platforms (a real production
 // Metro build, which must strip the __DEV__-guarded require of
-// src/data/workouts.json) and scans the output for strings that exist only
-// in the personal dataset.
+// src/data/dev-datasets.json) and scans the output for strings that exist
+// only in the dev-only datasets — every local data/*.csv, not just the one
+// that backs src/data/workouts.json.
 //
 //   npm run verify:release-bundle
 //
@@ -24,6 +25,7 @@ const root = path.join(__dirname, '..');
 const personalCsv = path.join(root, 'data', 'workouts.csv');
 const personalJson = path.join(root, 'src', 'data', 'workouts.json');
 const previewJson = path.join(root, 'src', 'data', 'preview-workouts.json');
+const devDatasetsJson = path.join(root, 'src', 'data', 'dev-datasets.json');
 
 interface WorkoutLike {
   title?: string;
@@ -97,17 +99,29 @@ function main() {
   }
   console.log('✓ positive control: preview dataset found in bundle (scan is valid)');
 
-  // 2. Personal data must be absent.
-  if (!fs.existsSync(personalCsv) || !fs.existsSync(personalJson)) {
-    console.log('· personal dataset not on this machine — nothing to leak-check (OK on CI)');
-    return;
-  }
+  // 2. Personal data must be absent. Every dev-only dataset counts, not just
+  // the one behind workouts.json — a second local CSV is just as personal.
   const previewText = fs.readFileSync(previewJson, 'utf8');
-  const personal = JSON.parse(fs.readFileSync(personalJson, 'utf8')) as WorkoutLike[];
+  const devWorkouts: WorkoutLike[] = [];
+  if (fs.existsSync(personalCsv) && fs.existsSync(personalJson)) {
+    devWorkouts.push(...(JSON.parse(fs.readFileSync(personalJson, 'utf8')) as WorkoutLike[]));
+  }
+  if (fs.existsSync(devDatasetsJson)) {
+    const datasets = JSON.parse(fs.readFileSync(devDatasetsJson, 'utf8')) as {
+      workouts?: WorkoutLike[];
+    }[];
+    for (const d of datasets) devWorkouts.push(...(d.workouts ?? []));
+  }
+  // Sample-derived strings ship in every build by design, so they can't be
+  // evidence of a leak — the preview filter drops them.
   const personalProbes = sampleEvenly(
-    probeStrings(personal).filter((s) => !previewText.includes(s)),
+    probeStrings(devWorkouts).filter((s) => !previewText.includes(s)),
     500,
   );
+  if (personalProbes.length === 0) {
+    console.log('· no personal dataset on this machine — nothing to leak-check (OK on CI)');
+    return;
+  }
   const leaks = personalProbes.filter((s) => blob.includes(s));
   if (leaks.length > 0) {
     console.error(`\nFAIL: ${leaks.length} personal-only strings found in the production bundle:`);

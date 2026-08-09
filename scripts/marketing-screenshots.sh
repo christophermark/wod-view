@@ -12,10 +12,12 @@
 #
 # How it stays clean: the dev app boots on the bundled dataset, which on this
 # machine is Chris's personal history — never allowed in marketing material.
-# So the run temporarily overwrites src/data/workouts.json with the committed
-# synthetic sample (identical to preview-workouts.json, both generated from
-# data/workouts.sample.csv), takes the shots without any preview banner, and
-# restores the real file via `npm run convert` on exit — even on failure.
+# So the run temporarily overwrites src/data/workouts.json AND
+# src/data/dev-datasets.json (the app reads the latter for its selectable dev
+# sources) with the committed synthetic sample (identical to
+# preview-workouts.json, both generated from data/workouts.sample.csv), takes
+# the shots without any preview banner, and restores the real files via
+# `npm run convert` on exit — even on failure.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -62,6 +64,18 @@ trap restore EXIT
 
 # Swap the bundled dataset to the synthetic sample for the duration of the run.
 cp src/data/preview-workouts.json src/data/workouts.json
+node -e "
+const workouts = require('./src/data/preview-workouts.json');
+const fs = require('fs');
+fs.writeFileSync(
+  'src/data/dev-datasets.json',
+  JSON.stringify(
+    [{ id: 'workouts.sample', label: 'SAMPLE DATA', file: 'workouts.sample.csv', count: workouts.length, workouts }],
+    null,
+    2,
+  ),
+);
+"
 
 # Marketing-grade status bar: 9:41, full battery, full signal.
 xcrun simctl status_bar "$UDID" override \

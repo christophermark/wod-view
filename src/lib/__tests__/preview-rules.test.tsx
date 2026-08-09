@@ -10,7 +10,7 @@ import { ReactNode } from 'react';
 
 import { useWorkouts, WorkoutsProvider } from '../data-context';
 
-jest.mock('@/data/workouts.json', () => []);
+jest.mock('@/data/dev-datasets.json', () => []);
 
 jest.mock('expo-file-system', () => {
   const store = new Map<string, string>();

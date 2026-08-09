@@ -15,8 +15,10 @@ export default function SettingsScreen() {
     source,
     stats,
     importedCount,
+    devDatasets,
+    bundledDatasetId,
     importCsv,
-    useBundled,
+    useBundled: selectBundledDataset,
     useImported,
     enterPreview,
     resetImportedData,
@@ -72,14 +74,17 @@ export default function SettingsScreen() {
 
         <Text style={styles.sectionLabel}>DATA SOURCE</Text>
         <View style={styles.card}>
-          {__DEV__ && (
-            <SourceRow
-              label="MY HISTORY (BUNDLED)"
-              sub="Baked in at build time — dev-only test mode"
-              active={source === 'bundled'}
-              onPress={useBundled}
-            />
-          )}
+          {__DEV__ &&
+            devDatasets.map((d, i) => (
+              <SourceRow
+                key={d.id}
+                label={d.label}
+                sub={`${d.file} · ${d.count} workouts`}
+                active={source === 'bundled' && bundledDatasetId === d.id}
+                onPress={() => selectBundledDataset(d.id)}
+                divider={i > 0}
+              />
+            ))}
           <SourceRow
             label="IMPORTED EXPORT"
             sub={
@@ -88,7 +93,7 @@ export default function SettingsScreen() {
             active={source === 'imported'}
             disabled={importedCount == null}
             onPress={useImported}
-            divider={__DEV__}
+            divider={__DEV__ && devDatasets.length > 0}
           />
           {__DEV__ && (
             <SourceRow

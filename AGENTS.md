@@ -16,8 +16,10 @@ its brief.
 ## Commands
 
 - `npm run convert` — parse `data/workouts.csv` (or the committed sample fallback) into
-  `src/data/workouts.json`, and `data/workouts.sample.csv` into
-  `src/data/preview-workouts.json`. Runs automatically on postinstall.
+  `src/data/workouts.json`, `data/workouts.sample.csv` into
+  `src/data/preview-workouts.json`, and every `data/*.csv` into
+  `src/data/dev-datasets.json` (dev-only, selectable data sources — see below).
+  Runs automatically on postinstall.
 - `npx tsx scripts/generate-sample-workouts.ts` — regenerate the synthetic sample CSV
   (deterministic; seeded PRNG, fixed date range ending 2026-07-01).
 - `npx tsx scripts/generate-brand-assets.ts` — regenerate every icon/logo PNG in
@@ -95,7 +97,10 @@ dependency graphs. If you touch that require, re-verify with `npm run verify:rel
   `bundled` (dev-only test mode, empty in production), `imported` (in-app CSV import,
   persisted via expo-file-system), and `preview` (committed synthetic sample data for App
   Store reviewers; the root layout renders a persistent "SAMPLE DATA" banner whose
-  tap deep-links to the onboarding import step, plus a ✕ that exits preview).
+  tap deep-links to the onboarding import step, plus a ✕ that exits preview). `bundled`
+  is backed by any local CSV dropped in `data/` (each becomes a selectable row under
+  Settings → DATA SOURCE in dev builds); `dev-datasets.json` carries them and is
+  gitignored/dev-only, same privacy boundary as the old single-dataset `workouts.json`.
 - Production first launch has no data: `needsOnboarding` gates the main screens behind
   `Stack.Protected` in `_layout.tsx` and routes to `onboarding.tsx` (import or preview).
 - The tab group's index route (`src/app/(tabs)/index.tsx`, which the launch URL "/"
