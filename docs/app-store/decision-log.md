@@ -148,3 +148,58 @@ with the reasoning, so any of them can be revisited with context.
   (play.google.com/apps/testing/com.christophermark.wodview). Swap it to the
   public listing URL once the app is live on Play — reminder recorded in
   `docs/app-intent.md` and the site repo's AGENTS.md.
+
+## 2026-07-26 (v1.0.2)
+
+- **Onboarding goes trial-first.** One primary CTA — explore with sample data
+  — with import demoted to a text action, because a first-launch user has
+  nothing to import yet and a reviewer never will. The sample-data banner
+  becomes the conversion path (tap deep-links to import) rather than a label.
+- **Sample data is off-limits once real data exists.** `enterPreview()`
+  no-ops when an import is present, and the dev settings row disables to
+  match — synthetic data must never overwrite or shadow the user's archive.
+  Production semantics are pinned by `preview-rules.test.tsx` rather than by
+  the dev build's behavior, which differs on purpose.
+
+## 2026-07-29 (v1.0.3)
+
+- **SF Symbols are iOS-only — Android needs an explicit fallback.**
+  `expo-symbols` renders nothing on Android and raises no error, so the tab
+  bar and settings gears shipped blank there. The fix is one `Icon`
+  component: `SymbolView` on iOS, `@expo/vector-icons` MaterialIcons on
+  Android. Standing rule: any icon or system-UI API must be looked at on
+  both platforms before release — silence is not success.
+- **Tab order settled as LOG · STATS · CALENDAR**, moving Stats to the
+  center slot.
+
+## 2026-07-30
+
+- **Platform names removed from the v1.0.3 store notes.** Apple's precheck
+  flags "android" in What's New — naming another mobile platform in App
+  Store metadata risks a metadata rejection. Reworded to "render correctly
+  on every device", true on both stores, so the shared text stays shared
+  instead of diverging per platform.
+- **A spent versionCode's Play notes cannot be revised.** `changelogs/4.txt`
+  keeps the text Play already received; changing it requires a new build.
+  Corollary: store notes are worth getting right _before_ the upload, not
+  after.
+
+## 2026-08-02
+
+- **Rule hardened: never name a platform in the shared store notes.** The
+  previous guidance allowed naming a platform when a change shipped on only
+  one — which is precisely what put "Android:" into the v1.0.3 What's New.
+  The rule now bans it outright, with that before/after as the worked
+  example; platform detail belongs in the GitHub release body, which no
+  store reads. A reader on one store has no use for the other store's news.
+  See `.claude/skills/release/user-facing-release-notes.md`.
+- **STATS becomes the app's entry point.** It therefore owns the tab group's
+  index route — the launch URL "/" only resolves to a file named
+  `index.tsx` — so LOG moved to `/log`. Tab bar order is unchanged. The WOD
+  VIEW wordmark follows the entry point onto STATS; LOG now reads "LOG",
+  matching CALENDAR.
+- **Maestro flows anchor on 'TOTAL WODS', not the wordmark.** Matching is
+  case-insensitive, so a `WOD VIEW` pattern also matched the home-screen app
+  icon and passed ~1.5s into a cold launch, firing the next tap at a
+  hierarchy XCUITest could not resolve. Anchor launch waits on content that
+  exists only inside the app.
