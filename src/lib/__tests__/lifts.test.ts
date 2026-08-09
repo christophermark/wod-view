@@ -1,4 +1,4 @@
-import { liftNameFor, liftPages, parseRepScheme, percentTable } from '../lifts';
+import { liftNameFor, liftPages, loadCeiling, parseRepScheme, percentTable } from '../lifts';
 import type { Workout } from '../workouts';
 
 let seq = 0;
@@ -456,6 +456,61 @@ describe('scoreRaw fallback', () => {
     expect(page.sessions).toHaveLength(1);
     expect(page.sessions[0].sets).toEqual([{ load: 185, success: true, reps: null }]);
     expect(page.sessions[0].topLoad).toBe(185);
+  });
+});
+
+// Real cases from a 2,600-workout SugarWOD archive, where "Load" was also the
+// score type for whole-workout tonnage and for summed strength days.
+describe('implausible loads', () => {
+  it('drops a whole-workout tonnage score (315# bar × 11 rounds logged as 17325)', () => {
+    const list = [
+      workout({ barbellLift: 'Deadlift', scoreType: 'Load', sets: [], scoreRaw: 17325 }),
+      workout({ barbellLift: 'Deadlift', scoreType: 'Load', sets: [loadSet(405)] }),
+    ];
+    const page = liftPages(list)[0];
+    expect(page.allTimeMax).toBe(405);
+    expect(page.sessions).toHaveLength(1);
+  });
+
+  it('keeps a genuinely heavy deadlift — the ceiling rejects non-lifts, not strong athletes', () => {
+    const list = [workout({ barbellLift: 'Deadlift', scoreType: 'Load', sets: [loadSet(510)] })];
+    expect(liftPages(list)[0].allTimeMax).toBe(510);
+  });
+
+  it('drops a shoulder-to-overhead day that summed three separate top sets', () => {
+    // 135 strict + 175 push press + 215 push jerk exported as one 525 score:
+    // under the global ceiling, but impossible for the strict press in it.
+    const list = [
+      workout({
+        description: 'Strict Press, Push Press, Push Jerk — build to a heavy single each',
+        scoreType: 'Load',
+        sets: [loadSet(525)],
+      }),
+    ];
+    expect(liftPages(list)).toHaveLength(0);
+  });
+
+  it('a complex takes the lowest ceiling of its parts', () => {
+    expect(loadCeiling('Deadlifts')).toBe(900);
+    expect(loadCeiling('Strict Press')).toBe(350);
+    expect(loadCeiling('Deadlifts + Strict Press')).toBe(350);
+  });
+
+  it('falls back to the default ceiling for a lift the taxonomy does not know', () => {
+    expect(loadCeiling('Zercher Carry')).toBe(800);
+  });
+
+  it('keeps the plausible sets of a session that also logged an impossible one', () => {
+    const list = [
+      workout({
+        barbellLift: 'Back Squat',
+        scoreType: 'Load',
+        sets: [loadSet(315), loadSet(9720)],
+      }),
+    ];
+    const page = liftPages(list)[0];
+    expect(page.sessions[0].sets).toHaveLength(1);
+    expect(page.allTimeMax).toBe(315);
   });
 });
 

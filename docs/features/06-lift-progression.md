@@ -49,6 +49,15 @@ workouts, detect the lift from the description via taxonomy defs flagged
 workout matching two lifts (e.g. "Clean & Jerk complex") gets one page under
 the complex's full detected name rather than polluting both lifts' charts.
 
+Plausibility ceilings: `Load` is not only a max-effort score type. Gyms log
+whole-workout tonnage under it ("315# bar, 11 rounds" → 17325) and
+shoulder-to-overhead days that sum three separate top sets into one number
+(135 + 175 + 215 → 525). Every barbell def carries a `maxPlausibleLoad` set
+well above elite performance; `loadCeiling(lift)` takes the lowest ceiling
+among a complex's parts, and sets above it are dropped before any max, e1RM,
+or chart point is computed. The workout itself is untouched in LOG and
+CALENDAR — only its claim to be a lift attempt is rejected.
+
 Rep parsing for e1RM: sets×reps schemes (`5x5`, `3-3-3-1-1-1`, `EMOM 10: 2
 reps`). When unparseable, `reps = null` — the session still charts by
 `topLoad`, only the e1RM line skips it. Cap Epley at 10 reps (beyond that the

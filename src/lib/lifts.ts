@@ -52,6 +52,35 @@ export interface LiftPage {
 const BARBELL_DEFS = MOVEMENT_DEFS.filter((d) => d.barbellLift);
 
 /**
+ * Ceiling for a lift the taxonomy doesn't pin down (an untagged barbell_lift
+ * value, a movement with no maxPlausibleLoad). Above any single rep a human
+ * puts on a barbell, so it only ever catches non-lift scores.
+ */
+const DEFAULT_LOAD_CEILING = 800;
+
+/**
+ * Heaviest single rep this lift page could plausibly hold, in pounds.
+ *
+ * "Load" is not only a max-effort score type. Gyms also log whole-workout
+ * tonnage under it ("315# bar, 11 rounds of unbroken deadlifts" scores 17325)
+ * and shoulder-to-overhead days that sum three separate top sets into one
+ * number (135 strict + 175 push press + 215 push jerk scores 525). Neither is
+ * a lift attempt, and both dwarf every real max on the LIFT BESTS list.
+ *
+ * A complex ("Power Cleans + Push Jerks") is limited by its weakest link —
+ * the bar can't be heavier than the hardest movement in it allows — so joined
+ * pages take the lowest ceiling of their parts.
+ */
+export function loadCeiling(lift: string): number {
+  const limits = lift
+    .split(' + ')
+    .map(
+      (part) => BARBELL_DEFS.find((d) => d.name === part)?.maxPlausibleLoad ?? DEFAULT_LOAD_CEILING,
+    );
+  return Math.min(...limits);
+}
+
+/**
  * Epley: load × (1 + reps/30). Capped at 10 reps — beyond that the formula is
  * fiction, and a 12-rep set isn't a max-effort attempt anyway.
  */
@@ -238,9 +267,15 @@ export function liftPages(list: Workout[], todayIso?: string): LiftPage[] {
     if (sets.length === 0) continue;
     const lift = liftNameFor(w);
     if (!lift) continue;
+    // Drop tonnage totals and summed strength days before they become maxes.
+    // Filtering sets rather than whole sessions keeps a session that logged
+    // real attempts alongside one impossible number.
+    const ceiling = loadCeiling(lift);
+    const plausible = sets.filter((s) => s.load <= ceiling);
+    if (plausible.length === 0) continue;
     const sessions = byLift.get(lift);
-    if (sessions) sessions.push(buildSession(w, sets));
-    else byLift.set(lift, [buildSession(w, sets)]);
+    if (sessions) sessions.push(buildSession(w, plausible));
+    else byLift.set(lift, [buildSession(w, plausible)]);
   }
 
   const pages: LiftPage[] = [];

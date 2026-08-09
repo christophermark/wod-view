@@ -20,6 +20,13 @@ export interface MovementDef {
   equipment?: string;
   /** True for lifts that get progression pages (docs/features/06). */
   barbellLift?: boolean;
+  /**
+   * Heaviest single rep this lift could plausibly be, in pounds. Set well
+   * above elite human performance — it exists only to reject scores that
+   * aren't single lifts at all (see lifts.ts), never to judge an athlete.
+   * Defaults to DEFAULT_LOAD_CEILING when unset.
+   */
+  maxPlausibleLoad?: number;
   /** Display-name of the broader movement this refines (e.g. 'Cleans'). */
   variantOf?: string;
 }
@@ -42,6 +49,7 @@ export const MOVEMENT_DEFS: MovementDef[] = [
     modality: 'weightlifting',
     equipment: 'barbell',
     barbellLift: true,
+    maxPlausibleLoad: 900,
   },
   {
     name: 'Double Unders',
@@ -75,6 +83,7 @@ export const MOVEMENT_DEFS: MovementDef[] = [
     modality: 'weightlifting',
     equipment: 'barbell',
     barbellLift: true,
+    maxPlausibleLoad: 500,
   },
   {
     name: 'Cleans',
@@ -82,6 +91,7 @@ export const MOVEMENT_DEFS: MovementDef[] = [
     modality: 'weightlifting',
     equipment: 'barbell',
     barbellLift: true,
+    maxPlausibleLoad: 600,
   },
   {
     name: 'Thrusters',
@@ -89,6 +99,7 @@ export const MOVEMENT_DEFS: MovementDef[] = [
     modality: 'weightlifting',
     equipment: 'barbell',
     barbellLift: true,
+    maxPlausibleLoad: 500,
   },
   {
     name: 'Front Squats',
@@ -96,6 +107,7 @@ export const MOVEMENT_DEFS: MovementDef[] = [
     modality: 'weightlifting',
     equipment: 'barbell',
     barbellLift: true,
+    maxPlausibleLoad: 700,
   },
   {
     name: 'Back Squats',
@@ -103,6 +115,7 @@ export const MOVEMENT_DEFS: MovementDef[] = [
     modality: 'weightlifting',
     equipment: 'barbell',
     barbellLift: true,
+    maxPlausibleLoad: 900,
   },
   { name: 'Lunges', pattern: /lunge/i, modality: 'gymnastics' },
   { name: 'Sit-Ups', pattern: /sit-? ?up/i, modality: 'gymnastics' },
@@ -120,6 +133,7 @@ export const MOVEMENT_DEFS: MovementDef[] = [
     modality: 'weightlifting',
     equipment: 'barbell',
     barbellLift: true,
+    maxPlausibleLoad: 450,
   },
   {
     name: 'Overhead Squats',
@@ -127,6 +141,7 @@ export const MOVEMENT_DEFS: MovementDef[] = [
     modality: 'weightlifting',
     equipment: 'barbell',
     barbellLift: true,
+    maxPlausibleLoad: 500,
   },
   { name: 'Muscle-Ups', pattern: /muscle-? ?up/i, modality: 'gymnastics', equipment: 'rings' },
 
@@ -138,6 +153,7 @@ export const MOVEMENT_DEFS: MovementDef[] = [
     modality: 'weightlifting',
     equipment: 'barbell',
     barbellLift: true,
+    maxPlausibleLoad: 800,
   },
   {
     name: 'Strict Press',
@@ -145,6 +161,7 @@ export const MOVEMENT_DEFS: MovementDef[] = [
     modality: 'weightlifting',
     equipment: 'barbell',
     barbellLift: true,
+    maxPlausibleLoad: 350,
   },
   {
     name: 'Jerks',
@@ -152,6 +169,7 @@ export const MOVEMENT_DEFS: MovementDef[] = [
     modality: 'weightlifting',
     equipment: 'barbell',
     barbellLift: true,
+    maxPlausibleLoad: 600,
   },
   {
     name: 'Biking',
@@ -211,6 +229,7 @@ export const MOVEMENT_DEFS: MovementDef[] = [
     modality: 'weightlifting',
     equipment: 'barbell',
     barbellLift: true,
+    maxPlausibleLoad: 500,
   },
   { name: 'Man Makers', pattern: /man ?maker/i, modality: 'weightlifting', equipment: 'dumbbell' },
   { name: 'Step-Ups', pattern: /step-? ?ups?\b/i, modality: 'gymnastics', equipment: 'box' },
@@ -265,6 +284,7 @@ export const MOVEMENT_DEFS: MovementDef[] = [
     modality: 'weightlifting',
     equipment: 'barbell',
     barbellLift: true,
+    maxPlausibleLoad: 600,
   },
   {
     name: 'Box Step-Overs',
@@ -292,6 +312,7 @@ export const MOVEMENT_DEFS: MovementDef[] = [
     modality: 'weightlifting',
     equipment: 'barbell',
     barbellLift: true,
+    maxPlausibleLoad: 600,
     variantOf: 'Cleans',
   },
   {
@@ -300,6 +321,7 @@ export const MOVEMENT_DEFS: MovementDef[] = [
     modality: 'weightlifting',
     equipment: 'barbell',
     barbellLift: true,
+    maxPlausibleLoad: 600,
     variantOf: 'Cleans',
   },
   {
@@ -308,6 +330,7 @@ export const MOVEMENT_DEFS: MovementDef[] = [
     modality: 'weightlifting',
     equipment: 'barbell',
     barbellLift: true,
+    maxPlausibleLoad: 600,
     variantOf: 'Cleans',
   },
   {
@@ -316,6 +339,7 @@ export const MOVEMENT_DEFS: MovementDef[] = [
     modality: 'weightlifting',
     equipment: 'barbell',
     barbellLift: true,
+    maxPlausibleLoad: 550,
     variantOf: 'Cleans',
   },
   {
@@ -324,6 +348,7 @@ export const MOVEMENT_DEFS: MovementDef[] = [
     modality: 'weightlifting',
     equipment: 'barbell',
     barbellLift: true,
+    maxPlausibleLoad: 500,
     variantOf: 'Snatches',
   },
   {
@@ -332,6 +357,7 @@ export const MOVEMENT_DEFS: MovementDef[] = [
     modality: 'weightlifting',
     equipment: 'barbell',
     barbellLift: true,
+    maxPlausibleLoad: 500,
     variantOf: 'Snatches',
   },
   {
@@ -340,6 +366,7 @@ export const MOVEMENT_DEFS: MovementDef[] = [
     modality: 'weightlifting',
     equipment: 'barbell',
     barbellLift: true,
+    maxPlausibleLoad: 500,
     variantOf: 'Snatches',
   },
   {
@@ -348,6 +375,7 @@ export const MOVEMENT_DEFS: MovementDef[] = [
     modality: 'weightlifting',
     equipment: 'barbell',
     barbellLift: true,
+    maxPlausibleLoad: 600,
     variantOf: 'Jerks',
   },
   {
@@ -356,6 +384,7 @@ export const MOVEMENT_DEFS: MovementDef[] = [
     modality: 'weightlifting',
     equipment: 'barbell',
     barbellLift: true,
+    maxPlausibleLoad: 600,
     variantOf: 'Jerks',
   },
   // Pull/balance/press accessory lifts get their own defs so their loads —
@@ -367,6 +396,7 @@ export const MOVEMENT_DEFS: MovementDef[] = [
     modality: 'weightlifting',
     equipment: 'barbell',
     barbellLift: true,
+    maxPlausibleLoad: 800,
     variantOf: 'Snatches',
   },
   {
@@ -375,6 +405,7 @@ export const MOVEMENT_DEFS: MovementDef[] = [
     modality: 'weightlifting',
     equipment: 'barbell',
     barbellLift: true,
+    maxPlausibleLoad: 400,
     variantOf: 'Snatches',
   },
   {
@@ -383,6 +414,7 @@ export const MOVEMENT_DEFS: MovementDef[] = [
     modality: 'weightlifting',
     equipment: 'barbell',
     barbellLift: true,
+    maxPlausibleLoad: 800,
     variantOf: 'Cleans',
   },
   {
@@ -391,6 +423,7 @@ export const MOVEMENT_DEFS: MovementDef[] = [
     modality: 'weightlifting',
     equipment: 'barbell',
     barbellLift: true,
+    maxPlausibleLoad: 300,
     variantOf: 'Strict Press',
   },
   {
@@ -399,6 +432,7 @@ export const MOVEMENT_DEFS: MovementDef[] = [
     modality: 'weightlifting',
     equipment: 'barbell',
     barbellLift: true,
+    maxPlausibleLoad: 900,
     variantOf: 'Deadlifts',
   },
   {
