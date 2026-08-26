@@ -1,12 +1,21 @@
 import * as WebBrowser from 'expo-web-browser';
-import { Pressable, StyleSheet, StyleProp, Text, View, ViewStyle } from 'react-native';
+import { Platform, Pressable, StyleSheet, StyleProp, Text, View, ViewStyle } from 'react-native';
 
 import {
   SUGARWOD_EXPORT_FILENAME,
   SUGARWOD_EXPORT_HELP_URL,
-  SUGARWOD_EXPORT_STEPS,
+  sugarwodExportSteps,
 } from '@/lib/sugarwod-export';
 import { colors, fonts, radii, spacing } from '@/theme';
+
+// Where step 3 sends the emailed attachment so the picker can reach it. There
+// is no Files app on Android, and sending an Android user looking for one is
+// the difference between a two-minute import and a dead end.
+const SAVE_DESTINATION = Platform.select({
+  android: 'your Downloads folder',
+  default: 'the Files app',
+});
+const EXPORT_STEPS = sugarwodExportSteps(SAVE_DESTINATION);
 
 /**
  * Numbered how-to-export steps plus an attachment-style chip that shows users
@@ -16,7 +25,7 @@ import { colors, fonts, radii, spacing } from '@/theme';
 export function ExportStepsCard({ style }: { style?: StyleProp<ViewStyle> }) {
   return (
     <View style={[styles.card, style]}>
-      {SUGARWOD_EXPORT_STEPS.map((step, i) => (
+      {EXPORT_STEPS.map((step, i) => (
         <View key={i} style={[styles.stepRow, i > 0 && { marginTop: spacing.lg }]}>
           <Text style={styles.stepNumber}>{i + 1}</Text>
           <Text style={styles.stepText}>{highlightFilename(step)}</Text>

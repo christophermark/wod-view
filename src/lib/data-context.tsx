@@ -1,5 +1,6 @@
 import { File, Paths } from 'expo-file-system';
 import { createContext, ReactNode, useCallback, useContext, useMemo, useState } from 'react';
+import { Platform } from 'react-native';
 
 import { WrongFileError } from '@/lib/parse-sugarwod';
 import { parseWorkoutsCsv } from '@/lib/parse-workouts-csv';
@@ -83,6 +84,26 @@ const sourcePrefFile = () => new File(Paths.document, 'data-source.json');
 // picked photo/video before reading it entirely into memory as text.
 const MAX_IMPORT_FILE_BYTES = 25 * 1024 * 1024;
 
+// What the system file picker will let the user select.
+//
+// The two platforms filter on completely different things, so one list can't
+// serve both. iOS matches UTIs resolved from the file *extension*, so naming
+// the CSV types keeps the picker tidy and still always offers workouts.csv.
+// Android matches the MIME string the source provider *declares*, exactly and
+// with no extension fallback — and CSV is declared inconsistently in the wild
+// (Google Drive rewrites uploaded CSVs to application/octet-stream, and Gmail
+// hands attachments over as the same). Any type missing from the list renders
+// the user's workouts.csv visible but greyed out: an unrecoverable dead end,
+// and a silent one, since a picker that can't be satisfied is indistinguishable
+// from a cancelled one. So Android picks wide and lets parseWorkoutsCsv reject
+// the wrong file on its header — content validation is both stricter than a
+// provider MIME string and able to explain itself.
+export function importMimeTypes(os: string): string[] {
+  if (os === 'android') return ['*/*'];
+  return ['text/csv', 'text/comma-separated-values', 'text/plain'];
+}
+const IMPORT_MIME_TYPES = importMimeTypes(Platform.OS);
+
 function readImportedWorkouts(): Workout[] | null {
   try {
     const file = importedDataFile();
@@ -137,10 +158,10 @@ export function WorkoutsProvider({ children }: { children: ReactNode }) {
 
   const importCsv = useCallback(async (): Promise<ImportResult> => {
     try {
-      const picked = await File.pickFileAsync({
-        mimeTypes: ['text/csv', 'text/comma-separated-values', 'text/plain'],
-      });
-      if (picked.canceled) return { ok: false, canceled: true };
+      const picked = await File.pickFileAsync({ mimeTypes: IMPORT_MIME_TYPES });
+      // File.pickFileAsync reports a real picker failure as a cancellation, so
+      // a null result lands here too — there is nothing to tell the user apart.
+      if (picked.canceled || !picked.result) return { ok: false, canceled: true };
       if (picked.result.size > MAX_IMPORT_FILE_BYTES) {
         return { ok: false, error: 'That file is too large to be a workout export.' };
       }
