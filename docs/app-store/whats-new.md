@@ -17,6 +17,10 @@ instead (`.claude/skills/release/internal-release-notes.md`). Never include
 anything from the personal dataset (the AGENTS.md privacy rule applies here
 too).
 
+## v1.1.0
+
+Importing your history is more reliable. The file picker no longer greys out your own export — choose any file and the app reads it, with a clear message if it isn't a SugarWOD or Chalk It Pro export. And if the system file picker can't open at all, you now get an explanation and a way forward instead of a button that appears to do nothing.
+
 ## v1.0.5
 
 Lift bests now show what you actually lifted. Workouts scored as total weight moved — a whole metcon's tonnage, or a strength day that summed three separate lifts — were being read as one-rep maxes and topping the list. They're now left out, so your real PRs stand on their own.
