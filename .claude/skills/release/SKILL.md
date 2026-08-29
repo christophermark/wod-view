@@ -142,10 +142,14 @@ prompt trying. Rely on memory and this list, confirm with Chris whether
 they still apply, and read the actual routing from the submit lane's own
 output (it prints the track it targets):
 
-- `PLAY_TRACK=alpha` routes Android submissions to closed testing while
-  Google's production-access requirement (12+ testers for 14 days) is
-  pending on the developer account (in effect since 2026-07-23). Remove
-  once Google grants production access.
+- `PLAY_TRACK` should now be **unset**: Google granted the developer
+  account production access on 2026-08-29, so the submit lane's own
+  default (`production`) is correct and Android releases go straight to
+  the public track. The `PLAY_TRACK=alpha` override that stood from
+  2026-07-23 while the 12-testers-for-14-days requirement was pending is
+  retired — don't reintroduce it, and if the submit lane ever prints a
+  non-production track, that's a leftover line in `fastlane/.env` to
+  remove, not the intended routing.
 - `PLAY_RELEASE_STATUS=draft` is only needed before the app's first
   published Play release (no longer the case — v1.0.0 is live on closed
   testing).
@@ -194,8 +198,8 @@ artifact-design skill first; title "WOD View vX.Y.Z release report") so the
 release outcome survives context clearing: version + `ios.buildNumber` +
 `android.versionCode`, gate and build results, both sets of release notes,
 what was submitted where with the verified store states, and any follow-ups
-or temporary overrides still in force (`PLAY_TRACK`, pending
-production-access clock, collateral not regenerated, …). Anything that
+or temporary overrides still in force (`PLAY_TRACK`, collateral not
+regenerated, …). Anything that
 failed or was skipped goes in the report plainly.
 
 ## Re-uploading the same version

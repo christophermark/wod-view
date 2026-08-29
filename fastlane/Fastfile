@@ -266,13 +266,40 @@ platform :android do
       package_name: ANDROID_PACKAGE,
       aab: aab,
       json_key: json_key,
-      # Production, unless overridden — set PLAY_TRACK=alpha in fastlane/.env
-      # while Google's production-access requirement (12+ closed testers for
-      # 14 days) is still pending on the developer account.
+      # Production by default. Production access was granted 2026-08-29, so
+      # PLAY_TRACK should stay unset; set it only to deliberately hold a
+      # release back on a testing track.
       track: ENV.fetch("PLAY_TRACK", "production"),
       # Until the app's first Play release is live, the API only accepts
       # draft releases — set PLAY_RELEASE_STATUS=draft in fastlane/.env.
       release_status: ENV.fetch("PLAY_RELEASE_STATUS", "completed"),
+      skip_upload_metadata: true,
+      skip_upload_changelogs: false,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+
+  desc "Promote an already-uploaded release to production, reusing its versionCode"
+  lane :promote do |options|
+    json_key = File.expand_path(required_environment_variable("GOOGLE_PLAY_JSON_KEY_PATH"))
+    # Play permanently burns a versionCode on first upload, so a release that
+    # landed on a testing track can never be re-uploaded to production — it has
+    # to be promoted. Source track defaults to alpha (where PLAY_TRACK used to
+    # send submissions); override with `from:` for beta/internal.
+    from_track = options[:from] || "alpha"
+    version_code = expo_config["android"]["versionCode"]
+    required_release_notes(File.join(__dir__, "metadata", "android", "en-US", "changelogs", "#{version_code}.txt"))
+
+    upload_to_play_store(
+      package_name: ANDROID_PACKAGE,
+      json_key: json_key,
+      track: from_track,
+      track_promote_to: "production",
+      track_promote_release_status: "completed",
+      version_code: version_code,
+      skip_upload_aab: true,
+      skip_upload_apk: true,
       skip_upload_metadata: true,
       skip_upload_changelogs: false,
       skip_upload_images: true,

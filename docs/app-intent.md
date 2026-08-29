@@ -23,12 +23,16 @@ dashboard. No accounts, no servers, no analytics, no subscription.
   (trademark; see `docs/app-store/store-listing.md`).
 - **Store listings:** App Store —
   https://apps.apple.com/us/app/wodview/id6790285943 (live). Google Play —
-  **in closed testing** as of 2026-07-23; the opt-in link is
-  https://play.google.com/apps/testing/com.christophermark.wodview, and the
-  public listing will be
+  the developer account was granted **production access on 2026-08-29**
+  (clearing Google's 12-testers-for-14-days requirement), and v1.1.0 is the
+  first release submitted to the production track — pending review, not yet
+  live. The closed-testing opt-in link is
+  https://play.google.com/apps/testing/com.christophermark.wodview; the
+  public listing is
   https://play.google.com/store/apps/details?id=com.christophermark.wodview.
-  **Reminder for Chris:** once the app is live on Play, swap the marketing
-  page's Google Play button (and this bullet) to the public listing URL.
+  **Reminder for Chris:** once that first production release passes review
+  and the app is live on Play, swap the marketing page's Google Play button
+  (and this bullet) to the public listing URL.
 - **Website:** https://www.christophermark.me/wodview — the `/wodview/…`
   namespace is canonical (not `/wod-view/…`, and not GitHub Pages, which is
   retired to redirect stubs in `docs/privacy/` and `docs/support/`). Pages:

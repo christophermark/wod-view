@@ -155,13 +155,20 @@ than the HEAD commit (a stale build from before your latest changes).
 - `deploy:submit:android` uploads the AAB to the **production** track with
   the versionCode's changelog. Play reviews it automatically and it goes
   live on approval (managed publishing must stay off, which is the
-  default). Two temporary overrides in `fastlane/.env`, both to remove once
-  outgrown: while the developer account is still working through Google's
-  production-access requirement (12+ closed testers for 14 days), set
-  `PLAY_TRACK=alpha` so submissions land on closed testing instead; and
-  before the app's _first_ published Play release, set
-  `PLAY_RELEASE_STATUS=draft` — the API rejects non-draft releases until
-  then, and a draft still needs one manual rollout in the Play Console.
+  default). Both of the temporary `fastlane/.env` overrides that once
+  redirected this are now retired and should stay unset: `PLAY_TRACK=alpha`
+  (held submissions on closed testing until Google granted production
+  access on 2026-08-29) and `PLAY_RELEASE_STATUS=draft` (needed only before
+  the app's first published Play release). If either is still present in a
+  local `fastlane/.env`, remove it — the lane's defaults are what you
+  want.
+- `deploy:promote:android` promotes an already-uploaded release to
+  production **reusing its versionCode**, which is the only way to move a
+  build that landed on a testing track — Play burns a versionCode on first
+  upload and never accepts it again, so re-running `deploy:submit:android`
+  cannot do it. Source track defaults to `alpha`; pass another with
+  `bundle exec fastlane android promote from:beta`. It uploads no binary,
+  only the track change plus that versionCode's changelog.
 - `deploy:testflight` returns without waiting for Apple's processing. Select
   tester groups in App Store Connect.
 - `deploy:app-store` uploads only the binary — no listing copy, screenshots,

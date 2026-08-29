@@ -72,6 +72,7 @@
     "deploy:submit": "bundle exec fastlane ios submit && bundle exec fastlane android submit",
     "deploy:submit:ios": "bundle exec fastlane ios submit",
     "deploy:submit:android": "bundle exec fastlane android submit",
+    "deploy:promote:android": "bundle exec fastlane android promote",
     "version:minor": "tsx scripts/bump-version.ts minor",
     "version:patch": "tsx scripts/bump-version.ts patch",
     "web": "expo start --web",
