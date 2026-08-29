@@ -172,6 +172,19 @@ Flow-writing gotchas (all learned the hard way — see comments in the flows):
   on their header, which it does with far better copy. Keep
   `import-picker.test.ts` honest if you touch that list; `.maestro/flows/import.yaml`
   drives the _iOS_ Files picker and will never catch an Android regression.
+- **A silent import button on Android means the picker never opened.**
+  expo-modules-core launches the pick with a bare `startActivityForResult` and
+  no `try`/`catch` (`AppContextActivityResultRegistry.onLaunch`, unlike the
+  sibling `SendIntentException` branch), so when nothing on the device answers
+  `ACTION_OPEN_DOCUMENT` the `ActivityNotFoundException` becomes a rejected
+  promise, which `File.pickFileAsync` turns into `{canceled: true}`, which the
+  import screens correctly render as nothing. Samsung is the usual reporter —
+  a disabled system Files app, Auto Blocker, or a Knox policy. `importCsv`
+  therefore watches `AppState`: on Android the picker is its own activity, so a
+  "cancellation" that arrives while the app never left the foreground means no
+  picker was shown, and `pickerNeverOpened()` turns it into a real message. The
+  signal does not exist on iOS (the picker is presented in-app), so never
+  extend that check there — `import-picker-failure.test.tsx` pins both halves.
 - In-app copy that names a place on the device must be platform-branched —
   there is no Files app on Android. `sugarwodExportSteps()` takes the save
   destination as an argument so `sugarwod-export.ts` stays import-free;
