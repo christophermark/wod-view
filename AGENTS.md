@@ -157,6 +157,39 @@ Flow-writing gotchas (all learned the hard way — see comments in the flows):
 
 ## Gotchas
 
+- **The import file picker is platform-asymmetric, and only iOS is covered by
+  e2e.** `File.pickFileAsync`'s `mimeTypes` mean different things per platform:
+  iOS maps them to UTTypes and matches by _file extension_, so a precise CSV
+  list always offers `workouts.csv`; Android passes them to
+  `ACTION_OPEN_DOCUMENT` as `EXTRA_MIME_TYPES` and matches the MIME string the
+  source provider _declares_, exactly, with no extension fallback. CSVs are
+  declared inconsistently in the wild (Google Drive rewrites uploads to
+  `application/octet-stream`, Gmail hands attachments over as the same), so a
+  precise list greys the user's own export out — and because
+  `File.pickFileAsync` reports every failure as `{canceled: true}`, that dead
+  end is completely silent. Hence `importMimeTypes()` in `data-context.tsx`
+  goes wide (`*/*`) on Android and lets `parseWorkoutsCsv` reject wrong files
+  on their header, which it does with far better copy. Keep
+  `import-picker.test.ts` honest if you touch that list; `.maestro/flows/import.yaml`
+  drives the _iOS_ Files picker and will never catch an Android regression.
+- **A silent import button on Android means the picker never opened.**
+  expo-modules-core launches the pick with a bare `startActivityForResult` and
+  no `try`/`catch` (`AppContextActivityResultRegistry.onLaunch`, unlike the
+  sibling `SendIntentException` branch), so when nothing on the device answers
+  `ACTION_OPEN_DOCUMENT` the `ActivityNotFoundException` becomes a rejected
+  promise, which `File.pickFileAsync` turns into `{canceled: true}`, which the
+  import screens correctly render as nothing. Samsung is the usual reporter —
+  a disabled system Files app, Auto Blocker, or a Knox policy. `importCsv`
+  therefore watches `AppState`: on Android the picker is its own activity, so a
+  "cancellation" that arrives while the app never left the foreground means no
+  picker was shown, and `pickerNeverOpened()` turns it into a real message. The
+  signal does not exist on iOS (the picker is presented in-app), so never
+  extend that check there — `import-picker-failure.test.tsx` pins both halves.
+- In-app copy that names a place on the device must be platform-branched —
+  there is no Files app on Android. `sugarwodExportSteps()` takes the save
+  destination as an argument so `sugarwod-export.ts` stays import-free;
+  `ExportStepsCard` supplies it via `Platform.select`.
+
 - Exiting sample data (banner ✕) falls back to imported data if any, else to
   "no data" → onboarding in production. In dev builds the bundled test dataset
   backstops instead, so ✕ appears to jump to test mode — a dev-only artifact.
