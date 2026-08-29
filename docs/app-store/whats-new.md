@@ -17,6 +17,10 @@ instead (`.claude/skills/release/internal-release-notes.md`). Never include
 anything from the personal dataset (the AGENTS.md privacy rule applies here
 too).
 
+## v1.1.1
+
+The app version now sits next to the settings icon on every screen, so you can see which build you're running at a glance — handy when checking whether an update has landed or reporting a problem. The full version and build number are at the bottom of Settings.
+
 ## v1.1.0
 
 Importing your history is more reliable. The file picker no longer greys out your own export — choose any file and the app reads it, with a clear message if it isn't a SugarWOD or Chalk It Pro export. And if the system file picker can't open at all, you now get an explanation and a way forward instead of a button that appears to do nothing.

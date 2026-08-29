@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { VersionTag } from '@/components/VersionTag';
 import { WorkoutCard } from '@/components/WorkoutCard';
 import { useWorkouts } from '@/lib/data-context';
 import { groupByMonth, parseDate, Workout } from '@/lib/workouts';
@@ -80,6 +81,7 @@ export default function LogScreen() {
           <Text style={styles.headerMeta}>
             {stats.total} WODS · SINCE {sinceYear}
           </Text>
+          <VersionTag />
           <Pressable onPress={() => router.push('/settings')} hitSlop={10} testID="settings-button">
             <Icon name="gearshape.fill" color={colors.inkFaint} size={16} />
           </Pressable>

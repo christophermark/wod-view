@@ -4,6 +4,7 @@ import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-nati
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ExportStepsCard } from '@/components/ExportStepsCard';
+import { APP_VERSION_BUILD_LABEL } from '@/lib/app-version';
 import { useWorkouts } from '@/lib/data-context';
 import { SUGARWOD_EXPORT_FILENAME } from '@/lib/sugarwod-export';
 import { colors, fonts, radii, spacing } from '@/theme';
@@ -164,6 +165,12 @@ export default function SettingsScreen() {
           Currently viewing {stats.total} workouts from the {source} dataset. Everything stays on
           this device.
         </Text>
+
+        {APP_VERSION_BUILD_LABEL && (
+          <Text style={styles.version} testID="settings-version">
+            WOD VIEW {APP_VERSION_BUILD_LABEL}
+          </Text>
+        )}
       </ScrollView>
     </View>
   );
@@ -369,5 +376,13 @@ const styles = StyleSheet.create({
     color: colors.inkFaint,
     paddingHorizontal: spacing.lg + spacing.xs,
     marginTop: spacing.xl,
+  },
+  version: {
+    fontFamily: fonts.mono,
+    fontSize: 11,
+    letterSpacing: 1,
+    color: colors.inkFaint,
+    textAlign: 'center',
+    marginTop: spacing.md,
   },
 });

@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { VersionTag } from '@/components/VersionTag';
 import { benchmarkHistory, retestRadar, todayIso } from '@/lib/benchmarks';
 import { useWorkouts } from '@/lib/data-context';
 import { liftPages } from '@/lib/lifts';
@@ -104,6 +105,7 @@ export default function StatsScreen() {
         <Text style={styles.wordmark}>WOD VIEW</Text>
         <View style={styles.headerRight}>
           <Text style={styles.headerMeta}>{year == null ? 'LIFETIME' : String(year)}</Text>
+          <VersionTag />
           <Pressable
             onPress={() => router.push('/settings')}
             hitSlop={10}

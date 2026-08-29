@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { VersionTag } from '@/components/VersionTag';
 import { WorkoutCard } from '@/components/WorkoutCard';
 import { useWorkouts } from '@/lib/data-context';
 import { formatDate, monthName, parseDate } from '@/lib/workouts';
@@ -65,6 +66,7 @@ export default function CalendarScreen() {
         <Text style={styles.heading}>CALENDAR</Text>
         <View style={styles.headerRight}>
           <Text style={styles.headerMeta}>{monthCount} THIS MONTH</Text>
+          <VersionTag />
           <Pressable
             onPress={() => router.push('/settings')}
             hitSlop={10}
